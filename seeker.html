@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Saved Homes — InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Your saved properties on InzuLink." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Shared navbar styles -->
+  <link rel="stylesheet" href="./assets/app.css" />
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0b1220;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+
+      --danger:#dc2626;
+      --danger-bg:#fef2f2;
+      --success:#10b981;
+    }
+
+    body{
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      margin:0;
+      color: var(--text);
+    }
+
+    .wrap{
+      width:min(1200px, 92%);
+      margin: 0 auto;
+      padding: 18px 0 46px;
+    }
+
+    .header{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 20px 18px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      margin:0;
+      font-size: clamp(1.4rem, 2.6vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      color: var(--primary);
+    }
+    .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.6;
+      max-width: 780px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
+
+    .btn{
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 0.92rem;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      text-decoration:none;
+      white-space: nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background: var(--primary); color:#fff; }
+    .btn-primary:hover{ background:#1e293b; }
+    .btn-outline{
+      background:#fff;
+      color: var(--primary);
+      border-color: var(--border);
+    }
+    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
+
+    /* Grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      padding: 16px 0 0;
+    }
+
+    .card{
+      background:#fff;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(2,6,23,0.06);
+      transition: transform .2s, box-shadow .2s;
+      cursor:pointer;
+      display:flex;
+      flex-direction: column;
+    }
+    .card:hover{ transform: translateY(-4px); box-shadow: 0 18px 35px rgba(2,6,23,0.12); }
+
+    .imgWrap{
+      height: 220px;
+      overflow:hidden;
+      position:relative;
+      background:#cbd5e1;
+    }
+    .imgWrap img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .badge{
+      position:absolute;
+      top:0; left:0; width:100%;
+      padding: 12px 0;
+      text-align:center;
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color:#fff;
+      z-index: 10;
+      background: rgba(15,23,42,0.92);
+    }
+    .bg-rent{ background: rgba(15,23,42,0.92); }
+    .bg-sale{ background: rgba(245,158,11,0.92); color:#111827; }
+    .bg-shared{ background: rgba(168,85,247,0.92); }
+    .bg-sold{ background: rgba(239,68,68,0.92); }
+
+    .body{
+      padding: 18px;
+      display:flex;
+      flex-direction: column;
+      flex:1;
+    }
+    .verified{
+      color:#16a34a;
+      font-size: .75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom: 6px;
+    }
+    .price{
+      font-size: 1.22rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+    .t{
+      font-size: 1rem;
+      font-weight: 800;
+      margin: 6px 0 4px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .loc{
+      font-size: .88rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-weight: 650;
+    }
+    .meta{
+      margin-top:auto;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .86rem;
+      font-weight: 800;
+      color:#334155;
+      margin-bottom: 12px;
+    }
+
+    .btn-remove{
+      width:100%;
+      padding: 11px;
+      border-radius: 12px;
+      border: 1px solid #fecaca;
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-weight: 900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition: background .12s ease;
+    }
+    .btn-remove:hover{ background:#fee2e2; }
+
+    /* Empty */
+    .empty{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 38px 18px;
+      text-align:center;
+      margin-top: 16px;
+    }
+    .empty i{ font-size: 3.6rem; color:#e2e8f0; }
+    .empty h2{ margin: 10px 0 8px; color: var(--primary); font-weight: 900; letter-spacing:-0.4px; }
+    .empty p{ margin:0; color: var(--muted); font-weight: 650; line-height:1.7; }
+
+    /* Modal (details) */
+    .overlay{
+      position: fixed;
+      inset:0;
+      background: rgba(2,6,23,0.60);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 2000;
+      padding: 18px;
+    }
+    .modal{
+      width:min(980px, 96vw);
+      background:#fff;
+      border-radius: 18px;
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      max-height: 92vh;
+      position:relative;
+    }
+    @media (max-width: 980px){
+      .modal{ grid-template-columns: 1fr; max-height: 94vh; }
+    }
+
+    .close{
+      position:absolute;
+      top: 10px; right: 10px;
+      background:#fff;
+      border:1px solid var(--border);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      cursor:pointer;
+      z-index: 25;
+    }
+
+    .gallery{
+      position: relative;
+      background:#0b1220;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 320px;
+    }
+    .mainImg{
+      width: 100%;
+      height: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+    }
+    .arrow{
+      position:absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+      color:#fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+    .prev{ left: 12px; }
+    .next{ right: 12px; }
+
+    .info{
+      padding: 18px;
+      overflow:auto;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.82rem;
+      color:#fff;
+      margin-bottom: 10px;
+      background: rgba(15,23,42,0.92);
+    }
+    .mTitle{
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      color: var(--primary);
+      letter-spacing:-0.5px;
+      font-weight: 900;
+    }
+    .mLoc{
+      color:#64748b;
+      font-weight: 750;
+      margin-bottom: 10px;
+    }
+    .mPrice{
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 10px 0 14px;
+    }
+    .specs{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0 14px;
+    }
+    .spec{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background:#fff;
+    }
+    .spec small{ display:block; color: var(--muted); font-weight: 800; font-size: 0.82rem; }
+    .spec b{ display:block; color: var(--primary); font-weight: 900; margin-top: 4px; }
+
+    .desc{
+      line-height:1.7;
+      color:#475569;
+      font-weight: 650;
+    }
+
+    .cta{
+      width:100%;
+      border:none;
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--success);
+      color:#fff;
+      font-weight: 900;
+      cursor:pointer;
+      margin-top: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .cta:hover{ background:#059669; }
+
+    footer{
+      margin-top: 18px;
+      background: var(--primary);
+      border-radius: 22px;
+      padding: 22px 16px;
+      color:#94a3b8;
+      text-align:center;
+    }
+    footer a{ color:#94a3b8; font-weight:800; text-decoration:none; }
+    footer a:hover{ color:#fff; }
+  </style>
+
+  <script>
+    // Guard (must be logged in)
+    (function(){
+      let u = null;
+      try { u = JSON.parse(localStorage.getItem("user")); } catch(_) {}
+      if (!u) window.location.replace("login.html?next=seeker.html");
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Shared navbar -->
+  <div id="appNavbar"></div>
+
+  <main class="wrap">
+    <section class="header" aria-label="Saved homes header">
+      <div>
+        <h1 class="title">My Saved Homes</h1>
+        <p class="sub">Properties you bookmarked for later. Click a card to view details.</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse feed</a>
+        <button class="btn btn-primary" type="button" onclick="loadFavorites(true)">
+          <i class="ph ph-arrows-clockwise"></i> Refresh
+        </button>
+      </div>
+    </section>
+
+    <section id="contentArea">
+      <div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading favorites...</div>
+    </section>
+
+    <footer>
+      © 2026 InzuLink • <a href="contract.html">Contract Tool</a>
+    </footer>
+  </main>
+
+  <!-- Detail modal -->
+  <div class="overlay" id="detailOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-label="Property details">
+      <div class="close" onclick="closeModal()">✕</div>
+
+      <div class="gallery">
+        <button class="arrow prev" id="btnPrev" onclick="moveImg(-1)">&#10094;</button>
+        <img class="mainImg" id="mainImg" alt="Property image" />
+        <button class="arrow next" id="btnNext" onclick="moveImg(1)">&#10095;</button>
+      </div>
+
+      <div class="info">
+        <div class="pill" id="mType">Rent</div>
+        <h2 class="mTitle" id="mTitle">Title</h2>
+        <div class="mLoc" id="mLoc">📍 Location</div>
+        <div class="mPrice" id="mPrice">RWF 0</div>
+
+        <div class="specs">
+          <div class="spec"><small>Category</small><b id="mCat">-</b></div>
+          <div class="spec"><small id="mDynLabel">Bedrooms</small><b id="mDynValue">-</b></div>
+        </div>
+
+        <div class="desc">
+          <strong style="color:var(--primary); display:block; margin-bottom:6px;">Description</strong>
+          <span id="mDesc">—</span>
+        </div>
+
+        <button class="cta" id="mCta">
+          <i class="ph ph-whatsapp-logo"></i> Chat on WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared navbar script -->
+  <script src="./assets/navbar.js"></script>
+
+  <script>
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem("user")); } catch(_) {}
+
+    const contentArea = document.getElementById("contentArea");
+
+    // Modal state
+    let modalHouse = null;
+    let modalImages = [];
+    let modalIndex = 0;
+
+    function money(v){
+      const n = Number(v || 0);
+      if (!Number.isFinite(n)) return "RWF 0";
+      return "RWF " + n.toLocaleString();
+    }
+    function safe(v){ return (v === null || v === undefined) ? "" : String(v); }
+
+    function normalizeType(t){
+      const x = (t || "").toLowerCase();
+      if (x.includes("rent")) return "Rent";
+      if (x.includes("sale")) return "Sale";
+      if (x.includes("shared") || x.includes("room")) return "Shared";
+      if (x.includes("sold")) return "Sold";
+      return t || "Rent";
+    }
+    function typeBadgeClass(type){
+      const t = normalizeType(type);
+      if (t === "Sale") return "bg-sale";
+      if (t === "Shared") return "bg-shared";
+      if (t === "Sold") return "bg-sold";
+      return "bg-rent";
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000){
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try { return await fetch(url, { ...options, signal: controller.signal }); }
+      finally { clearTimeout(id); }
+    }
+
+    function renderEmpty(){
+      contentArea.innerHTML = `
+        <div class="empty">
+          <i class="ph ph-heart-break"></i>
+          <h2>No favorites yet</h2>
+          <p>Browse the feed and tap the heart icon to save homes here.</p>
+          <div style="margin-top:18px;">
+            <a class="btn btn-primary" href="feed.html"><i class="ph ph-globe"></i> Browse properties</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildCards(list){
+      contentArea.innerHTML = `<div class="grid" id="grid"></div>`;
+      const grid = document.getElementById("grid");
+
+      list.forEach(h => {
+        // Flexible field names (to avoid crashes)
+        const id = Number(h.property_id ?? h.id ?? h.propertyId);
+        const title = safe(h.title || "Property");
+        const location = safe(h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda");
+        const category = safe(h.category || "-");
+
+        const type = normalizeType(h.listing_type || h.type || h.status || "Rent");
+        const isVerified = !!(h.is_verified || h.is_verified_agent);
+
+        const priceRaw = h.price_per_month ?? h.price ?? 0;
+        const priceText = money(priceRaw);
+
+        const imgs = (h.images && Array.isArray(h.images) && h.images.length)
+          ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
+          : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
+
+        const metaText = (category || "").toLowerCase() === "land"
+          ? `UPI: ${safe(h.upi || h.UPI || h.land_upi || "N/A")}`
+          : `Beds: ${safe(h.bedrooms ?? h.beds ?? "—")}`;
+
+        const card = document.createElement("article");
+        card.className = "card";
+        card.onclick = () => openModal(h);
+
+        card.innerHTML = `
+          <div class="imgWrap">
+            <div class="badge ${typeBadgeClass(type)}">${safe(type)}</div>
+            <img src="${imgs[0]}" alt="Property photo" loading="lazy" />
+          </div>
+          <div class="body">
+            ${isVerified ? `<div class="verified"><i class="ph ph-seal-check"></i> Verified</div>` : ``}
+            <div class="price">${priceText}</div>
+            <div class="t">${title}</div>
+            <div class="loc">📍 ${location}</div>
+
+            <div class="meta">
+              <span>${safe(category)}</span>
+              <span>${metaText}</span>
+            </div>
+
+            <button class="btn-remove" onclick="event.stopPropagation(); removeFav(${id});">
+              <i class="ph ph-trash"></i> Remove
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    async function loadFavorites(force=false){
+      if (!user) return window.location.replace("login.html?next=seeker.html");
+
+      contentArea.innerHTML = `<div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading favorites...</div>`;
+
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/favorites/${user.id}`, {}, 15000);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data?.error || "Failed to load");
+
+        const list = Array.isArray(data) ? data : [];
+        if (list.length === 0) return renderEmpty();
+
+        buildCards(list);
+
+      } catch(err){
+        contentArea.innerHTML = `
+          <div class="empty" style="border-color:#fecaca;">
+            <i class="ph ph-warning-circle" style="color:#fecaca;"></i>
+            <h2 style="color:#991b1b;">Could not load favorites</h2>
+            <p>Check your server or API_BASE setting, then try again.</p>
+            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="loadFavorites(true)"><i class="ph ph-arrows-clockwise"></i> Retry</button>
+              <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse feed</a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function removeFav(propertyId){
+      if (!user) return window.location.replace("login.html?next=seeker.html");
+      if (!confirm("Remove this property from your saved list?")) return;
+
+      try{
+        // Your backend toggles favorite via POST /api/favorites
+        const res = await fetchWithTimeout(`${API_BASE}/api/favorites`, {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ userId: user.id, propertyId: Number(propertyId) })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || "Failed");
+
+        loadFavorites(true);
+      } catch(_) {
+        alert("Could not remove right now. Please try again.");
+      }
+    }
+
+    function openModal(h){
+      modalHouse = h;
+
+      const type = normalizeType(h.listing_type || h.type || h.status || "Rent");
+      const category = safe(h.category || "-");
+      const title = safe(h.title || "Property");
+      const location = safe(h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda");
+
+      const priceRaw = h.price_per_month ?? h.price ?? 0;
+
+      modalImages = (h.images && Array.isArray(h.images) && h.images.length)
+        ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
+        : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
+      modalIndex = 0;
+
+      document.getElementById("mType").textContent = safe(type);
+      document.getElementById("mType").style.background =
+        type === "Sale" ? "rgba(245,158,11,0.92)" :
+        type === "Shared" ? "rgba(168,85,247,0.92)" :
+        type === "Sold" ? "rgba(239,68,68,0.92)" :
+        "rgba(15,23,42,0.92)";
+
+      document.getElementById("mTitle").textContent = title;
+      document.getElementById("mLoc").textContent = `📍 ${location}`;
+      document.getElementById("mPrice").textContent = money(priceRaw);
+      document.getElementById("mCat").textContent = category;
+      document.getElementById("mDesc").textContent = safe(h.description || "No description provided.");
+
+      const isLand = (category || "").toLowerCase() === "land";
+      document.getElementById("mDynLabel").textContent = isLand ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
+      document.getElementById("mDynValue").textContent = isLand
+        ? safe(h.upi || h.UPI || h.land_upi || "—")
+        : (type === "Shared" ? safe(h.rooms ?? "—") : safe(h.bedrooms ?? h.beds ?? "—"));
+
+      // WhatsApp CTA
+      const btn = document.getElementById("mCta");
+      btn.onclick = () => {
+        let phone = safe(h.contact_phone || h.phone || "");
+        phone = phone.replace(/[^\d]/g, "");
+        if (!phone) return alert("Phone number is not available for this listing.");
+
+        // normalize Rwanda formats: 07xxxxxxx -> 2507xxxxxxx
+        if (phone.startsWith("07")) phone = "250" + phone.substring(1);
+
+        const text = encodeURIComponent(`Hello! I'm interested in this property on InzuLink: "${title}".`);
+        window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+      };
+
+      setModalImage();
+      document.getElementById("detailOverlay").style.display = "flex";
+      document.getElementById("detailOverlay").setAttribute("aria-hidden", "false");
+    }
+
+    function setModalImage(){
+      const img = document.getElementById("mainImg");
+      img.src = modalImages[modalIndex] || modalImages[0];
+
+      document.getElementById("btnPrev").style.display = (modalImages.length > 1) ? "flex" : "none";
+      document.getElementById("btnNext").style.display = (modalImages.length > 1) ? "flex" : "none";
+    }
+
+    function moveImg(step){
+      if (modalImages.length <= 1) return;
+      modalIndex = (modalIndex + step + modalImages.length) % modalImages.length;
+      setModalImage();
+    }
+
+    function closeModal(){
+      document.getElementById("detailOverlay").style.display = "none";
+      document.getElementById("detailOverlay").setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("detailOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "detailOverlay") closeModal();
+    });
+
+    // Init
+    window.addEventListener("load", () => loadFavorites());
+  </script>
+</body>
+</html>
