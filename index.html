@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>InzuLink — Rwanda’s Digital Real Estate Partner</title>
+
+  <!-- SEO -->
+  <meta name="description" content="InzuLink helps you find rentals and homes in Rwanda with trusted listings, direct contact, and instant contract generation." />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Social preview -->
+  <meta property="og:title" content="InzuLink — Rwanda’s Digital Real Estate Partner" />
+  <meta property="og:description" content="Trusted listings, direct landlord contact, and instant contract generation." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts + icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Shared navbar styles -->
+  <link rel="stylesheet" href="assets/app.css" />
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --accent-hover:#d97706;
+      --bg:#f8fafc;
+      --text:#0b1220;
+      --muted:#64748b;
+      --card:#ffffff;
+      --border:#e2e8f0;
+      --shadow: 0 20px 40px -10px rgba(2,6,23,0.12);
+      --shadow-sm: 0 10px 25px rgba(2,6,23,0.08);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
+    a{ color:inherit; text-decoration:none; }
+    button,input{ font-family:inherit; }
+
+    /* Page layout container */
+    .page-wrap{
+      width:min(1150px, 92%);
+      margin: 0 auto;
+    }
+
+    /* HERO */
+    .hero{
+  margin-top: 14px;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+
+  /* Brighter, clearer image */
+  background:
+    linear-gradient(110deg, rgba(15,23,42,0.38), rgba(15,23,42,0.58)),
+    url("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2200&auto=format&fit=crop");
+
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(2,6,23,0.08);
+}
+
+/* Optional: gentle clarity + contrast without darkening too much */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(255,255,255,0.02);
+  mix-blend-mode: overlay;
+  pointer-events:none;
+}
+
+    .hero-inner{
+  padding: 110px 42px;        /* ⬅ more vertical space */
+  display:grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 32px;
+  align-items: center;
+  color: #fff;
+  min-height: 72vh;           /* ⬅ makes hero feel BIG */
+}
+
+
+    .hero h1{
+  margin: 0 0 16px;
+  font-weight: 900;
+  font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.9px;
+}
+
+    .hero p{
+      margin: 0 0 18px;
+      color: #cbd5e1;
+      line-height: 1.7;
+      max-width: 560px;
+      font-size: 1.05rem;
+    }
+    .hero-ctas{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 900;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      user-select: none;
+    }
+    .pill:active{ transform: translateY(1px); }
+    .pill-primary{
+      background: var(--accent);
+      color: #111827;
+      box-shadow: 0 18px 35px rgba(245,158,11,0.25);
+    }
+    .pill-primary:hover{ background: var(--accent-hover); }
+    .pill-ghost{
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.18);
+      color: #fff;
+    }
+    .pill-ghost:hover{ background: rgba(255,255,255,0.16); }
+
+    /* Hero right card */
+    .hero h1{
+  margin: 0 0 12px;
+  font-weight: 900;
+  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.8px;
+}
+
+    .hero-card h3{
+      margin: 0 0 8px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      font-size: 1.05rem;
+    }
+    .hero-card ul{
+      margin: 0;
+      padding-left: 18px;
+      color: #e2e8f0;
+      line-height: 1.7;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    @media (min-width: 1200px){
+  .hero-inner{
+    padding-top: 130px;
+    padding-bottom: 130px;
+  }
+}
+
+    /* LIVE STATS */
+    .stats{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .stat{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(2,6,23,0.05);
+      padding: 18px 18px;
+    }
+    .stat .num{
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .stat .label{
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    /* SECTION */
+    .section{
+      margin-top: 26px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow-sm);
+      padding: 34px 26px;
+    }
+    .section-head{
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .kicker{
+      color: var(--accent);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.78rem;
+    }
+    .title{
+      margin: 6px 0 0;
+      font-size: 1.9rem;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      color: var(--primary);
+    }
+    .desc{
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 720px;
+      font-weight: 600;
+    }
+
+    /* CARDS GRID */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .card{
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 20px rgba(2,6,23,0.04);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover{ transform: translateY(-3px); box-shadow: 0 18px 35px rgba(2,6,23,0.10); }
+    .icon{
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+    .card h3{
+      margin: 0 0 6px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.2px;
+    }
+    .card p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* TRUST STRIP */
+    .strip{
+      margin-top: 14px;
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+    }
+    .strip strong{ color: #92400e; }
+    .strip span{ color: #7c2d12; font-weight: 700; }
+    .strip .actions{ display:flex; gap:10px; flex-wrap: wrap; }
+
+    /* FOOTER */
+    .footer{
+      margin-top: 26px;
+      border-radius: 22px;
+      overflow:hidden;
+      background: var(--primary);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: var(--shadow-sm);
+    }
+    .footer-inner{
+      padding: 28px 22px;
+      display:grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .fbrand{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 900;
+      color:#fff;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .fbrand .brand-icon{
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    }
+    .footer a{ color:#94a3b8; font-weight: 800; }
+    .footer a:hover{ color:#fff; }
+    .fcol strong{
+      display:block;
+      color:#fff;
+      margin-bottom: 10px;
+      font-weight: 900;
+    }
+    .flink{ display:flex; align-items:center; gap:10px; padding: 8px 0; }
+    .copy{
+      padding: 14px 22px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      text-align:center;
+      font-size: 0.85rem;
+      color:#94a3b8;
+    }
+
+    /* MODAL */
+    .modal-overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background: rgba(2,6,23,0.60);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      padding: 18px;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal{
+      width: min(900px, 96%);
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      max-height: 82vh;
+      overflow:auto;
+      position: relative;
+    }
+    .modal h2{
+      margin: 0 0 8px;
+      font-weight: 900;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    .modal .content{
+      color:#334155;
+      line-height: 1.75;
+      font-weight: 600;
+    }
+    .x{
+      position:absolute; right:14px; top:12px;
+      cursor:pointer;
+      color:#64748b;
+      font-size: 1.5rem;
+    }
+    .x:hover{ color: var(--primary); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-inner{ grid-template-columns: 1fr; }
+      .stats{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
+      .footer-inner{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px){
+      .hero-inner{ padding: 54px 18px; }
+      .footer-inner{ grid-template-columns: 1fr; }
+      .title{ font-size: 1.6rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Shared navbar mount -->
+  <div id="appNavbar"></div>
+
+  <main class="page-wrap">
+    <!-- HERO -->
+    <section class="hero" aria-label="InzuLink introduction">
+      <div class="hero-inner">
+        <div>
+          <h1>
+            Find Your Next Home<br />
+            <span style="color:var(--accent);">With Trust & Speed.</span>
+          </h1>
+          <p>
+            InzuLink connects seekers and landlords across Rwanda — browse listings, contact directly, and generate clear contracts in minutes.
+          </p>
+
+          <div class="hero-ctas" id="heroCtas">
+            <a class="pill pill-primary" href="feed.html">
+              Browse Listings <i class="ph ph-arrow-right"></i>
+            </a>
+            <a class="pill pill-ghost" href="signup.html">
+              Create Account <i class="ph ph-user-plus"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-card" aria-label="Key benefits">
+          <h3><i class="ph ph-sparkle"></i> Built for Rwanda</h3>
+          <ul>
+            <li>Cleaner listings & safer browsing</li>
+            <li>Direct landlord contact</li>
+            <li>Instant contract generation</li>
+            <li>Roommate option (for students)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats" aria-label="Platform stats">
+      <div class="stat">
+        <div class="num" id="statListings">—</div>
+        <div class="label">Active Listings</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statUsers">—</div>
+        <div class="label">Users</div>
+      </div>
+      <div class="stat">
+        <div class="num">Safety</div>
+        <div class="label">Scam Awareness</div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" aria-label="Features">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Why InzuLink</div>
+          <div class="title">Everything You Need</div>
+          <div class="desc">
+            Designed for real situations: reducing scams, saving time, and making renting/selling easier.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="icon" style="background:#dcfce7;color:#16a34a;"><i class="ph ph-shield-check"></i></div>
+          <h3>Safer Listings</h3>
+          <p>Encourages verification and promotes safer practices to reduce fraud and fake posts.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon" style="background:#e0f2fe;color:#0284c7;"><i class="ph ph-buildings"></i></div>
+          <h3>Smart Discovery</h3>
+          <p>Filter properties by district, budget, and type — quickly find what matches your needs.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon" style="background:#fff7ed;color:#ea580c;"><i class="ph ph-file-text"></i></div>
+          <h3>Instant Contracts</h3>
+          <p>Create a simple lease agreement quickly using the built-in contract tool.</p>
+        </div>
+      </div>
+
+      <div class="strip" role="note" aria-label="Safety notice">
+        <div>
+          <strong>Safety tip:</strong>
+          <span>Never pay money before visiting the property and meeting the landlord.</span>
+        </div>
+        <div class="actions">
+          <button class="pill pill-primary" style="padding:10px 14px;" onclick="openModal('safety')">
+            Safety Tips <i class="ph ph-warning-circle"></i>
+          </button>
+          <a class="pill pill-ghost" style="padding:10px 14px;" href="contract.html">
+            Contract Tool <i class="ph ph-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" aria-label="Footer">
+      <div class="footer-inner">
+        <div class="fcol">
+          <div class="fbrand">
+            <span class="brand-icon"><i class="ph ph-house-line"></i></span>
+            Inzu<span style="color:var(--accent);">Link</span>
+          </div>
+          <div style="color:#94a3b8;line-height:1.7;font-weight:700;">
+            Simplifying real estate in Rwanda through technology and trust.
+          </div>
+          <div class="flink" style="cursor:pointer;" onclick="openModal('about')">
+            <i class="ph ph-info"></i> <span style="font-weight:900;color:#cbd5e1;">About</span>
+          </div>
+        </div>
+
+        <div class="fcol">
+          <strong>Platform</strong>
+          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse Listings</a></div>
+          <div class="flink"><i class="ph ph-plus-circle"></i> <a href="post-property.html">List a Property</a></div>
+          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract Tool</a></div>
+        </div>
+
+        <div class="fcol">
+          <strong>Legal</strong>
+          <div class="flink" style="cursor:pointer;" onclick="openModal('terms')"><i class="ph ph-scale"></i> <span style="color:#94a3b8;font-weight:800;">Terms</span></div>
+          <div class="flink" style="cursor:pointer;" onclick="openModal('privacy')"><i class="ph ph-lock"></i> <span style="color:#94a3b8;font-weight:800;">Privacy</span></div>
+          <div class="flink" style="cursor:pointer;" onclick="openModal('safety')"><i class="ph ph-warning-circle"></i> <span style="color:#94a3b8;font-weight:800;">Safety</span></div>
+        </div>
+
+        <div class="fcol">
+          <strong>Contact</strong>
+          <div class="flink"><i class="ph ph-phone"></i> <span style="font-weight:800;color:#94a3b8;">+250 789 446 462</span></div>
+          <div class="flink"><i class="ph ph-envelope"></i> <span style="font-weight:800;color:#94a3b8;">info@inzulink.rw</span></div>
+          <div class="flink"><i class="ph ph-map-pin"></i> <span style="font-weight:800;color:#94a3b8;">Kigali, Rwanda</span></div>
+        </div>
+      </div>
+      <div class="copy">© 2026 InzuLink. Built for Rwanda.</div>
+    </footer>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Information modal">
+    <div class="modal">
+      <i class="ph ph-x x" onclick="closeModal()" aria-label="Close modal"></i>
+      <h2 id="modalTitle">Title</h2>
+      <div class="content" id="modalBody">Content</div>
+    </div>
+  </div>
+
+  <!-- Shared navbar script -->
+  <script src="assets/navbar.js"></script>
+
+  <script>
+    // =========================================================
+    // HOSTING SAFE API BASE (no crashing if backend not reachable)
+    // =========================================================
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+
+    // Role-aware hero CTAs (small polish)
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem("user")); } catch (_) {}
+    if (user?.role === "Landlord") {
+      document.getElementById("heroCtas").innerHTML =
+        `<a class="pill pill-primary" href="landlord.html">Open Dashboard <i class="ph ph-arrow-right"></i></a>`;
+    } else if (user?.role === "Admin") {
+      document.getElementById("heroCtas").innerHTML =
+        `<a class="pill pill-primary" href="dashboard.html">Open Admin Panel <i class="ph ph-arrow-right"></i></a>`;
+    }
+
+    // Stats: safe fetch with timeout + fallback
+    function fetchWithTimeout(url, timeoutMs = 6000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
+    }
+
+    async function loadStats() {
+      const elListings = document.getElementById("statListings");
+      const elUsers = document.getElementById("statUsers");
+      // default fallback values (for demos/offline)
+      elListings.textContent = "500+";
+      elUsers.textContent = "1k+";
+
+      try {
+        const res = await fetchWithTimeout(`${API_BASE}/api/analytics/stats`, 6500);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.properties === "number") elListings.textContent = `${data.properties}+`;
+        if (typeof data.users === "number") elUsers.textContent = `${data.users}+`;
+      } catch (e) {
+        // keep fallback values
+      }
+    }
+    loadStats();
+
+    // Modal content
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+
+    const modalContent = {
+      about: {
+        title: "About InzuLink",
+        body: `
+          <p><strong>InzuLink</strong> is a platform connecting landlords and seekers across Rwanda.</p>
+          <ul>
+            <li>Browse property listings with clearer details.</li>
+            <li>Contact landlords directly.</li>
+            <li>Use safety tips to reduce scams.</li>
+            <li>Generate simple rental contracts faster.</li>
+          </ul>
+        `
+      },
+      privacy: {
+        title: "Privacy Policy",
+        body: `
+          <h3>1) Information We Collect</h3>
+          <ul>
+            <li><strong>Account:</strong> Name, Email, Phone, NIDA (if provided).</li>
+            <li><strong>Listings:</strong> Property details, photos, pricing.</li>
+            <li><strong>Usage:</strong> Search activity to improve the platform.</li>
+          </ul>
+          <h3>2) How We Use It</h3>
+          <ul>
+            <li>Reduce fraud and improve trust.</li>
+            <li>Connect seekers and landlords.</li>
+            <li>Improve performance and safety.</li>
+          </ul>
+          <h3>3) Your Rights</h3>
+          <p>You can request access, correction, or deletion via <strong>info@inzulink.rw</strong>.</p>
+        `
+      },
+      terms: {
+        title: "Terms of Service",
+        body: `
+          <h3>1) Platform Role</h3>
+          <p>InzuLink is a technology platform for connecting users; it does not own or inspect properties.</p>
+          <h3>2) Account Responsibility</h3>
+          <p>You are responsible for your account. Fraudulent activity may lead to a ban.</p>
+          <h3>3) Safety</h3>
+          <p>Always visit properties and verify details before any payment.</p>
+        `
+      },
+      safety: {
+        title: "Safety Tips",
+        body: `
+          <p style="color:#dc2626;font-weight:900;">Never pay before visiting the property and meeting the landlord.</p>
+          <ul>
+            <li>Visit during daytime and go with a friend if possible.</li>
+            <li>Confirm identity and ownership details.</li>
+            <li>Avoid sharing sensitive personal information.</li>
+            <li>Report suspicious listings.</li>
+          </ul>
+        `
+      }
+    };
+
+    function openModal(key){
+      const content = modalContent[key];
+      if (!content) return;
+      modalTitle.innerHTML = content.title;
+      modalBody.innerHTML = content.body;
+      modalOverlay.style.display = "flex";
+    }
+
+    function closeModal(){
+      modalOverlay.style.display = "none";
+    }
+
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+  </script>
+</body>
+</html>

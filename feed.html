@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Browse Properties — InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
+  <!-- Shared navbar styles -->
+  <link rel="stylesheet" href="./assets/app.css" />
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --accent-hover:#d97706;
+      --success:#10b981;
+      --bg-page:#f8fafc;
+      --text-main:#334155;
+      --text-light:#64748b;
+      --border:#e2e8f0;
+      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+
+      --danger:#dc2626;
+      --danger-bg:#fef2f2;
+      --warn:#f59e0b;
+      --warn-bg:#fffbeb;
+      --card:#ffffff;
+    }
+
+    body{
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg-page);
+      margin:0;
+      padding:0;
+      color: var(--text-main);
+    }
+
+    /* Page layout */
+    .wrap{
+      width:min(1200px, 92%);
+      margin: 0 auto;
+      padding: 18px 0 46px;
+    }
+
+    /* HERO SEARCH */
+    .hero{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 28px 18px 18px;
+    }
+    .hero h1{
+      margin:0 0 8px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      color: var(--primary);
+      letter-spacing:-0.6px;
+      font-weight: 900;
+      text-align:center;
+    }
+    .hero p{
+      margin:0 0 18px;
+      color: var(--text-light);
+      text-align:center;
+      font-weight: 600;
+      line-height:1.6;
+    }
+
+    .search-bar{
+      background:#fff;
+      margin: 0 auto;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .search-input, .search-select{
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      min-width: 200px;
+      flex: 1;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline:none;
+      background:#fff;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .search-input:focus, .search-select:focus{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
+    }
+
+    .btn{
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 0.92rem;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      white-space: nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background: var(--primary); color:#fff; }
+    .btn-primary:hover{ background:#1e293b; }
+    .btn-accent{ background: var(--accent); color:#111827; }
+    .btn-accent:hover{ background: var(--accent-hover); color:#111827; }
+    .btn-outline{
+      background:#fff;
+      color: var(--primary);
+      border-color: var(--border);
+      font-weight: 900;
+      text-decoration:none;
+    }
+    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
+
+    .mini-row{
+      display:flex;
+      justify-content:center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    /* MAP */
+    #feedMap{
+      height: 420px;
+      width: 100%;
+      margin-top: 16px;
+      border-radius: 16px;
+      display:none;
+      border: 1px solid var(--border);
+      overflow:hidden;
+    }
+
+    /* SAFETY BANNER */
+    .safety-banner{
+      margin: 18px auto 18px;
+      background: var(--danger-bg);
+      border: 1px solid #fecaca;
+      padding: 14px 14px;
+      border-radius: 16px;
+      color: #991b1b;
+      font-size: 0.92rem;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      line-height:1.55;
+      font-weight: 700;
+      width:min(1200px, 92%);
+    }
+
+    /* FEED GRID */
+    .feed-container{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      padding: 12px 0 30px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+      cursor:pointer;
+      position: relative;
+      display:flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(2,6,23,0.06);
+    }
+    .card:hover{ transform: translateY(-4px); box-shadow: 0 18px 35px rgba(2,6,23,0.12); }
+    .card.is-sold{ opacity:.85; filter: grayscale(18%); }
+
+    .card.featured{
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 18px rgba(245,158,11,0.22);
+      order: -1;
+    }
+
+    .featured-badge{
+      position:absolute;
+      top: 44px;
+      left: 0;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color:#fff;
+      padding: 5px 12px;
+      border-top-right-radius: 999px;
+      border-bottom-right-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      z-index: 25;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      box-shadow: 2px 3px 10px rgba(2,6,23,0.22);
+    }
+
+    .card-img-wrap{ height: 220px; overflow:hidden; position:relative; background:#cbd5e1; }
+    .card-img{ width:100%; height:100%; object-fit: cover; }
+
+    .badge{
+      position:absolute;
+      top:0; left:0; width:100%;
+      padding: 12px 0;
+      text-align:center;
+      font-size: .85rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color:#fff;
+      z-index: 15;
+    }
+    .bg-rent{ background: rgba(15,23,42,0.92); }
+    .bg-sale{ background: rgba(245,158,11,0.92); }
+    .bg-sold{ background: rgba(239,68,68,0.92); }
+    .bg-shared{ background: rgba(168,85,247,0.92); }
+
+    .fav-btn{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 25;
+      background:#fff;
+      border:none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor:pointer;
+      font-size: 1.2rem;
+      color:#ef4444;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.20);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .fav-btn:hover{ transform: scale(1.06); background:#fee2e2; }
+
+    .vid-badge{
+      position:absolute;
+      bottom:10px; right:10px;
+      background: rgba(2,6,23,0.75);
+      color:#fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      z-index: 20;
+    }
+
+    .star-badge{
+      position:absolute;
+      bottom:10px; left:10px;
+      background:#fff;
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      z-index: 20;
+      box-shadow: 0 6px 16px rgba(2,6,23,0.12);
+    }
+
+    .card-body{ padding: 18px; display:flex; flex-direction:column; flex: 1; }
+    .verified-badge{
+      color: #16a34a;
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom: 6px;
+    }
+
+    .price{ font-size: 1.22rem; font-weight: 900; color: var(--primary); }
+    .title{ font-size: 1.02rem; font-weight: 800; margin: 6px 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .location{ font-size: 0.88rem; color: var(--text-light); margin-bottom: 12px; font-weight: 650; }
+
+    .card-meta{
+      margin-top:auto;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      color:#334155;
+      margin-bottom: 12px;
+    }
+
+    .card-action-btn{
+      width:100%;
+      padding: 11px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition: background .12s ease;
+      user-select:none;
+    }
+    .btn-call-card{ background: var(--success); color:#fff; }
+    .btn-call-card:hover{ background:#059669; }
+    .btn-sold-card{ background:#e2e8f0; color:#94a3b8; cursor:not-allowed; pointer-events:none; }
+
+    /* Footer */
+    footer{
+      margin-top: 18px;
+      background: var(--primary);
+      border-radius: 22px;
+      padding: 22px 16px;
+      color:#94a3b8;
+      text-align:center;
+    }
+    .footer-links{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin: 10px 0 12px;
+    }
+    .footer-links a, .footer-links span{
+      color:#94a3b8;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .footer-links a:hover, .footer-links span:hover{ color:#fff; }
+
+    /* Modals (kept from your project, styled cleanly) */
+    .modal-overlay{
+      position: fixed; inset:0;
+      background: rgba(2,6,23,0.60);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 2000;
+      padding: 18px;
+    }
+    .modal-content{
+      width:min(980px, 96vw);
+      background:#fff;
+      border-radius: 18px;
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      max-height: 92vh;
+    }
+    @media (max-width: 980px){
+      .modal-content{ grid-template-columns: 1fr; max-height: 94vh; }
+    }
+
+    .close-btn{
+      position:absolute;
+      top: 10px; right: 10px;
+      background:#fff;
+      border:1px solid var(--border);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      cursor:pointer;
+      z-index: 25;
+    }
+
+    .modal-gallery{
+      position: relative;
+      background:#0b1220;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 320px;
+    }
+    .main-display{
+      width: 100%;
+      height: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+    }
+    .nav-arrow{
+      position:absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+      color:#fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+    .prev-btn{ left: 12px; }
+    .next-btn{ right: 12px; }
+
+    .modal-info{
+      padding: 18px;
+      overflow:auto;
+    }
+    .tag-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.82rem;
+      color:#fff;
+      margin-bottom: 10px;
+    }
+    .modal-title{
+      margin: 0 0 6px;
+      font-size: 1.35rem;
+      color: var(--primary);
+      letter-spacing:-0.5px;
+      font-weight: 900;
+    }
+    .modal-price{
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 10px 0 14px;
+    }
+    .specs-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0 14px;
+    }
+    .spec-box{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background:#fff;
+    }
+    .spec-label{ display:block; color: var(--text-light); font-weight: 800; font-size: 0.82rem; }
+    .spec-value{ display:block; color: var(--primary); font-weight: 900; margin-top: 4px; }
+
+    .call-btn{
+      width:100%;
+      border:none;
+      border-radius: 14px;
+      padding: 12px;
+      background: #22c55e;
+      color:#fff;
+      font-weight: 900;
+      cursor:pointer;
+      margin-top: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .call-btn:hover{ background:#16a34a; }
+
+    .video-container{
+      margin-top: 14px;
+      border:1px solid var(--border);
+      border-radius: 16px;
+      overflow:hidden;
+      background:#0b1220;
+    }
+    .video-container video{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    /* Reviews */
+    .modal-reviews{
+      margin-top: 16px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 16px;
+    }
+    .review-item{
+      background:#f8fafc;
+      border: 1px solid #eef2f7;
+      padding: 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+    .review-header{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+      color:#0f172a;
+    }
+    .review-text{ font-size: 0.92rem; color:#475569; line-height:1.6; font-weight: 650; }
+    .star-input i{ font-size: 1.45rem; color:#cbd5e1; cursor:pointer; transition:.12s; }
+    .star-input i.active{ color: var(--accent); }
+
+    /* Auth popup */
+    .auth-popup{
+      position: fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(2,6,23,0.65);
+      z-index: 2100;
+      padding: 18px;
+    }
+    .auth-box{
+      width:min(520px, 96vw);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      text-align:center;
+    }
+    .auth-btn-row{ display:flex; gap:12px; margin-top: 14px; justify-content:center; flex-wrap:wrap; }
+    .auth-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-decoration:none;
+      border:1px solid transparent;
+    }
+    .btn-login{ background: var(--primary); color:#fff; }
+    .btn-signup{ background: var(--accent); color:#111827; }
+
+    /* Simple modal for About/Terms/Privacy/Safety + Report */
+    .modal-box{
+      width:min(760px, 96vw);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position: relative;
+      max-height: 92vh;
+      overflow:auto;
+    }
+    .close-modal{
+      position:absolute;
+      top: 10px; right: 10px;
+      cursor:pointer;
+      font-size: 1.5rem;
+      color:#64748b;
+    }
+    .close-modal:hover{ color:#ef4444; }
+    .modal-title2{
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing:-0.4px;
+      font-size: 1.2rem;
+      margin: 6px 0 10px;
+    }
+    .modal-content-text{
+      color:#475569;
+      line-height:1.75;
+      font-weight: 650;
+    }
+
+    .form-group{ margin-bottom: 14px; }
+    .form-label{ display:block; font-weight: 900; margin-bottom: 8px; color:#334155; }
+    .form-input{
+      width:100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      box-sizing:border-box;
+      font-family: inherit;
+      outline:none;
+    }
+    .form-input:focus{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
+    }
+
+    /* Sticky ad */
+    .sticky-ad{
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 56px;
+      background:#fff;
+      border-top: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 -6px 18px rgba(2,6,23,0.08);
+      z-index: 1000;
+    }
+    .ad-placeholder{
+      background:#f1f5f9;
+      color:#64748b;
+      font-weight: 900;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .spacer-bottom{ height: 70px; } /* for sticky-ad */
+  </style>
+</head>
+
+<body>
+  <!-- Shared navbar (injected by ./assets/navbar.js) -->
+  <div id="appNavbar"></div>
+
+  <main class="wrap">
+    <section class="hero" aria-label="Search properties">
+      <h1>Find Your Next Property</h1>
+      <p>Search houses, land, and shared rooms across Rwanda.</p>
+
+      <div class="search-bar">
+        <input type="text" id="sLocation" class="search-input" placeholder="📍 Location (e.g. Kigali)..." />
+        <select id="sType" class="search-select">
+          <option value="All">All Types</option>
+          <option value="Rent">For Rent</option>
+          <option value="Shared">Roommate / Shared</option>
+          <option value="Sale">For Sale</option>
+        </select>
+        <select id="sCategory" class="search-select">
+          <option value="All">All Categories</option>
+          <option value="House">House</option>
+          <option value="Apartment">Apartment</option>
+          <option value="Land">Land</option>
+        </select>
+        <input type="number" id="sMaxPrice" class="search-input" placeholder="💰 Max Price" />
+
+        <button class="btn btn-primary" id="btnSearch" type="button" onclick="applyFilters()">
+          <i class="ph ph-magnifying-glass"></i> Search
+        </button>
+
+        <button class="btn btn-accent" type="button" onclick="findNearMe()">
+          <i class="ph ph-navigation-arrow"></i> Near Me
+        </button>
+
+        <a class="btn btn-outline" href="contract.html">
+          <i class="ph ph-file-text"></i> Contract Tool
+        </a>
+      </div>
+
+      <div class="mini-row">
+        <button class="btn btn-outline" type="button" onclick="toggleMap()">
+          <i class="ph ph-map-trifold"></i> Show/Hide Map
+        </button>
+
+        <button class="btn btn-outline" type="button" onclick="openReportModal()">
+          <i class="ph ph-warning-circle"></i> Report an issue
+        </button>
+      </div>
+
+      <div id="feedMap" aria-label="Map view"></div>
+    </section>
+  </main>
+
+  <main class="wrap">
+    <section class="feed-container" id="houseList" aria-label="Property listings">
+      <div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">
+        Loading properties...
+      </div>
+    </section>
+
+    <footer>
+      <div style="font-weight:900; font-size:1.15rem; color:#fff;">
+        Inzu<span style="color:var(--accent);">Link</span>
+      </div>
+
+      <div class="footer-links">
+        <span onclick="openContentModal('about')">About</span>
+        <span onclick="openContentModal('terms')">Terms</span>
+        <span onclick="openContentModal('privacy')">Privacy</span>
+        <span onclick="openContentModal('safety')">Safety</span>
+        <a href="contract.html" style="color:var(--accent);">Contract Tool</a>
+      </div>
+
+      <div style="font-size:0.86rem; color:#94a3b8; font-weight:700;">
+        © 2026 InzuLink. Kigali, Rwanda.
+      </div>
+    </footer>
+
+    <div class="spacer-bottom"></div>
+  </main>
+
+  <div class="sticky-ad">
+    <div class="ad-placeholder">📢 AD SPACE: Moving? Call +250 788... (Your Future Client)</div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-content">
+      <div class="close-btn" onclick="closeModal()">✕</div>
+
+      <div class="modal-gallery">
+        <button class="nav-arrow prev-btn" id="btnPrev" onclick="changeModalImage(-1)">&#10094;</button>
+        <img src="" class="main-display" id="fullImage" alt="Property image" />
+        <button class="nav-arrow next-btn" id="btnNext" onclick="changeModalImage(1)">&#10095;</button>
+      </div>
+
+      <div class="modal-info">
+        <div>
+          <span id="modalTypeBadge" class="tag-pill bg-rent">Rent</span>
+          <h2 class="modal-title" id="modalTitle">Title</h2>
+          <div style="color:#64748b; font-weight:750; margin-bottom: 10px;" id="modalLocation">📍 Location</div>
+          <div class="modal-price" id="modalPrice">RWF 0</div>
+        </div>
+
+        <div class="specs-grid">
+          <div class="spec-box"><span class="spec-label">Category</span><span class="spec-value" id="modalCat">-</span></div>
+          <div class="spec-box"><span class="spec-label" id="dynLabel">Bedrooms</span><span class="spec-value" id="dynValue">-</span></div>
+          <div class="spec-box" id="upiBox" style="display:none;"><span class="spec-label">UPI</span><span class="spec-value" id="modalUPI">-</span></div>
+        </div>
+
+        <div style="line-height:1.7; color:#475569; font-weight:650;">
+          <strong style="color:var(--primary); display:block; margin-bottom:6px;">Description</strong>
+          <span id="modalDesc">...</span>
+        </div>
+
+        <div id="serviceArea"></div>
+        <div id="modalVideoArea" class="video-container" style="display:none;"></div>
+
+        <div class="modal-reviews">
+          <h3 style="margin:0 0 10px; color:var(--primary); letter-spacing:-0.4px;">Reviews</h3>
+
+          <div id="reviewsList" style="max-height:200px; overflow:auto; margin-bottom:12px;">
+            <div style="color:#94a3b8; font-weight:900;">Loading reviews...</div>
+          </div>
+
+          <div style="background:#fffbeb; padding:14px; border-radius:16px; border:1px solid #fde68a;">
+            <strong style="display:block; margin-bottom:10px; color:#7c2d12;">Write a Review</strong>
+
+            <div class="star-input" id="starInput" style="margin-bottom:10px;">
+              <i class="ph ph-star" onclick="setRating(1)"></i>
+              <i class="ph ph-star" onclick="setRating(2)"></i>
+              <i class="ph ph-star" onclick="setRating(3)"></i>
+              <i class="ph ph-star" onclick="setRating(4)"></i>
+              <i class="ph ph-star" onclick="setRating(5)"></i>
+            </div>
+
+            <textarea id="reviewComment"
+              style="width:100%; padding:10px; border-radius:12px; border:1px solid #cbd5e1; box-sizing:border-box; font-family:inherit;"
+              placeholder="How was this property?"></textarea>
+
+            <button onclick="submitReview()"
+              style="background:var(--primary); color:#fff; border:none; padding:10px 14px; border-radius:12px; font-weight:900; cursor:pointer; margin-top:10px;">
+              Post Review
+            </button>
+          </div>
+        </div>
+
+        <button class="call-btn" id="modalPhone">
+          <i class="ph ph-whatsapp-logo"></i> Chat on WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH POPUP -->
+  <div class="auth-popup" id="loginModal">
+    <div class="auth-box">
+      <i class="ph ph-lock-key" style="font-size: 2.7rem; color: var(--accent);"></i>
+      <h2 style="margin:10px 0 8px; color:var(--primary); letter-spacing:-0.4px;">Log In to Contact</h2>
+      <p style="color:#64748b; line-height:1.7; font-weight:650; margin:0;">
+        To improve safety, please login to view phone numbers and contact landlords.
+      </p>
+
+      <div class="auth-btn-row">
+        <a href="login.html" class="auth-btn btn-login">Log In</a>
+        <a href="signup.html" class="auth-btn btn-signup">Sign Up</a>
+      </div>
+
+      <div style="margin-top:14px; font-size:0.95rem; color:#94a3b8; cursor:pointer; text-decoration:underline; font-weight:800;"
+        onclick="closeAuthModal()">Continue browsing</div>
+    </div>
+  </div>
+
+  <!-- CONTENT MODAL -->
+  <div class="modal-overlay" id="contentModal">
+    <div class="modal-box">
+      <i class="ph ph-x close-modal" onclick="closeModals()"></i>
+      <div class="modal-title2" id="mTitle">Title</div>
+      <div class="modal-content-text" id="mBody">...</div>
+    </div>
+  </div>
+
+  <!-- REPORT MODAL -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal-box">
+      <i class="ph ph-x close-modal" onclick="closeModals()"></i>
+      <div class="modal-title2" style="color:#ef4444;">
+        <i class="ph ph-warning-circle"></i> Report an Issue
+      </div>
+      <p style="color:#64748b; font-weight:650; line-height:1.7; margin-top:6px;">
+        Did you find a fake listing or experience a bug? Let us know.
+      </p>
+
+      <form onsubmit="submitReport(event)">
+        <div class="form-group">
+          <label class="form-label">Issue Type</label>
+          <select class="form-input" id="reportType">
+            <option>Fake Listing / Scam</option>
+            <option>Technical Bug</option>
+            <option>Harassment</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Details</label>
+          <textarea class="form-input" id="reportDetails" rows="4" placeholder="Please describe what happened..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your Email (Optional)</label>
+          <input type="email" class="form-input" id="reportEmail" placeholder="For follow up" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          <i class="ph ph-paper-plane-tilt"></i> Submit Report
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared navbar script -->
+  <script src="./assets/navbar.js"></script>
+
+  <script>
+    // Hosting-safe API base
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+
+    // User
+    let currentUser = null;
+    try { currentUser = JSON.parse(localStorage.getItem("user")); } catch(_) {}
+
+    // State
+    let allProperties = [];
+    let filteredProperties = [];
+    let currentModalHouse = null;
+    let currentModalImages = [];
+    let currentModalIndex = 0;
+    let currentRating = 0;
+
+    // Map
+    let feedMap = null;
+    let mapVisible = false;
+    let mapMarkers = [];
+
+    function money(v){
+      const n = Number(v || 0);
+      if (!Number.isFinite(n)) return "RWF 0";
+      return "RWF " + n.toLocaleString();
+    }
+
+    function safeText(v){
+      return (v === null || v === undefined) ? "" : String(v);
+    }
+
+    function normalizeType(t){
+      const x = (t || "").toLowerCase();
+      if (x.includes("rent")) return "Rent";
+      if (x.includes("sale")) return "Sale";
+      if (x.includes("shared") || x.includes("room")) return "Shared";
+      if (x.includes("sold")) return "Sold";
+      return t || "Rent";
+    }
+
+    function badgeClass(type){
+      const t = normalizeType(type);
+      if (t === "Rent") return "bg-rent";
+      if (t === "Sale") return "bg-sale";
+      if (t === "Shared") return "bg-shared";
+      if (t === "Sold") return "bg-sold";
+      return "bg-rent";
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000){
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try { return await fetch(url, { ...options, signal: controller.signal }); }
+      finally { clearTimeout(id); }
+    }
+
+    async function loadFeed(){
+      const container = document.getElementById("houseList");
+      container.innerHTML = `<div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">Loading properties...</div>`;
+
+      // Optional analytics (non-blocking)
+      try { fetch(`${API_BASE}/api/analytics/visit`, { method: "POST" }); } catch(_) {}
+
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/properties`, {}, 15000);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data?.error || "Failed to load properties");
+
+        allProperties = Array.isArray(data) ? data : [];
+        filteredProperties = allProperties.slice();
+
+        renderFeed(filteredProperties);
+        updateMapMarkers(filteredProperties);
+
+      } catch(err){
+        container.innerHTML = `
+          <div style="text-align:center; padding:34px; color:#ef4444; grid-column:1/-1; font-weight:900;">
+            Could not load properties. Please check your server / API_BASE.
+            <div style="margin-top:10px; color:#64748b; font-weight:800;">Tip: localStorage.setItem("API_BASE","https://YOUR-BACKEND.onrender.com")</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderFeed(list){
+      const container = document.getElementById("houseList");
+      if (!list || list.length === 0){
+        container.innerHTML = `<div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">No results found.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(h => {
+        const type = normalizeType(h.type || h.listing_type || "Rent");
+        const isSold = type === "Sold" || (h.is_sold === true);
+
+        const featured = (h.is_featured === true) ? "featured" : "";
+        const soldClass = isSold ? "is-sold" : "";
+
+        const images = (h.images && h.images.length > 0)
+          ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
+          : ["https://via.placeholder.com/800x500?text=InzuLink+Property"];
+
+        const showVideo = !!h.video_path;
+        const hasStars = Number.isFinite(Number(h.avg_rating)) && Number(h.avg_rating) > 0;
+
+        const bedrooms = h.bedrooms ?? h.beds ?? "-";
+        const rooms = h.rooms ?? "-";
+        const category = h.category || "-";
+
+        const label2 = (type === "Land" || category === "Land") ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
+        const value2 = (type === "Land" || category === "Land") ? (h.upi || h.UPI || "-") : (type === "Shared" ? rooms : bedrooms);
+
+        const location = h.location || h.district || "Rwanda";
+
+        return `
+          <article class="card ${featured} ${soldClass}" onclick="openModal(${Number(h.id)})">
+            ${featured ? `<div class="featured-badge"><i class="ph ph-crown"></i> Featured</div>` : ""}
+            <div class="card-img-wrap">
+              <div class="badge ${badgeClass(type)}">${type}</div>
+
+              ${hasStars ? `<div class="star-badge"><i class="ph ph-star-fill"></i> ${Number(h.avg_rating).toFixed(1)}</div>` : ""}
+              ${showVideo ? `<div class="vid-badge"><i class="ph ph-video-camera"></i> Video</div>` : ""}
+
+              <button class="fav-btn" onclick="event.stopPropagation(); toggleFavorite(${Number(h.id)});" title="Save">
+                <i class="ph ph-heart"></i>
+              </button>
+
+              <img class="card-img" src="${images[0]}" alt="Property photo" loading="lazy" />
+            </div>
+
+            <div class="card-body">
+              ${h.is_verified ? `<div class="verified-badge"><i class="ph ph-seal-check"></i> Verified</div>` : ""}
+
+              <div class="price">${money(h.price)}</div>
+              <div class="title">${safeText(h.title || "Property")}</div>
+              <div class="location">📍 ${safeText(location)}</div>
+
+              <div class="card-meta">
+                <span>${safeText(category)}</span>
+                <span>${label2}: ${safeText(value2)}</span>
+              </div>
+
+              ${
+                isSold
+                  ? `<button class="card-action-btn btn-sold-card"><i class="ph ph-lock"></i> Not available</button>`
+                  : `<button class="card-action-btn btn-call-card" onclick="event.stopPropagation(); contactHouse(${Number(h.id)});">
+                       <i class="ph ph-whatsapp-logo"></i> Contact
+                     </button>`
+              }
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function applyFilters(){
+      const loc = (document.getElementById("sLocation").value || "").trim().toLowerCase();
+      const type = document.getElementById("sType").value;
+      const cat  = document.getElementById("sCategory").value;
+      const maxP = Number(document.getElementById("sMaxPrice").value || 0);
+
+      filteredProperties = allProperties.filter(h => {
+        const location = (h.location || h.district || "").toLowerCase();
+        const title = (h.title || "").toLowerCase();
+        const c = (h.category || "").toLowerCase();
+
+        const hType = normalizeType(h.type || h.listing_type || "Rent");
+
+        const okLoc = !loc || location.includes(loc) || title.includes(loc);
+        const okType = (type === "All") || (hType === type);
+        const okCat = (cat === "All") || (c === cat.toLowerCase());
+        const okPrice = (!maxP || Number(h.price || 0) <= maxP);
+
+        return okLoc && okType && okCat && okPrice;
+      });
+
+      // Optional analytics (non-blocking)
+      if (loc) {
+        try{
+          fetch(`${API_BASE}/api/analytics/search`, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ term: loc })
+          });
+        } catch(_){}
+      }
+
+      renderFeed(filteredProperties);
+      updateMapMarkers(filteredProperties);
+    }
+
+    function toggleMap(){
+      mapVisible = !mapVisible;
+      const el = document.getElementById("feedMap");
+      el.style.display = mapVisible ? "block" : "none";
+
+      if (mapVisible){
+        setTimeout(() => {
+          initMapIfNeeded();
+          try { feedMap.invalidateSize(); } catch(_) {}
+        }, 80);
+      }
+    }
+
+    function initMapIfNeeded(){
+      if (feedMap) return;
+
+      feedMap = L.map("feedMap").setView([-1.9441, 30.0619], 12); // Kigali default
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+      }).addTo(feedMap);
+    }
+
+    function clearMarkers(){
+      mapMarkers.forEach(m => { try { feedMap.removeLayer(m); } catch(_) {} });
+      mapMarkers = [];
+    }
+
+    function updateMapMarkers(list){
+      if (!mapVisible) return;
+      initMapIfNeeded();
+      clearMarkers();
+
+      (list || []).forEach(h => {
+        const lat = Number(h.latitude || h.lat);
+        const lng = Number(h.longitude || h.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const marker = L.marker([lat, lng]).addTo(feedMap);
+        marker.bindPopup(`<b>${safeText(h.title || "Property")}</b><br/>${money(h.price)}<br/>📍 ${safeText(h.location || "")}`);
+        marker.on("click", () => openModal(Number(h.id)));
+        mapMarkers.push(marker);
+      });
+    }
+
+    function findNearMe(){
+      if (!navigator.geolocation){
+        alert("Geolocation is not supported in this browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+
+        // Show map automatically
+        if (!mapVisible) toggleMap();
+        initMapIfNeeded();
+        feedMap.setView([latitude, longitude], 13);
+
+        // Add "You" marker
+        L.circleMarker([latitude, longitude], { radius: 8 }).addTo(feedMap).bindPopup("You are here").openPopup();
+
+      }, () => {
+        alert("Location permission denied. Please allow location access and try again.");
+      }, { enableHighAccuracy: true, timeout: 8000 });
+    }
+
+    function openModal(id){
+      const house = allProperties.find(x => Number(x.id) === Number(id));
+      if (!house) return;
+
+      currentModalHouse = house;
+
+      // analytics click (non-blocking)
+      try { fetch(`${API_BASE}/api/properties/${Number(id)}/click`, { method:"POST" }); } catch(_) {}
+
+      const type = normalizeType(house.type || house.listing_type || "Rent");
+      const badge = document.getElementById("modalTypeBadge");
+      badge.className = `tag-pill ${badgeClass(type)}`;
+      badge.textContent = type;
+
+      document.getElementById("modalTitle").textContent = safeText(house.title || "Property");
+      document.getElementById("modalLocation").textContent = `📍 ${safeText(house.location || house.district || "Rwanda")}`;
+      document.getElementById("modalPrice").textContent = money(house.price);
+
+      document.getElementById("modalCat").textContent = safeText(house.category || "-");
+
+      const isLand = (house.category || "").toLowerCase() === "land" || type === "Land";
+      document.getElementById("dynLabel").textContent = isLand ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
+      document.getElementById("dynValue").textContent = isLand
+        ? safeText(house.upi || house.UPI || "-")
+        : (type === "Shared" ? safeText(house.rooms ?? "-") : safeText(house.bedrooms ?? house.beds ?? "-"));
+
+      // If you keep a separate UPI box in your DB, show/hide:
+      const upiBox = document.getElementById("upiBox");
+      if (isLand) {
+        upiBox.style.display = "none"; // already shown in dynLabel/dynValue
+      } else {
+        upiBox.style.display = "none";
+      }
+
+      document.getElementById("modalDesc").textContent = safeText(house.description || "No description provided.");
+
+      // Images
+      currentModalImages = (house.images && house.images.length > 0)
+        ? house.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
+        : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
+
+      currentModalIndex = 0;
+      setModalImage();
+
+      // Video
+      const vArea = document.getElementById("modalVideoArea");
+      if (house.video_path){
+        const vUrl = `${API_BASE}/${String(house.video_path).replace(/\\/g, "/")}`;
+        vArea.style.display = "block";
+        vArea.innerHTML = `<video controls playsinline src="${vUrl}"></video>`;
+      } else {
+        vArea.style.display = "none";
+        vArea.innerHTML = "";
+      }
+
+      // WhatsApp button
+      const phoneBtn = document.getElementById("modalPhone");
+      phoneBtn.onclick = () => contactHouse(Number(house.id));
+
+      // Load reviews
+      loadReviews(Number(house.id));
+
+      // Open modal
+      document.getElementById("detailModal").style.display = "flex";
+    }
+
+    function closeModal(){
+      document.getElementById("detailModal").style.display = "none";
+    }
+
+    function changeModalImage(step){
+      if (!currentModalImages || currentModalImages.length <= 1) return;
+      currentModalIndex = (currentModalIndex + step + currentModalImages.length) % currentModalImages.length;
+      setModalImage();
+    }
+
+    function setModalImage(){
+      const img = document.getElementById("fullImage");
+      img.src = currentModalImages[currentModalIndex] || currentModalImages[0];
+      document.getElementById("btnPrev").style.display = (currentModalImages.length > 1) ? "flex" : "none";
+      document.getElementById("btnNext").style.display = (currentModalImages.length > 1) ? "flex" : "none";
+    }
+
+    function showAuthModal(){ document.getElementById("loginModal").style.display = "flex"; }
+    function closeAuthModal(){ document.getElementById("loginModal").style.display = "none"; }
+
+    async function contactHouse(id){
+      if (!currentUser){
+        showAuthModal();
+        return;
+      }
+
+      const house = allProperties.find(x => Number(x.id) === Number(id));
+      if (!house) return;
+
+      const phone = safeText(house.phone || house.contact_phone || "");
+      const cleanPhone = phone.replace(/[^\d]/g, "");
+
+      if (!cleanPhone){
+        alert("Contact not available for this listing.");
+        return;
+      }
+
+      const text = encodeURIComponent(`Hello! I'm interested in this property on InzuLink: "${safeText(house.title)}". Can you share more details?`);
+      window.open(`https://wa.me/${cleanPhone}?text=${text}`, "_blank");
+    }
+
+    async function toggleFavorite(propertyId){
+      if (!currentUser){
+        showAuthModal();
+        return;
+      }
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/favorites`, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ userId: currentUser.id, propertyId: Number(propertyId) })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || "Failed");
+        // Small feedback (silent)
+      } catch(_){
+        alert("Could not save. Please try again.");
+      }
+    }
+
+    async function loadReviews(pid){
+      const list = document.getElementById("reviewsList");
+      list.innerHTML = `<div style="color:#94a3b8; font-weight:900;">Loading reviews...</div>`;
+
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/reviews/${Number(pid)}`);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error("Failed");
+
+        const reviews = Array.isArray(data) ? data : [];
+        if (reviews.length === 0){
+          list.innerHTML = `<div style="color:#94a3b8; font-weight:900;">No reviews yet.</div>`;
+          return;
+        }
+
+        list.innerHTML = reviews.map(r => {
+          const stars = "★".repeat(Math.max(0, Math.min(5, Number(r.rating || 0))));
+          return `
+            <div class="review-item">
+              <div class="review-header">
+                <span>${safeText(r.name || "User")} • ${stars}</span>
+                <span style="color:#94a3b8; font-weight:800;">${safeText(r.created_at || "")}</span>
+              </div>
+              <div class="review-text">${safeText(r.comment || "")}</div>
+            </div>
+          `;
+        }).join("");
+
+      } catch(_){
+        list.innerHTML = `<div style="color:#ef4444; font-weight:900;">Failed to load reviews.</div>`;
+      }
+    }
+
+    function setRating(n){
+      currentRating = Number(n);
+      const stars = document.querySelectorAll("#starInput i");
+      stars.forEach((s, idx) => {
+        if (idx < currentRating) s.classList.add("active");
+        else s.classList.remove("active");
+      });
+    }
+
+    async function submitReview(){
+      if (!currentUser){
+        showAuthModal();
+        return;
+      }
+      if (!currentModalHouse) return;
+
+      const comment = (document.getElementById("reviewComment").value || "").trim();
+      if (!currentRating) return alert("Please select a rating.");
+      if (comment.length < 3) return alert("Please write a short comment.");
+
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/reviews`, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            propertyId: Number(currentModalHouse.id),
+            rating: currentRating,
+            comment
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || "Failed");
+
+        document.getElementById("reviewComment").value = "";
+        setRating(0);
+        loadReviews(Number(currentModalHouse.id));
+
+      } catch(_){
+        alert("Could not post review. Please try again.");
+      }
+    }
+
+    function openContentModal(type){
+      const modal = document.getElementById("contentModal");
+      const title = document.getElementById("mTitle");
+      const body = document.getElementById("mBody");
+
+      const content = {
+        about: {
+          t: "About InzuLink",
+          b: "InzuLink helps seekers and landlords connect through clearer listings and safer practices. Our goal is to reduce fraud and speed up housing search across Rwanda."
+        },
+        terms: {
+          t: "Terms",
+          b: "InzuLink provides listings and tools. Always verify a property in person before making payments. InzuLink is not responsible for payments made outside the platform."
+        },
+        privacy: {
+          t: "Privacy",
+          b: "We store account details to run the service. We do not sell personal data. Passwords should be stored securely (hashed) on the server."
+        },
+        safety: {
+          t: "Safety",
+          b: "Never pay before visiting. Meet the landlord. Avoid pressure to send ‘booking fees’. Report suspicious listings immediately."
+        }
+      };
+
+      const c = content[type] || content.about;
+      title.textContent = c.t;
+      body.textContent = c.b;
+
+      modal.style.display = "flex";
+    }
+
+    function openReportModal(){
+      document.getElementById("reportModal").style.display = "flex";
+    }
+
+    function closeModals(){
+      document.getElementById("contentModal").style.display = "none";
+      document.getElementById("reportModal").style.display = "none";
+    }
+
+    async function submitReport(e){
+      e.preventDefault();
+      const type = document.getElementById("reportType").value;
+      const details = (document.getElementById("reportDetails").value || "").trim();
+      const email = (document.getElementById("reportEmail").value || "").trim();
+
+      if (details.length < 5) return alert("Please add more details.");
+
+      // For now: local-only (until we add backend route)
+      alert("Thank you! Your report has been recorded (demo mode).");
+      closeModals();
+    }
+
+    // Close on overlay click
+    document.getElementById("detailModal").addEventListener("click", (e) => {
+      if (e.target.id === "detailModal") closeModal();
+    });
+    document.getElementById("contentModal").addEventListener("click", (e) => {
+      if (e.target.id === "contentModal") closeModals();
+    });
+    document.getElementById("reportModal").addEventListener("click", (e) => {
+      if (e.target.id === "reportModal") closeModals();
+    });
+
+    // Init
+    window.addEventListener("load", () => {
+      loadFeed();
+    });
+  </script>
+</body>
+</html>

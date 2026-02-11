@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard — InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <link rel="stylesheet" href="./assets/app.css" />
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0b1220;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+      --ok:#16a34a;
+      --okBg:#f0fdf4;
+      --warnBg:#fffbeb;
+      --bad:#dc2626;
+      --badBg:#fef2f2;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui;background:var(--bg);color:var(--text)}
+    .wrap{width:min(1250px,94%);margin:0 auto;padding:18px 0 44px}
+
+    header{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      display:flex;align-items:flex-start;justify-content:space-between;
+      gap:14px;flex-wrap:wrap;
+    }
+    header h1{margin:0;font-size:1.9rem;font-weight:900;letter-spacing:-.6px;color:var(--primary)}
+    header p{margin:6px 0 0;color:var(--muted);font-weight:650;line-height:1.6;max-width:860px}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
+    .btn{
+      padding:10px 12px;border-radius:12px;border:1px solid transparent;cursor:pointer;
+      font-weight:900;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;
+      background:#fff;color:var(--primary);border-color:var(--border);
+      transition:transform .12s ease, background .12s ease, border-color .12s ease;
+      text-decoration:none;white-space:nowrap;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn.primary:hover{background:#1e293b}
+    .btn.danger{background:var(--badBg);color:#991b1b;border-color:#fecaca}
+    .btn.warn{background:var(--warnBg);color:#92400e;border-color:#fde68a}
+    .btn:disabled{opacity:.65;cursor:not-allowed}
+
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid var(--border);
+      background:#f1f5f9;color:#475569;
+      font-weight:900;font-size:.82rem;
+      text-transform:uppercase;letter-spacing:.4px;
+    }
+    .pill.live{background:var(--okBg);border-color:#bbf7d0;color:var(--ok)}
+    .pill.demo{background:var(--warnBg);border-color:#fde68a;color:#92400e}
+
+    .stats{margin-top:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 12px 30px rgba(2,6,23,.08);
+      padding:16px;
+    }
+    .stat{display:flex;gap:12px;align-items:center;}
+    .stat i{font-size:34px;color:var(--accent)}
+    .stat .n{font-size:1.6rem;font-weight:900;color:var(--primary);letter-spacing:-.3px}
+    .stat .l{color:var(--muted);font-weight:800;margin-top:2px}
+
+    .breakdown{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+    .miniRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;font-weight:800;color:#334155;}
+    .miniRow:last-child{border-bottom:none}
+    .miniRow span{color:var(--muted);font-weight:800}
+
+    .tabs{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
+    .tab{
+      padding:10px 14px;border-radius:999px;border:1px solid var(--border);
+      font-weight:900;cursor:pointer;background:#fff;color:#334155;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .section{display:none;margin-top:14px}
+    .section.active{display:block}
+
+    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+    .sectionHead h2{margin:0;font-size:1.15rem;font-weight:900;color:var(--primary);letter-spacing:-.3px}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
+
+    .input{padding:10px 12px;border-radius:12px;border:1px solid #cbd5e1;outline:none;font-family:inherit;background:#fff;min-width:220px;font-weight:750;color:#0f172a;}
+    .select{padding:10px 12px;border-radius:12px;border:1px solid #cbd5e1;outline:none;font-family:inherit;background:#fff;font-weight:800;color:#0f172a;}
+    .input:focus,.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,23,42,.10)}
+
+    .tableWrap{overflow:auto;border:1px solid #e5e7eb;border-radius:16px}
+    table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff;min-width:920px}
+    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+    th{position:sticky;top:0;background:#fff;font-weight:900;color:#334155;z-index:1}
+    tr:hover td{background:#fafafa}
+
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:.78rem;border:1px solid var(--border);background:#f1f5f9;color:#475569;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+    .tag.ok{background:var(--okBg);border-color:#bbf7d0;color:var(--ok)}
+    .tag.bad{background:var(--badBg);border-color:#fecaca;color:var(--bad)}
+    .tag.warn{background:var(--warnBg);border-color:#fde68a;color:#92400e}
+
+    .muted{color:var(--muted);font-weight:750}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+
+    .toast{
+      position:fixed;bottom:18px;left:50%;
+      transform:translateX(-50%);
+      background:#0b1220;color:#fff;padding:12px 14px;border-radius:14px;
+      box-shadow:0 18px 35px rgba(2,6,23,.22);
+      font-weight:850;display:none;z-index:9999;
+      max-width:min(92vw,720px);text-align:center;
+    }
+    .empty{padding:22px;text-align:center;color:var(--muted);font-weight:800;border:1px dashed #cbd5e1;border-radius:16px;background:#fff;}
+
+    .charts{
+      display:grid;
+      gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    }
+    .chartHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    .chartTitle{font-weight:900;color:var(--primary);display:flex;align-items:center;gap:10px}
+    .chartHint{color:var(--muted);font-weight:750;font-size:.92rem;line-height:1.5}
+    canvas{
+      width:100%;
+      height:260px;
+      border:1px solid #f1f5f9;
+      border-radius:14px;
+      background:#fff;
+    }
+
+    footer{margin-top:18px;background:var(--primary);border-radius:22px;padding:22px 16px;color:#94a3b8;text-align:center;}
+  </style>
+
+  <script>
+    (function(){
+      let u=null; try{u=JSON.parse(localStorage.getItem("user"))}catch(e){}
+      if(!u || u.role !== "Admin"){ alert("Admin access only."); location.href="index.html"; }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="wrap">
+    <header>
+      <div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <h1>Admin Dashboard</h1>
+          <span id="modePill" class="pill demo">DEMO MODE</span>
+        </div>
+        <p>
+          Manage users, verify payments, approve promotions, monitor analytics, and manage featured listings.
+          Set <span class="mono">API_BASE</span> to connect to your hosted backend.
+        </p>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" onclick="openSetApi()"><i class="ph ph-gear"></i> API_BASE</button>
+        <button class="btn primary" type="button" onclick="refreshAll()"><i class="ph ph-arrows-clockwise"></i> Refresh All</button>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="card stat"><i class="ph ph-users"></i><div><div class="n" id="statUsers">—</div><div class="l">Total users</div></div></div>
+      <div class="card stat"><i class="ph ph-house"></i><div><div class="n" id="statProps">—</div><div class="l">Total properties</div></div></div>
+      <div class="card stat"><i class="ph ph-eye"></i><div><div class="n" id="statLeads">—</div><div class="l">Total views (leads)</div></div></div>
+      <div class="card stat"><i class="ph ph-currency-circle-dollar"></i><div><div class="n" id="statAvg">—</div><div class="l">Avg rent (RWF)</div></div></div>
+    </section>
+
+    <section class="breakdown">
+      <div class="card">
+        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-shield-check"></i> Safety</div>
+        <div class="miniRow"><div>Active users</div><span id="bdActive">—</span></div>
+        <div class="miniRow"><div>Banned users</div><span id="bdBanned">—</span></div>
+        <div class="miniRow"><div>Verified agents</div><span id="bdVerified">—</span></div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-user-gear"></i> Roles</div>
+        <div class="miniRow"><div>Landlords</div><span id="bdLandlords">—</span></div>
+        <div class="miniRow"><div>Seekers</div><span id="bdSeekers">—</span></div>
+        <div class="miniRow"><div>Admins</div><span id="bdAdmins">—</span></div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-star"></i> Monetization</div>
+        <div class="miniRow"><div>Pro users</div><span id="bdPro">—</span></div>
+        <div class="miniRow"><div>Pending Pro requests</div><span id="bdProPending">—</span></div>
+        <div class="miniRow"><div>Pending promotions</div><span id="bdPromoPending">—</span></div>
+      </div>
+    </section>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="reports"><i class="ph ph-chart-line"></i> Charts & Reports</div>
+      <div class="tab" data-tab="featured"><i class="ph ph-star"></i> Featured Listings</div>
+      <div class="tab" data-tab="moderation"><i class="ph ph-shield-check"></i> Moderation</div>
+      <div class="tab" data-tab="users"><i class="ph ph-users"></i> Users</div>
+      <div class="tab" data-tab="pro"><i class="ph ph-trophy"></i> Pro Requests</div>
+      <div class="tab" data-tab="promo"><i class="ph ph-rocket-launch"></i> Promotions</div>
+      <div class="tab" data-tab="transactions"><i class="ph ph-receipt"></i> Transactions</div>
+      <div class="tab" data-tab="contracts"><i class="ph ph-file-doc"></i> Contracts</div>
+    </div>
+
+    <section class="section active" id="reports">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Charts & market intelligence</h2>
+          <div class="tools">
+            <select id="tsDays" class="select">
+              <option value="7">Last 7 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+            <button class="btn primary" onclick="loadReports(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="charts" style="margin-bottom:14px;">
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-users"></i> New users per day</div>
+              <div class="chartHint">Signup growth trend.</div>
+            </div>
+            <canvas id="tsUsers"></canvas>
+          </div>
+
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-house"></i> New properties per day</div>
+              <div class="chartHint">Supply trend (new listings).</div>
+            </div>
+            <canvas id="tsProps"></canvas>
+          </div>
+
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-receipt"></i> Transactions per day</div>
+              <div class="chartHint">Monetization activity.</div>
+            </div>
+            <canvas id="tsTx"></canvas>
+          </div>
+
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-file-doc"></i> Contracts per day</div>
+              <div class="chartHint">Usage signal (agreements).</div>
+            </div>
+            <canvas id="tsContracts"></canvas>
+          </div>
+        </div>
+
+        <div class="charts">
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-map-pin"></i> Avg rent by district</div>
+              <div class="chartHint">Based on available rent listings.</div>
+            </div>
+            <canvas id="chartPricing"></canvas>
+            <div id="repPricing" class="muted" style="margin-top:10px;">Loading…</div>
+          </div>
+
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-stack"></i> Inventory by category</div>
+              <div class="chartHint">Shows supply distribution.</div>
+            </div>
+            <canvas id="chartInventory"></canvas>
+            <div id="repInventory" class="muted" style="margin-top:10px;">Loading…</div>
+          </div>
+
+          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+            <div class="chartHead">
+              <div class="chartTitle"><i class="ph ph-magnifying-glass"></i> Top search terms</div>
+              <div class="chartHint">Requires search logging to be real.</div>
+            </div>
+            <canvas id="chartDemand"></canvas>
+            <div id="repDemand" class="muted" style="margin-top:10px;">Loading…</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;" class="muted">
+          Tip: Later, we’ll enable <span class="mono">/api/analytics/search</span> to insert into <span class="mono">SearchLogs</span>.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="featured">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Featured listings (manage)</h2>
+          <div class="tools">
+            <input id="featuredSearch" class="input" placeholder="Search title/district/category..." />
+            <button class="btn primary" onclick="loadFeatured(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Created</th>
+                <th style="min-width:220px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="featuredTable"></tbody>
+          </table>
+        </div>
+
+        <div id="featuredEmpty" class="empty" style="display:none;">No featured properties found.</div>
+      </div>
+    </section>
+
+    <!-- MODERATION (UI already present; now we wire it in JS below) -->
+    <section class="section" id="moderation">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Property moderation</h2>
+          <div class="tools">
+            <select id="modStatus" class="select">
+              <option value="Pending" selected>Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <input id="modSearch" class="input" placeholder="Search title/district/landlord phone..." />
+            <button class="btn primary" onclick="loadModeration(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Landlord</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th style="min-width:320px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="modTable"></tbody>
+          </table>
+        </div>
+
+        <div id="modEmpty" class="empty" style="display:none;">No properties found for this status.</div>
+      </div>
+    </section>
+
+    <section class="section" id="users">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Users management</h2>
+          <div class="tools">
+            <input id="userSearch" class="input" placeholder="Search name/email/phone/nida..." />
+            <select id="userRoleFilter" class="select">
+              <option value="">All roles</option>
+              <option value="Admin">Admin</option>
+              <option value="Landlord">Landlord</option>
+              <option value="Seeker">Seeker</option>
+            </select>
+            <select id="userStatusFilter" class="select">
+              <option value="">All status</option>
+              <option value="Active">Active</option>
+              <option value="Banned">Banned</option>
+            </select>
+            <button class="btn primary" onclick="loadUsers(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Role</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th style="min-width:220px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+        <div id="usersEmpty" class="empty" style="display:none;">No users to display.</div>
+      </div>
+    </section>
+
+    <section class="section" id="pro">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Pro requests (pending verification)</h2>
+          <div class="tools">
+            <input id="proSearch" class="input" placeholder="Search name/phone..." />
+            <button class="btn primary" onclick="loadProRequests(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>User</th><th>Payer phone</th><th>Action</th></tr></thead>
+            <tbody id="proTable"></tbody>
+          </table>
+        </div>
+        <div id="proEmpty" class="empty" style="display:none;">No pending pro requests.</div>
+      </div>
+    </section>
+
+    <section class="section" id="promo">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Property promotions (pending payments)</h2>
+          <div class="tools">
+            <input id="promoSearch" class="input" placeholder="Search title/phone..." />
+            <button class="btn primary" onclick="loadPendingPromos(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>Property</th><th>Payer phone</th><th style="min-width:260px;">Action</th></tr></thead>
+            <tbody id="promoTable"></tbody>
+          </table>
+        </div>
+        <div id="promoEmpty" class="empty" style="display:none;">No pending promotions.</div>
+      </div>
+    </section>
+
+    <section class="section" id="transactions">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Transactions</h2>
+          <div class="tools">
+            <input id="txSearch" class="input" placeholder="Search user/phone/type..." />
+            <select id="txTypeFilter" class="select">
+              <option value="">All types</option>
+              <option value="ProSubscription">ProSubscription</option>
+              <option value="PropertyBoost">PropertyBoost</option>
+            </select>
+            <button class="btn primary" onclick="loadTransactions(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>User</th><th>Phone</th><th>Amount</th><th>Type</th><th>Status</th><th>Created</th></tr></thead>
+            <tbody id="txTable"></tbody>
+          </table>
+        </div>
+        <div id="txEmpty" class="empty" style="display:none;">No transactions found.</div>
+      </div>
+    </section>
+
+    <section class="section" id="contracts">
+      <div class="card">
+        <div class="sectionHead">
+          <h2>Contract logs</h2>
+          <div class="tools">
+            <input id="contractSearch" class="input" placeholder="Search landlord/tenant/district..." />
+            <button class="btn primary" onclick="loadContracts(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>Landlord</th><th>Tenant</th><th>Tenant ID</th><th>District</th><th>Rent</th><th>Generated</th></tr></thead>
+            <tbody id="contractsTable"></tbody>
+          </table>
+        </div>
+        <div id="contractsEmpty" class="empty" style="display:none;">No contracts logged.</div>
+      </div>
+    </section>
+
+    <footer>© 2026 InzuLink — Admin Panel</footer>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="./assets/navbar.js"></script>
+
+  <script>
+    // ---------- Config ----------
+    const API_BASE = (localStorage.getItem("API_BASE") || "").replace(/\/$/, "");
+    const isLive = !!API_BASE;
+
+    const modePill = document.getElementById("modePill");
+    modePill.textContent = isLive ? "LIVE MODE" : "DEMO MODE";
+    modePill.className = "pill " + (isLive ? "live" : "demo");
+
+    // Tabs
+    const tabs = document.querySelectorAll(".tab");
+    const sections = document.querySelectorAll(".section");
+    tabs.forEach(t => t.addEventListener("click", () => {
+      tabs.forEach(x => x.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      t.classList.add("active");
+      document.getElementById(t.dataset.tab).classList.add("active");
+    }));
+
+    // Toast
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+    function toast(msg){
+      clearTimeout(toastTimer);
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      toastTimer = setTimeout(() => toastEl.style.display = "none", 2600);
+    }
+
+    function safe(v){ return (v === null || v === undefined) ? "—" : String(v); }
+    function fmtDate(s){
+      if (!s) return "—";
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return "—";
+      return d.toLocaleString();
+    }
+    function fmtMoney(n){
+      const x = Number(n||0);
+      if (!Number.isFinite(x)) return "RWF 0";
+      return "RWF " + Math.round(x).toLocaleString("en-RW");
+    }
+
+    async function fetchJSON(path, opts={}, timeoutMs=15000){
+      if (!isLive) throw new Error("DEMO_MODE");
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try{
+        const res = await fetch(API_BASE + path, { ...opts, signal: controller.signal });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) throw new Error((data && data.error) ? data.error : `HTTP_${res.status}`);
+        return data;
+      } finally { clearTimeout(id); }
+    }
+
+    // ---------- DEMO ----------
+    const DEMO = {
+      stats: { users: 128, properties: 64, leads: 3240, avgRent: 245000 },
+      users: [
+        { user_id: 1, full_name: "Admin User", email: "admin@inzulink.test", phone:"0780000000", nida_number:"1199xxxx", role:"Admin", subscription_plan:"Pro", is_verified_agent:true, status:"Active", created_at: new Date().toISOString() },
+        { user_id: 2, full_name: "Landlord One", email: "landlord@inzulink.test", phone:"0781111111", nida_number:"1199yyyy", role:"Landlord", subscription_plan:"Free", is_verified_agent:false, status:"Active", created_at: new Date().toISOString() },
+        { user_id: 3, full_name: "Seeker One", email: "seeker@inzulink.test", phone:"0782222222", nida_number:"1199zzzz", role:"Seeker", subscription_plan:"Free", is_verified_agent:false, status:"Banned", created_at: new Date().toISOString() }
+      ],
+      pro: [{ user_id: 22, full_name:"Jane Doe", pro_payment_phone:"0783333333" }],
+      promo: [{ property_id: 99, title:"House in Kacyiru", payer_phone:"0784444444" }],
+      transactions: [
+        { id: 1, full_name: "Jane Doe", phone_number:"0783333333", amount:10000, payment_type:"ProSubscription", status:"Success", created_at: new Date().toISOString() }
+      ],
+      contracts: [
+        { id: 1, landlord_name:"Paul", tenant_name:"Alice", tenant_id:"1199-xxxx", property_district:"Gasabo", rent_amount:300000, generated_at: new Date().toISOString() }
+      ],
+      reports: {
+        pricing: [
+          { district:"Gasabo", avg_price: 320000 },
+          { district:"Kicukiro", avg_price: 260000 },
+          { district:"Nyarugenge", avg_price: 240000 },
+          { district:"Huye", avg_price: 120000 }
+        ],
+        inventory: [
+          { category:"House", count: 22 },
+          { category:"Apartment", count: 31 },
+          { category:"Land", count: 11 }
+        ],
+        demand: [
+          { term:"Kacyiru", searches: 14 },
+          { term:"2 bedrooms", searches: 11 },
+          { term:"Near campus", searches: 9 },
+          { term:"Kimironko", searches: 7 }
+        ]
+      },
+      timeseries: (() => {
+        const days = 30;
+        const out = [];
+        for (let i=days-1;i>=0;i--){
+          const d = new Date();
+          d.setDate(d.getDate()-i);
+          out.push({
+            day: d.toISOString().slice(0,10),
+            users: Math.max(0, Math.round(Math.random()*6)),
+            properties: Math.max(0, Math.round(Math.random()*5)),
+            transactions: Math.max(0, Math.round(Math.random()*3)),
+            contracts: Math.max(0, Math.round(Math.random()*4))
+          });
+        }
+        return { days, series: out };
+      })(),
+      featured: [
+        { property_id: 10, title:"Modern Apartment", location:"Kigali", district:"Gasabo", category:"Apartment", price:350000, is_featured:true, created_at:new Date().toISOString() },
+        { property_id: 11, title:"Family House", location:"Kigali", district:"Kicukiro", category:"House", price:280000, is_featured:true, created_at:new Date().toISOString() }
+      ],
+      moderation: [
+        { property_id: 501, title:"New Listing — Kacyiru", location:"Kigali", district:"Gasabo", price:350000, category:"Apartment", status:"Pending", created_at:new Date().toISOString(), landlord_name:"Demo Landlord", landlord_phone:"0789999999", rejection_reason:null },
+        { property_id: 502, title:"Land Plot — Huye", location:"Huye", district:"Huye", price:1200000, category:"Land", status:"Rejected", created_at:new Date().toISOString(), landlord_name:"Demo Landlord 2", landlord_phone:"0788888888", rejection_reason:"Missing clear photos" }
+      ]
+    };
+
+    // ---------- State ----------
+    let stateUsers = [];
+    let statePro = [];
+    let statePromo = [];
+    let stateTx = [];
+    let stateContracts = [];
+    let stateReports = null;
+    let stateTime = null;
+    let stateFeatured = [];
+    let stateModeration = [];
+
+    // ---------- Stats / Breakdown ----------
+    function fillStats(stats){
+      document.getElementById("statUsers").textContent = (stats.users ?? "—").toLocaleString?.() || stats.users;
+      document.getElementById("statProps").textContent = (stats.properties ?? "—").toLocaleString?.() || stats.properties;
+      document.getElementById("statLeads").textContent = (stats.leads ?? "—").toLocaleString?.() || stats.leads;
+      document.getElementById("statAvg").textContent = Math.round(stats.avgRent || 0).toLocaleString("en-RW");
+
+      const u = stateUsers;
+      const active = u.filter(x => (x.status || "").toLowerCase() === "active").length;
+      const banned = u.filter(x => (x.status || "").toLowerCase() === "banned").length;
+      const verified = u.filter(x => !!x.is_verified_agent).length;
+      const landlords = u.filter(x => (x.role || "").toLowerCase() === "landlord").length;
+      const seekers = u.filter(x => (x.role || "").toLowerCase() === "seeker").length;
+      const admins = u.filter(x => (x.role || "").toLowerCase() === "admin").length;
+      const proUsers = u.filter(x => (x.subscription_plan || "").toLowerCase() === "pro").length;
+
+      document.getElementById("bdActive").textContent = active.toLocaleString();
+      document.getElementById("bdBanned").textContent = banned.toLocaleString();
+      document.getElementById("bdVerified").textContent = verified.toLocaleString();
+      document.getElementById("bdLandlords").textContent = landlords.toLocaleString();
+      document.getElementById("bdSeekers").textContent = seekers.toLocaleString();
+      document.getElementById("bdAdmins").textContent = admins.toLocaleString();
+      document.getElementById("bdPro").textContent = proUsers.toLocaleString();
+      document.getElementById("bdProPending").textContent = statePro.length.toLocaleString();
+      document.getElementById("bdPromoPending").textContent = statePromo.length.toLocaleString();
+    }
+
+    // ---------- Charts (no libs) ----------
+    function setCanvasDPI(canvas){
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w, h };
+    }
+
+    function drawBarChart(canvasId, labels, values, opts={}){
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const { ctx, w, h } = setCanvasDPI(canvas);
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+
+      const top=10, left=42, right=10, bottom=46;
+      const pw=w-left-right, ph=h-top-bottom;
+
+      if (!labels.length){
+        ctx.fillStyle="#64748b"; ctx.font="800 14px Inter,system-ui";
+        ctx.fillText("No data", 16, 26);
+        return;
+      }
+
+      const maxV = Math.max(...values, 1);
+      const gridLines = opts.gridLines ?? 4;
+
+      ctx.strokeStyle="#eef2f7"; ctx.lineWidth=1;
+      ctx.fillStyle="#64748b"; ctx.font="800 12px Inter,system-ui";
+
+      for (let i=0;i<=gridLines;i++){
+        const y = top + (ph * i / gridLines);
+        ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(left+pw,y); ctx.stroke();
+        const v = Math.round(maxV * (1 - i / gridLines));
+        const text = (opts.formatY ? opts.formatY(v) : String(v));
+        ctx.fillText(text, 8, y + 4);
+      }
+
+      const n=labels.length;
+      const gap=Math.max(8, pw*0.02);
+      const barW=Math.max(18, (pw - gap*(n-1))/n);
+
+      for (let i=0;i<n;i++){
+        const v=Math.max(0, values[i]);
+        const barH=(v/maxV)*(ph-6);
+        const x=left + i*(barW+gap);
+        const y=top + ph - barH;
+
+        ctx.fillStyle="#f59e0b";
+        ctx.fillRect(x,y,barW,barH);
+        ctx.fillStyle="rgba(255,255,255,0.25)";
+        ctx.fillRect(x,y,barW,3);
+
+        ctx.fillStyle="#334155";
+        ctx.font="800 11px Inter,system-ui";
+        const label=String(labels[i]);
+        const short=label.length>10 ? label.slice(0,9)+"…" : label;
+
+        ctx.save();
+        ctx.translate(x+barW/2, top+ph+34);
+        ctx.rotate(-0.35);
+        ctx.textAlign="center";
+        ctx.fillText(short, 0, 0);
+        ctx.restore();
+      }
+
+      ctx.strokeStyle="#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(left,top);
+      ctx.lineTo(left,top+ph);
+      ctx.lineTo(left+pw,top+ph);
+      ctx.stroke();
+    }
+
+    function drawLineChart(canvasId, labels, values){
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const { ctx, w, h } = setCanvasDPI(canvas);
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+
+      const top=12, left=42, right=14, bottom=34;
+      const pw=w-left-right, ph=h-top-bottom;
+
+      if (!labels.length){
+        ctx.fillStyle="#64748b"; ctx.font="800 14px Inter,system-ui";
+        ctx.fillText("No data", 16, 26);
+        return;
+      }
+
+      const maxV = Math.max(...values, 1);
+      const gridLines = 3;
+
+      ctx.strokeStyle="#eef2f7"; ctx.lineWidth=1;
+      ctx.fillStyle="#64748b"; ctx.font="800 12px Inter,system-ui";
+      for (let i=0;i<=gridLines;i++){
+        const y = top + (ph * i / gridLines);
+        ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(left+pw,y); ctx.stroke();
+        const v = Math.round(maxV * (1 - i / gridLines));
+        ctx.fillText(String(v), 10, y + 4);
+      }
+
+      const n = values.length;
+      const step = n>1 ? pw/(n-1) : pw;
+
+      ctx.strokeStyle="#f59e0b";
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      for (let i=0;i<n;i++){
+        const x = left + i*step;
+        const y = top + ph - (values[i]/maxV)*ph;
+        if (i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle="#0f172a";
+      for (let i=0;i<n;i++){
+        const x = left + i*step;
+        const y = top + ph - (values[i]/maxV)*ph;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+      }
+
+      ctx.fillStyle="#334155";
+      ctx.font="800 11px Inter,system-ui";
+      const ticks = Math.min(6, n);
+      for (let t=0;t<ticks;t++){
+        const idx = Math.round(t*(n-1)/(ticks-1 || 1));
+        const x = left + idx*step;
+        ctx.textAlign="center";
+        ctx.fillText(labels[idx], x, top+ph+22);
+      }
+
+      ctx.strokeStyle="#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(left,top);
+      ctx.lineTo(left,top+ph);
+      ctx.lineTo(left+pw,top+ph);
+      ctx.stroke();
+    }
+
+    // ---------- Render: Reports + charts ----------
+    function renderReports(){
+      const repPricing = document.getElementById("repPricing");
+      const repInventory = document.getElementById("repInventory");
+      const repDemand = document.getElementById("repDemand");
+
+      const R = stateReports || { pricing:[], inventory:[], demand:[] };
+
+      repPricing.innerHTML = R.pricing?.length
+        ? R.pricing.map(x => `<div class="miniRow"><div>${safe(x.district)}</div><span>${fmtMoney(x.avg_price)}</span></div>`).join("")
+        : `<div class="muted">No pricing data.</div>`;
+
+      repInventory.innerHTML = R.inventory?.length
+        ? R.inventory.map(x => `<div class="miniRow"><div>${safe(x.category)}</div><span>${safe(x.count)}</span></div>`).join("")
+        : `<div class="muted">No inventory data.</div>`;
+
+      repDemand.innerHTML = R.demand?.length
+        ? R.demand.map(x => `<div class="miniRow"><div>${safe(x.term)}</div><span>${safe(x.searches)}</span></div>`).join("")
+        : `<div class="muted">No search trends yet.</div>`;
+
+      drawBarChart("chartPricing", (R.pricing||[]).map(x=>x.district), (R.pricing||[]).map(x=>Number(x.avg_price||0)), {
+        gridLines: 4,
+        formatY: (v) => (v >= 1000 ? Math.round(v/1000) + "k" : String(v))
+      });
+      drawBarChart("chartInventory", (R.inventory||[]).map(x=>x.category), (R.inventory||[]).map(x=>Number(x.count||0)), { gridLines: 4 });
+      drawBarChart("chartDemand", (R.demand||[]).map(x=>x.term), (R.demand||[]).map(x=>Number(x.searches||0)), { gridLines: 4 });
+
+      const S = stateTime?.series || [];
+      const labels = S.map(x => String(x.day).slice(5)); // MM-DD
+      drawLineChart("tsUsers", labels, S.map(x => Number(x.users||0)));
+      drawLineChart("tsProps", labels, S.map(x => Number(x.properties||0)));
+      drawLineChart("tsTx", labels, S.map(x => Number(x.transactions||0)));
+      drawLineChart("tsContracts", labels, S.map(x => Number(x.contracts||0)));
+    }
+
+    // ---------- Render: Featured ----------
+    const featuredTable = document.getElementById("featuredTable");
+    const featuredEmpty = document.getElementById("featuredEmpty");
+
+    function renderFeatured(){
+      const q = (document.getElementById("featuredSearch").value || "").toLowerCase().trim();
+      let list = [...stateFeatured];
+      if (q){
+        list = list.filter(p => (`${p.title||""} ${p.district||""} ${p.category||""} ${p.location||""}`).toLowerCase().includes(q));
+      }
+
+      featuredTable.innerHTML = "";
+      featuredEmpty.style.display = list.length ? "none" : "block";
+
+      for (const p of list){
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>
+            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
+            <div class="muted mono">Property ID: ${safe(p.property_id)}</div>
+          </td>
+          <td>${safe(p.location)} • ${safe(p.district)}</td>
+          <td><span class="tag ok">${safe(p.category)}</span></td>
+          <td style="font-weight:900;color:var(--primary);">${fmtMoney(p.price)}</td>
+          <td class="muted">${fmtDate(p.created_at)}</td>
+          <td>
+            <button class="btn danger" onclick="setFeatured(${p.property_id}, false)">
+              <i class="ph ph-star-half"></i> Unfeature
+            </button>
+          </td>
+        `;
+        featuredTable.appendChild(row);
+      }
+    }
+
+    async function setFeatured(propertyId, isFeatured){
+      const ok = confirm(isFeatured ? "Feature this property?" : "Remove from Featured?");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          if (!isFeatured) stateFeatured = stateFeatured.filter(x => x.property_id !== propertyId);
+          toast("Updated (demo).");
+          renderFeatured();
+          return;
+        }
+
+        await fetchJSON(`/api/admin/featured-properties/${propertyId}`, {
+          method:"PUT",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ isFeatured })
+        }, 20000);
+
+        toast("Featured updated.");
+        await loadFeatured(true);
+      } catch(e){
+        toast("Failed to update featured.");
+      }
+    }
+
+    // ---------- Moderation (C) ----------
+    const modTable = document.getElementById("modTable");
+    const modEmpty = document.getElementById("modEmpty");
+
+    function tagPropertyStatus(s){
+      const v = (s||"").toLowerCase();
+      if (v === "approved") return `<span class="tag ok">Approved</span>`;
+      if (v === "rejected") return `<span class="tag bad">Rejected</span>`;
+      return `<span class="tag warn">Pending</span>`;
+    }
+
+    function renderModeration(){
+      const q = (document.getElementById("modSearch").value || "").toLowerCase().trim();
+      let list = [...stateModeration];
+
+      if (q){
+        list = list.filter(p => (
+          `${p.title||""} ${p.district||""} ${p.location||""} ${p.category||""} ${p.landlord_name||""} ${p.landlord_phone||""} ${p.property_id||""}`
+        ).toLowerCase().includes(q));
+      }
+
+      modTable.innerHTML = "";
+      modEmpty.style.display = list.length ? "none" : "block";
+
+      for (const p of list){
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>
+            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
+            <div class="muted mono">ID: ${safe(p.property_id)}</div>
+            ${p.rejection_reason ? `<div class="muted" style="margin-top:6px;">Reason: ${safe(p.rejection_reason)}</div>` : ""}
+          </td>
+          <td>
+            <div style="font-weight:900;color:var(--primary);">${safe(p.landlord_name || "—")}</div>
+            <div class="muted mono">${safe(p.landlord_phone || "—")}</div>
+          </td>
+          <td>${safe(p.location)} • ${safe(p.district)}</td>
+          <td><span class="tag">${safe(p.category)}</span></td>
+          <td style="font-weight:900;color:var(--primary);">${fmtMoney(p.price)}</td>
+          <td>${tagPropertyStatus(p.status)}</td>
+          <td class="muted">${fmtDate(p.created_at)}</td>
+          <td style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn primary" onclick="approveProperty(${p.property_id})"><i class="ph ph-check-circle"></i> Approve</button>
+            <button class="btn danger" onclick="rejectProperty(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
+            <button class="btn warn" onclick="removeProperty(${p.property_id})"><i class="ph ph-trash"></i> Remove</button>
+          </td>
+        `;
+        modTable.appendChild(row);
+      }
+    }
+
+    async function loadModeration(){
+      const status = (document.getElementById("modStatus").value || "Pending").toString();
+      try{
+        if (!isLive){
+          // demo: filter by status
+          stateModeration = (DEMO.moderation || []).filter(x => (x.status||"Pending") === status);
+          renderModeration();
+          return;
+        }
+        stateModeration = await fetchJSON(`/api/admin/properties?status=${encodeURIComponent(status)}&limit=200`, {}, 20000);
+        renderModeration();
+      } catch(e){
+        stateModeration = [];
+        renderModeration();
+        toast("Moderation list failed to load.");
+      }
+    }
+
+    async function approveProperty(propertyId){
+      const ok = confirm("Approve this listing and make it visible?");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          stateModeration = stateModeration.filter(x => x.property_id !== propertyId);
+          renderModeration();
+          toast("Approved (demo).");
+          return;
+        }
+        await fetchJSON(`/api/admin/properties/${propertyId}/approve`, { method:"PUT" }, 20000);
+        toast("Approved.");
+        await loadModeration(true);
+      } catch(e){ toast("Approve failed."); }
+    }
+
+    async function rejectProperty(propertyId){
+      const reason = prompt("Reject reason (required):");
+      if (reason === null) return;
+      const r = (reason||"").trim();
+      if (r.length < 3){ toast("Reason is required."); return; }
+
+      try{
+        if (!isLive){
+          stateModeration = stateModeration.filter(x => x.property_id !== propertyId);
+          renderModeration();
+          toast("Rejected (demo).");
+          return;
+        }
+        await fetchJSON(`/api/admin/properties/${propertyId}/reject`, {
+          method:"PUT",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ reason: r })
+        }, 20000);
+        toast("Rejected.");
+        await loadModeration(true);
+      } catch(e){ toast("Reject failed."); }
+    }
+
+    async function removeProperty(propertyId){
+      const ok = confirm("Remove this listing from the platform? (soft delete)");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          stateModeration = stateModeration.filter(x => x.property_id !== propertyId);
+          renderModeration();
+          toast("Removed (demo).");
+          return;
+        }
+        await fetchJSON(`/api/admin/properties/${propertyId}`, { method:"DELETE" }, 20000);
+        toast("Removed.");
+        await loadModeration(true);
+      } catch(e){ toast("Remove failed."); }
+    }
+
+    // ---------- Render: Users / Pro / Promo / Tx / Contracts ----------
+    const usersTable = document.getElementById("usersTable");
+    const usersEmpty = document.getElementById("usersEmpty");
+    const proTable = document.getElementById("proTable");
+    const proEmpty = document.getElementById("proEmpty");
+    const promoTable = document.getElementById("promoTable");
+    const promoEmpty = document.getElementById("promoEmpty");
+    const txTable = document.getElementById("txTable");
+    const txEmpty = document.getElementById("txEmpty");
+    const contractsTable = document.getElementById("contractsTable");
+    const contractsEmpty = document.getElementById("contractsEmpty");
+
+    function userTagRole(role){
+      const r = (role || "").toLowerCase();
+      if (r === "admin") return `<span class="tag warn">Admin</span>`;
+      if (r === "landlord") return `<span class="tag">Landlord</span>`;
+      return `<span class="tag">Seeker</span>`;
+    }
+    function userTagPlan(plan, verified){
+      const p = (plan || "").toLowerCase();
+      if (p === "pro") return `<span class="tag ok">Pro</span> ${verified ? `<span class="tag ok">Verified</span>` : ""}`;
+      return `<span class="tag">Free</span>`;
+    }
+    function userTagStatus(status){
+      const s = (status || "").toLowerCase();
+      if (s === "banned") return `<span class="tag bad">Banned</span>`;
+      return `<span class="tag ok">Active</span>`;
+    }
+
+    function renderUsers(){
+      const q = (document.getElementById("userSearch").value || "").toLowerCase().trim();
+      const roleF = document.getElementById("userRoleFilter").value;
+      const statusF = document.getElementById("userStatusFilter").value;
+
+      let list = [...stateUsers];
+      if (roleF) list = list.filter(u => (u.role || "") === roleF);
+      if (statusF) list = list.filter(u => (u.status || "") === statusF);
+
+      if (q){
+        list = list.filter(u => {
+          const blob = [u.full_name,u.email,u.phone,u.nida_number,u.role,u.status,u.subscription_plan]
+            .map(x => (x||"").toString().toLowerCase()).join(" ");
+          return blob.includes(q);
+        });
+      }
+
+      usersTable.innerHTML = "";
+      usersEmpty.style.display = list.length ? "none" : "block";
+
+      for (const u of list){
+        const isBanned = (u.status||"") === "Banned";
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><div style="font-weight:900;color:var(--primary);">${safe(u.full_name)}</div><div class="muted mono">ID: ${safe(u.user_id)}</div></td>
+          <td><div>${safe(u.email)}</div><div class="muted">${safe(u.phone)} • NIDA: <span class="mono">${safe(u.nida_number)}</span></div></td>
+          <td>${userTagRole(u.role)}</td>
+          <td>${userTagPlan(u.subscription_plan, u.is_verified_agent)}</td>
+          <td>${userTagStatus(u.status)}</td>
+          <td class="muted">${fmtDate(u.created_at)}</td>
+          <td>
+            <button class="btn ${isBanned ? "primary" : "danger"}" onclick="toggleBan(${u.user_id}, ${isBanned})">
+              <i class="ph ${isBanned ? "ph-check-circle" : "ph-prohibit"}"></i> ${isBanned ? "Activate" : "Ban"}
+            </button>
+          </td>
+        `;
+        usersTable.appendChild(row);
+      }
+    }
+
+    async function toggleBan(userId, currentlyBanned){
+      const ok = confirm(currentlyBanned ? "Activate this user?" : "Ban this user?");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          const u = stateUsers.find(x => x.user_id === userId);
+          if (u) u.status = currentlyBanned ? "Active" : "Banned";
+          toast("Updated (demo).");
+          renderUsers();
+          fillStats(DEMO.stats);
+          return;
+        }
+        const path = currentlyBanned ? `/api/users/${userId}/activate` : `/api/users/${userId}/ban`;
+        await fetchJSON(path, { method:"PUT" }, 15000);
+        toast("User updated.");
+        await loadUsers(true);
+      } catch(e){ toast("Failed to update user."); }
+    }
+
+    function renderPro(){
+      const q = (document.getElementById("proSearch").value || "").toLowerCase().trim();
+      let list = [...statePro];
+      if (q) list = list.filter(x => (`${x.full_name||""} ${x.pro_payment_phone||""}`).toLowerCase().includes(q));
+
+      proTable.innerHTML = "";
+      proEmpty.style.display = list.length ? "none" : "block";
+
+      for (const r of list){
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><div style="font-weight:900;color:var(--primary);">${safe(r.full_name)}</div><div class="muted mono">User ID: ${safe(r.user_id)}</div></td>
+          <td class="mono">${safe(r.pro_payment_phone)}</td>
+          <td><button class="btn primary" onclick="approvePro(${r.user_id})"><i class="ph ph-check-circle"></i> Approve Pro</button></td>
+        `;
+        proTable.appendChild(row);
+      }
+    }
+
+    async function approvePro(userId){
+      const ok = confirm("Approve Pro for this user? (1 month)");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          const u = stateUsers.find(x => x.user_id === userId);
+          if (u){ u.subscription_plan = "Pro"; u.is_verified_agent = true; }
+          statePro = statePro.filter(x => x.user_id !== userId);
+          toast("Approved (demo).");
+          renderPro(); renderUsers(); fillStats(DEMO.stats);
+          return;
+        }
+        await fetchJSON(`/api/users/${userId}/approve-pro`, { method:"PUT" }, 20000);
+        toast("Pro approved.");
+        await Promise.all([loadUsers(true), loadProRequests(true)]);
+      } catch(e){ toast("Failed to approve pro."); }
+    }
+
+    function renderPromo(){
+      const q = (document.getElementById("promoSearch").value || "").toLowerCase().trim();
+      let list = [...statePromo];
+      if (q) list = list.filter(x => (`${x.title||""} ${x.payer_phone||""} ${x.property_id||""}`).toLowerCase().includes(q));
+
+      promoTable.innerHTML = "";
+      promoEmpty.style.display = list.length ? "none" : "block";
+
+      for (const p of list){
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>
+            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
+            <div class="muted mono">Property ID: ${safe(p.property_id)}</div>
+          </td>
+          <td class="mono">${safe(p.payer_phone)}</td>
+          <td style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn primary" onclick="approvePromo(${p.property_id})"><i class="ph ph-star"></i> Approve Featured</button>
+            <button class="btn danger" onclick="rejectPromo(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
+          </td>
+        `;
+        promoTable.appendChild(row);
+      }
+    }
+
+    async function approvePromo(propertyId){
+      const ok = confirm("Approve this property to be Featured?");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          statePromo = statePromo.filter(x => x.property_id !== propertyId);
+          toast("Approved (demo).");
+          renderPromo();
+          return;
+        }
+        await fetchJSON(`/api/properties/${propertyId}/feature`, {
+          method:"PUT",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ isFeatured: true, isRejection: false })
+        }, 20000);
+        toast("Promotion approved.");
+        await Promise.all([loadPendingPromos(true), loadFeatured(true)]);
+      } catch(e){ toast("Failed to approve promotion."); }
+    }
+
+    async function rejectPromo(propertyId){
+      const ok = confirm("Reject this promotion request?");
+      if (!ok) return;
+
+      try{
+        if (!isLive){
+          statePromo = statePromo.filter(x => x.property_id !== propertyId);
+          toast("Rejected (demo).");
+          renderPromo();
+          return;
+        }
+        await fetchJSON(`/api/properties/${propertyId}/feature`, {
+          method:"PUT",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ isFeatured: false, isRejection: true })
+        }, 20000);
+        toast("Promotion rejected.");
+        await loadPendingPromos(true);
+      } catch(e){ toast("Failed to reject promotion."); }
+    }
+
+    function renderTx(){
+      const q = (document.getElementById("txSearch").value || "").toLowerCase().trim();
+      const typeF = document.getElementById("txTypeFilter").value;
+
+      let list = [...stateTx];
+      if (typeF) list = list.filter(x => (x.payment_type || "") === typeF);
+      if (q) list = list.filter(x => (`${x.full_name||""} ${x.phone_number||""} ${x.payment_type||""} ${x.status||""}`).toLowerCase().includes(q));
+
+      txTable.innerHTML = "";
+      txEmpty.style.display = list.length ? "none" : "block";
+
+      for (const t of list){
+        const statusTag = (t.status || "").toLowerCase() === "success"
+          ? `<span class="tag ok">Success</span>`
+          : `<span class="tag bad">${safe(t.status)}</span>`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><div style="font-weight:900;color:var(--primary);">${safe(t.full_name || "—")}</div><div class="muted mono">Tx ID: ${safe(t.id)}</div></td>
+          <td class="mono">${safe(t.phone_number)}</td>
+          <td style="font-weight:900;color:var(--primary);">${fmtMoney(t.amount)}</td>
+          <td><span class="tag">${safe(t.payment_type)}</span></td>
+          <td>${statusTag}</td>
+          <td class="muted">${fmtDate(t.created_at)}</td>
+        `;
+        txTable.appendChild(row);
+      }
+    }
+
+    function renderContracts(){
+      const q = (document.getElementById("contractSearch").value || "").toLowerCase().trim();
+      let list = [...stateContracts];
+      if (q) list = list.filter(c => (`${c.landlord_name||""} ${c.tenant_name||""} ${c.tenant_id||""} ${c.property_district||""}`).toLowerCase().includes(q));
+
+      contractsTable.innerHTML = "";
+      contractsEmpty.style.display = list.length ? "none" : "block";
+
+      for (const c of list){
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td style="font-weight:900;color:var(--primary);">${safe(c.landlord_name)}</td>
+          <td>${safe(c.tenant_name)}</td>
+          <td class="mono">${safe(c.tenant_id)}</td>
+          <td>${safe(c.property_district)}</td>
+          <td style="font-weight:900;color:var(--primary);">${fmtMoney(c.rent_amount)}</td>
+          <td class="muted">${fmtDate(c.generated_at)}</td>
+        `;
+        contractsTable.appendChild(row);
+      }
+    }
+
+    // ---------- Loaders ----------
+    async function loadStats(){
+      try{
+        const data = isLive ? await fetchJSON("/api/analytics/stats", {}, 15000) : DEMO.stats;
+        fillStats(data);
+      } catch(e){ fillStats(DEMO.stats); }
+    }
+
+    async function loadUsers(){
+      try{ stateUsers = isLive ? await fetchJSON("/api/users", {}, 20000) : DEMO.users; renderUsers(); }
+      catch(e){ stateUsers = DEMO.users; renderUsers(); toast("Users loaded (demo fallback)."); }
+    }
+
+    async function loadProRequests(){
+      try{ statePro = isLive ? await fetchJSON("/api/admin/pro-requests", {}, 20000) : DEMO.pro; renderPro(); }
+      catch(e){ statePro = DEMO.pro; renderPro(); toast("Pro requests loaded (demo fallback)."); }
+    }
+
+    async function loadPendingPromos(){
+      try{ statePromo = isLive ? await fetchJSON("/api/admin/pending-payments", {}, 20000) : DEMO.promo; renderPromo(); }
+      catch(e){ statePromo = DEMO.promo; renderPromo(); toast("Promotions loaded (demo fallback)."); }
+    }
+
+    async function loadFeatured(){
+      try{ stateFeatured = isLive ? await fetchJSON("/api/admin/featured-properties", {}, 20000) : DEMO.featured; renderFeatured(); }
+      catch(e){ stateFeatured = DEMO.featured; renderFeatured(); toast("Featured loaded (demo fallback)."); }
+    }
+
+    async function loadModeration(){
+      try{
+        if (!isLive){
+          const status = (document.getElementById("modStatus").value || "Pending").toString();
+          stateModeration = (DEMO.moderation || []).filter(x => (x.status||"Pending") === status);
+          renderModeration();
+          return;
+        }
+        const status = (document.getElementById("modStatus").value || "Pending").toString();
+        stateModeration = await fetchJSON(`/api/admin/properties?status=${encodeURIComponent(status)}&limit=200`, {}, 20000);
+        renderModeration();
+      } catch(e){
+        stateModeration = [];
+        renderModeration();
+        toast("Moderation list failed to load.");
+      }
+    }
+
+    async function loadTransactions(){
+      try{ stateTx = isLive ? await fetchJSON("/api/admin/transactions", {}, 20000) : DEMO.transactions; renderTx(); }
+      catch(e){ stateTx = DEMO.transactions; renderTx(); toast("Transactions loaded (demo fallback)."); }
+    }
+
+    async function loadContracts(){
+      try{ stateContracts = isLive ? await fetchJSON("/api/admin/contracts", {}, 20000) : DEMO.contracts; renderContracts(); }
+      catch(e){ stateContracts = DEMO.contracts; renderContracts(); toast("Contracts loaded (demo fallback)."); }
+    }
+
+    async function loadReports(){
+      const days = parseInt(document.getElementById("tsDays").value || "30", 10);
+
+      try{ stateReports = isLive ? await fetchJSON("/api/admin/reports", {}, 20000) : DEMO.reports; }
+      catch(e){ stateReports = DEMO.reports; }
+
+      try{ stateTime = isLive ? await fetchJSON(`/api/admin/timeseries?days=${encodeURIComponent(days)}`, {}, 20000) : DEMO.timeseries; }
+      catch(e){ stateTime = DEMO.timeseries; }
+
+      renderReports();
+    }
+
+    async function refreshAll(){
+      toast("Refreshing…");
+      await Promise.all([
+        loadUsers(),
+        loadProRequests(),
+        loadPendingPromos(),
+        loadFeatured(),
+        loadModeration(),
+        loadTransactions(),
+        loadContracts(),
+        loadReports()
+      ]);
+      await loadStats();
+      toast("Done.");
+    }
+
+    function openSetApi(){
+      const current = localStorage.getItem("API_BASE") || "";
+      const v = prompt("Set API_BASE (backend URL). Leave empty for Demo mode:", current);
+      if (v === null) return;
+      const trimmed = (v || "").trim().replace(/\/$/, "");
+      if (!trimmed){
+        localStorage.removeItem("API_BASE");
+        toast("Demo mode enabled.");
+      } else {
+        localStorage.setItem("API_BASE", trimmed);
+        toast("API_BASE saved. Reloading…");
+      }
+      location.reload();
+    }
+    window.openSetApi = openSetApi;
+
+    // Filters / listeners
+    ["userSearch","userRoleFilter","userStatusFilter"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", renderUsers);
+    });
+    document.getElementById("proSearch").addEventListener("input", renderPro);
+    document.getElementById("promoSearch").addEventListener("input", renderPromo);
+    document.getElementById("featuredSearch").addEventListener("input", renderFeatured);
+    document.getElementById("txSearch").addEventListener("input", renderTx);
+    document.getElementById("txTypeFilter").addEventListener("change", renderTx);
+    document.getElementById("contractSearch").addEventListener("input", renderContracts);
+    document.getElementById("tsDays").addEventListener("change", () => loadReports(true));
+
+    // Moderation listeners
+    document.getElementById("modSearch").addEventListener("input", renderModeration);
+    document.getElementById("modStatus").addEventListener("change", () => loadModeration(true));
+
+    window.addEventListener("resize", () => renderReports());
+
+    window.addEventListener("load", async () => {
+      await Promise.all([
+        loadUsers(),
+        loadProRequests(),
+        loadPendingPromos(),
+        loadFeatured(),
+        loadModeration(),
+        loadTransactions(),
+        loadContracts(),
+        loadReports()
+      ]);
+      await loadStats();
+    });
+  </script>
+</body>
+</html>

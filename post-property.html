@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Post Property — InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Create a new property listing on InzuLink." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Shared navbar styles -->
+  <link rel="stylesheet" href="./assets/app.css" />
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --accent-hover:#d97706;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0b1220;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+
+      --danger:#dc2626;
+      --danger-bg:#fef2f2;
+      --success:#10b981;
+      --success-bg:#f0fdf4;
+      --warn:#f59e0b;
+      --warn-bg:#fffbeb;
+    }
+
+    body{ margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
+
+    .wrap{ width:min(980px, 92%); margin:0 auto; padding:18px 0 46px; }
+
+    .hero{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding: 22px 18px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size: clamp(1.35rem, 2.5vw, 2rem);
+      font-weight: 900;
+      letter-spacing:-0.6px;
+      color:var(--primary);
+    }
+    .sub{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-weight:650;
+      line-height:1.65;
+      max-width: 720px;
+    }
+
+    .actions{ margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .btn{
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 0.92rem;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background: var(--primary); color:#fff; }
+    .btn-primary:hover{ background:#1e293b; }
+    .btn-accent{ background: var(--accent); color:#111827; }
+    .btn-accent:hover{ background: var(--accent-hover); }
+    .btn-outline{ background:#fff; color:var(--primary); border-color: var(--border); }
+    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
+    .btn:disabled{ opacity:.7; cursor:not-allowed; }
+
+    .card{
+      margin-top: 16px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding: 18px;
+    }
+
+    .msg{
+      display:none;
+      border-radius: 16px;
+      padding: 12px;
+      font-weight: 850;
+      line-height: 1.55;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .msg.ok{ display:block; background: var(--success-bg); border-color:#bbf7d0; color:#16a34a; }
+    .msg.err{ display:block; background: var(--danger-bg); border-color:#fecaca; color: var(--danger); }
+    .msg.warn{ display:block; background: var(--warn-bg); border-color:#fde68a; color:#92400e; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .field{ display:grid; gap:6px; }
+    label{ font-size:.85rem; font-weight:900; color:#475569; }
+    .input, .select, .textarea{
+      width:100%;
+      padding: 12px;
+      border-radius: 12px;
+      border:1px solid #cbd5e1;
+      outline:none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background:#fff;
+      transition: border-color .15s ease, box-shadow .15s ease;
+      box-sizing: border-box;
+    }
+    .textarea{ min-height: 120px; resize: vertical; }
+    .input:focus, .select:focus, .textarea:focus{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
+    }
+    .hint{
+      color: var(--muted);
+      font-weight: 650;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .hint b{ color: var(--primary); }
+
+    .section-title{
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing:-0.3px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background:#f1f5f9;
+      color:#475569;
+      font-weight: 900;
+      font-size: 0.82rem;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background:#fff;
+    }
+    .toggle input{ width:18px; height:18px; }
+
+    .drop{
+      border: 2px dashed #cbd5e1;
+      border-radius: 18px;
+      padding: 14px;
+      background:#fff;
+    }
+
+    .fileRow{
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .mini{
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .preview{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+    .thumb{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#f1f5f9;
+      aspect-ratio: 4/3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .footerBar{
+      margin-top: 16px;
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 14px;
+    }
+
+    .dangerBox{
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid #fecaca;
+      background: var(--danger-bg);
+      color:#991b1b;
+      font-weight: 750;
+      padding: 12px;
+      line-height: 1.6;
+    }
+
+    footer{
+      margin-top: 18px;
+      background: var(--primary);
+      border-radius: 22px;
+      padding: 22px 16px;
+      color:#94a3b8;
+      text-align:center;
+    }
+    footer a{ color:#94a3b8; font-weight:800; text-decoration:none; }
+    footer a:hover{ color:#fff; }
+  </style>
+
+  <script>
+    // Guard: must be logged in landlord
+    (function(){
+      let u = null;
+      try { u = JSON.parse(localStorage.getItem("user")); } catch(_) {}
+      if (!u || u.role !== "Landlord") window.location.replace("login.html?next=post-property.html");
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Shared navbar -->
+  <div id="appNavbar"></div>
+
+  <main class="wrap">
+    <section class="hero" aria-label="Post property header">
+      <div>
+        <h1>Post a New Listing</h1>
+        <p class="sub">
+          Fill the details carefully. Listings with clear photos and accurate location get more views.
+        </p>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-outline" href="landlord.html"><i class="ph ph-arrow-left"></i> Back</a>
+        <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Feed</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="msg" class="msg"></div>
+
+      <form id="postForm" novalidate>
+        <div class="section-title"><i class="ph ph-map-pin"></i> Location</div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="district">District *</label>
+            <input class="input" id="district" placeholder="e.g. Gasabo" required />
+            <div class="hint">Use official district name.</div>
+          </div>
+
+          <div class="field">
+            <label for="sector">Sector *</label>
+            <input class="input" id="sector" placeholder="e.g. Kacyiru" required />
+          </div>
+
+          <div class="field">
+            <label for="cell">Cell</label>
+            <input class="input" id="cell" placeholder="Optional" />
+          </div>
+
+          <div class="field">
+            <label for="village">Village</label>
+            <input class="input" id="village" placeholder="Optional" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px;" class="section-title"><i class="ph ph-house"></i> Listing Details</div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="listing_type">Listing Type *</label>
+            <select class="select" id="listing_type" required>
+              <option value="">Select</option>
+              <option value="Rent">Rent</option>
+              <option value="Sale">Sale</option>
+              <option value="Shared">Shared</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="category">Category *</label>
+            <select class="select" id="category" required>
+              <option value="">Select</option>
+              <option value="House">House</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Land">Land</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="price">Price (RWF) *</label>
+            <input class="input" id="price" type="number" min="0" step="1" placeholder="e.g. 250000" required />
+            <div class="hint">For Rent: monthly price. For Sale/Land: total price.</div>
+          </div>
+
+          <div class="field" id="bedroomsBox">
+            <label for="bedrooms">Bedrooms *</label>
+            <input class="input" id="bedrooms" type="number" min="0" step="1" placeholder="e.g. 2" required />
+          </div>
+
+          <div class="field" id="upiBox" style="display:none;">
+            <label for="upi">UPI (Land ID) *</label>
+            <input class="input" id="upi" placeholder="e.g. 1/03/06/..." />
+          </div>
+
+          <div class="field" id="landSizeBox" style="display:none;">
+            <label for="land_size">Land size (m²)</label>
+            <input class="input" id="land_size" type="number" min="0" step="1" placeholder="e.g. 300" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Contact phone *</label>
+            <input class="input" id="phone" inputmode="tel" placeholder="e.g. 078xxxxxxx" required />
+            <div class="hint">Used for WhatsApp contact from seekers.</div>
+          </div>
+
+          <div class="field">
+            <label>GPS location (optional)</label>
+            <div class="row">
+              <input class="input" id="lat" placeholder="Latitude" style="flex:1; min-width:180px;" />
+              <input class="input" id="lng" placeholder="Longitude" style="flex:1; min-width:180px;" />
+              <button class="btn btn-outline" type="button" onclick="useMyLocation()">
+                <i class="ph ph-navigation-arrow"></i> Use my location
+              </button>
+            </div>
+            <div class="hint">Helps “Near Me” search + map view. Safe to leave blank.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;" class="section-title"><i class="ph ph-text-aa"></i> Description</div>
+
+        <div class="field">
+          <label for="description">Description *</label>
+          <textarea class="textarea" id="description" required placeholder="Describe the property (amenities, water/electricity, parking, rules, etc.)"></textarea>
+          <div class="hint">Make it clear and honest. This improves trust.</div>
+        </div>
+
+        <div style="margin-top:14px;" class="section-title"><i class="ph ph-images"></i> Media Upload</div>
+
+        <div class="drop">
+          <div class="fileRow">
+            <div>
+              <div class="pill"><i class="ph ph-camera"></i> Photos (required)</div>
+              <div class="mini">Upload up to 10 photos (JPG/PNG). Clear photos get more calls.</div>
+            </div>
+            <input id="photos" type="file" accept="image/*" multiple required />
+          </div>
+
+          <div id="photoPreview" class="preview" aria-label="Photo preview"></div>
+
+          <div style="height:12px;"></div>
+
+          <div class="fileRow">
+            <div>
+              <div class="pill"><i class="ph ph-video-camera"></i> Video (optional)</div>
+              <div class="mini">1 short video (MP4 recommended). Optional.</div>
+            </div>
+            <input id="video" type="file" accept="video/*" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px;" class="section-title"><i class="ph ph-rocket-launch"></i> Optional Promotion</div>
+
+        <div class="toggle">
+          <input type="checkbox" id="promoToggle" />
+          <div>
+            <div style="font-weight:900; color:var(--primary);">Request “Featured” promotion</div>
+            <div class="hint" style="margin-top:4px;">
+              If enabled, add your MoMo phone to mark the promotion as <b>Pending</b> for admin verification.
+            </div>
+          </div>
+        </div>
+
+        <div id="promoBox" style="display:none; margin-top:12px;">
+          <div class="field">
+            <label for="payerPhone">MoMo payer phone *</label>
+            <input class="input" id="payerPhone" placeholder="078..." />
+            <div class="hint">Used by admin to verify payment (demo / simulation supported).</div>
+          </div>
+
+          <div class="dangerBox">
+            <b>Demo note:</b> In your current backend, promotion becomes “Pending” when payer phone is provided.
+            Admin later approves it (or payment simulation approves automatically).
+          </div>
+        </div>
+
+        <div class="footerBar">
+          <button class="btn btn-outline" type="button" onclick="resetForm()"><i class="ph ph-eraser"></i> Clear</button>
+          <button class="btn btn-primary" id="submitBtn" type="submit"><i class="ph ph-paper-plane-tilt"></i> Publish Listing</button>
+        </div>
+      </form>
+    </section>
+
+    <footer>
+      © 2026 InzuLink • <a href="contract.html">Contract Tool</a>
+    </footer>
+  </main>
+
+  <!-- Shared navbar script -->
+  <script src="./assets/navbar.js"></script>
+
+  <script>
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem("user")); } catch(_) {}
+
+    const msg = document.getElementById("msg");
+    const form = document.getElementById("postForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const categoryEl = document.getElementById("category");
+    const bedroomsBox = document.getElementById("bedroomsBox");
+    const bedroomsEl = document.getElementById("bedrooms");
+    const upiBox = document.getElementById("upiBox");
+    const upiEl = document.getElementById("upi");
+    const landSizeBox = document.getElementById("landSizeBox");
+
+    const promoToggle = document.getElementById("promoToggle");
+    const promoBox = document.getElementById("promoBox");
+    const payerPhoneEl = document.getElementById("payerPhone");
+
+    const photosEl = document.getElementById("photos");
+    const videoEl = document.getElementById("video");
+    const photoPreview = document.getElementById("photoPreview");
+
+    function setMsg(type, text){
+      msg.className = "msg " + type;
+      msg.textContent = text;
+      msg.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function clearMsg(){
+      msg.className = "msg";
+      msg.textContent = "";
+    }
+
+    function isLand(){
+      return (categoryEl.value || "").toLowerCase() === "land";
+    }
+
+    function updateCategoryUI(){
+      if (isLand()){
+        bedroomsBox.style.display = "none";
+        bedroomsEl.required = false;
+        upiBox.style.display = "block";
+        upiEl.required = true;
+        landSizeBox.style.display = "block";
+      } else {
+        bedroomsBox.style.display = "block";
+        bedroomsEl.required = true;
+        upiBox.style.display = "none";
+        upiEl.required = false;
+        landSizeBox.style.display = "none";
+      }
+    }
+
+    categoryEl.addEventListener("change", updateCategoryUI);
+    updateCategoryUI();
+
+    promoToggle.addEventListener("change", () => {
+      promoBox.style.display = promoToggle.checked ? "block" : "none";
+      payerPhoneEl.required = promoToggle.checked;
+      if (!promoToggle.checked) payerPhoneEl.value = "";
+    });
+
+    function resetForm(){
+      if (!confirm("Clear all fields?")) return;
+      form.reset();
+      photoPreview.innerHTML = "";
+      promoBox.style.display = "none";
+      payerPhoneEl.required = false;
+      updateCategoryUI();
+      clearMsg();
+    }
+
+    function renderPhotoPreview(files){
+      photoPreview.innerHTML = "";
+      if (!files || files.length === 0) return;
+      const max = Math.min(files.length, 10);
+      for (let i=0; i<max; i++){
+        const f = files[i];
+        const url = URL.createObjectURL(f);
+        const div = document.createElement("div");
+        div.className = "thumb";
+        div.innerHTML = `<img src="${url}" alt="Photo preview" />`;
+        photoPreview.appendChild(div);
+      }
+      if (files.length > 10){
+        const note = document.createElement("div");
+        note.className = "hint";
+        note.style.gridColumn = "1 / -1";
+        note.textContent = "Only the first 10 photos will be uploaded.";
+        photoPreview.appendChild(note);
+      }
+    }
+
+    photosEl.addEventListener("change", () => {
+      const files = photosEl.files ? Array.from(photosEl.files) : [];
+      renderPhotoPreview(files);
+    });
+
+    function useMyLocation(){
+      if (!navigator.geolocation) return alert("Geolocation is not supported in this browser.");
+      navigator.geolocation.getCurrentPosition((pos) => {
+        document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
+        document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
+      }, () => {
+        alert("Location permission denied. You can type coordinates manually or leave blank.");
+      }, { enableHighAccuracy: true, timeout: 8000 });
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 25000){
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try { return await fetch(url, { ...options, signal: controller.signal }); }
+      finally { clearTimeout(id); }
+    }
+
+    function must(v){ return (v || "").toString().trim(); }
+
+    function normalizePhone(p){
+      let x = (p || "").trim();
+      x = x.replace(/[^\d]/g, "");
+      // allow 07xxxxxxx or 2507xxxxxxx
+      if (x.startsWith("07")) x = "250" + x.substring(1);
+      return x;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearMsg();
+
+      if (!user || user.role !== "Landlord"){
+        setMsg("err", "Session invalid. Please login again.");
+        return;
+      }
+
+      // Basic validation
+      const district = must(document.getElementById("district").value);
+      const sector = must(document.getElementById("sector").value);
+      const cell = must(document.getElementById("cell").value);
+      const village = must(document.getElementById("village").value);
+
+      const listing_type = must(document.getElementById("listing_type").value);
+      const category = must(document.getElementById("category").value);
+
+      const price = must(document.getElementById("price").value);
+      const bedrooms = must(document.getElementById("bedrooms").value);
+      const upi = must(document.getElementById("upi").value);
+      const land_size = must(document.getElementById("land_size").value);
+
+      const description = must(document.getElementById("description").value);
+
+      const phoneRaw = must(document.getElementById("phone").value);
+      const phone = normalizePhone(phoneRaw);
+
+      const lat = must(document.getElementById("lat").value);
+      const lng = must(document.getElementById("lng").value);
+
+      const photos = photosEl.files ? Array.from(photosEl.files) : [];
+      const video = videoEl.files && videoEl.files[0] ? videoEl.files[0] : null;
+
+      const wantsPromo = promoToggle.checked;
+      const payerPhone = wantsPromo ? normalizePhone(must(payerPhoneEl.value)) : "";
+
+      if (!district || !sector) return setMsg("err", "Please fill District and Sector.");
+      if (!listing_type || !category) return setMsg("err", "Please select Listing Type and Category.");
+      if (!price || Number(price) <= 0) return setMsg("err", "Price must be greater than 0.");
+      if (!description || description.length < 10) return setMsg("err", "Description must be at least 10 characters.");
+      if (!phone || phone.length < 10) return setMsg("err", "Please enter a valid phone number.");
+
+      if (isLand()){
+        if (!upi) return setMsg("err", "UPI is required for land.");
+      } else {
+        if (bedrooms === "" || Number(bedrooms) < 0) return setMsg("err", "Bedrooms must be 0 or more.");
+      }
+
+      if (!photos || photos.length === 0) return setMsg("err", "Please upload at least 1 photo.");
+      if (photos.length > 10) setMsg("warn", "Only the first 10 photos will be uploaded.");
+
+      if (wantsPromo && (!payerPhone || payerPhone.length < 10)) return setMsg("err", "Enter the MoMo payer phone for promotion.");
+
+      // Build multipart form-data (matches server.js)
+      const fd = new FormData();
+      fd.append("owner_id", String(user.id));
+      fd.append("district", district);
+      fd.append("sector", sector);
+      fd.append("cell", cell);
+      fd.append("village", village);
+      fd.append("price", String(price));
+      fd.append("bedrooms", String(isLand() ? 0 : (Number(bedrooms) || 0)));
+      fd.append("listing_type", listing_type);
+      fd.append("category", category);
+      fd.append("upi", isLand() ? upi : "");
+      fd.append("land_size", isLand() ? String(Number(land_size) || 0) : "0");
+      fd.append("description", description);
+      fd.append("phone", phone);
+      fd.append("lat", lat || "");
+      fd.append("lng", lng || "");
+      if (wantsPromo) fd.append("payerPhone", payerPhone);
+
+      // files: "photos" (max 10) + "video" (max 1)
+      photos.slice(0, 10).forEach(f => fd.append("photos", f));
+      if (video) fd.append("video", video);
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="ph ph-circle-notch"></i> Publishing...`;
+
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/properties`, {
+          method: "POST",
+          body: fd
+        }, 30000);
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok){
+          if (data?.error === "LIMIT_REACHED"){
+            setMsg("warn", "Free plan limit reached (4 active posts). Upgrade to Pro to post unlimited listings.");
+          } else if (data?.error) {
+            setMsg("err", data.error);
+          } else {
+            setMsg("err", "Could not publish right now. Please try again.");
+          }
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="ph ph-paper-plane-tilt"></i> Publish Listing`;
+          return;
+        }
+
+        setMsg("ok", wantsPromo
+          ? "Listing created! Promotion is pending verification. Redirecting..."
+          : "Listing created successfully! Redirecting..."
+        );
+
+        // Redirect to landlord dashboard
+        setTimeout(() => window.location.href = "landlord.html", 900);
+
+      } catch(err){
+        setMsg("warn", "Server unreachable right now. Check API_BASE and try again.");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="ph ph-paper-plane-tilt"></i> Publish Listing`;
+      }
+    });
+  </script>
+</body>
+</html>

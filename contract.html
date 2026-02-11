@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lease Generator - InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --primary:#0f172a;
+      --accent:#f59e0b;
+      --bg-page:#f8fafc;
+      --text-main:#334155;
+    }
+    body{font-family:'Inter',sans-serif;background:var(--bg-page);margin:0;color:var(--text-main);display:flex;flex-direction:column;min-height:100vh;}
+    .navbar{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:15px 5%;position:sticky;top:0;width:90%;z-index:1000;
+      background:rgba(255,255,255,.95);backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(0,0,0,.05);box-shadow:0 4px 30px rgba(0,0,0,.03);
+      margin:0 auto;
+    }
+    .brand{display:flex;align-items:center;gap:8px;font-size:1.4rem;font-weight:900;color:var(--primary);letter-spacing:-.5px;text-decoration:none;}
+    .brand-icon{
+      background:linear-gradient(135deg,#f59e0b,#d97706);
+      color:#fff;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+    }
+    .brand span{color:var(--accent);}
+    .nav-center{display:flex;gap:30px;align-items:center;}
+    .nav-link{text-decoration:none;color:var(--text-main);font-weight:600;font-size:.9rem;transition:.2s;display:flex;align-items:center;gap:6px;}
+    .nav-link:hover{color:var(--accent);}
+
+    .container{max-width:1000px;margin:40px auto;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;padding:0 20px;flex:1;}
+    .form-box{background:#fff;padding:35px;border-radius:16px;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);border:1px solid #e2e8f0;}
+    .btn-back{display:inline-flex;align-items:center;gap:5px;color:#64748b;text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:20px;}
+    .btn-back:hover{color:var(--primary);}
+
+    h1{margin-top:0;color:var(--primary);font-size:1.8rem;display:flex;align-items:center;gap:10px;font-weight:800;}
+    .section-label{font-size:.75rem;font-weight:800;text-transform:uppercase;color:#94a3b8;margin-top:25px;margin-bottom:12px;display:block;letter-spacing:.5px;}
+    .input-group{margin-bottom:15px;}
+    label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:#475569;}
+    input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-family:inherit;box-sizing:border-box;transition:.2s;}
+    input:focus,select:focus{border-color:var(--primary);outline:none;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+    .btn-generate{
+      background:var(--primary);color:#fff;width:100%;padding:15px;border-radius:8px;font-weight:700;border:none;cursor:pointer;margin-top:25px;
+      display:flex;align-items:center;justify-content:center;gap:10px;font-size:1rem;transition:.2s;
+    }
+    .btn-generate:hover{background:#1e293b;transform:translateY(-2px);}
+    .note{
+      background:#f1f5f9;border:1px solid #e2e8f0;padding:12px;border-radius:10px;font-size:.88rem;color:#475569;line-height:1.45;
+      margin-top:14px;
+    }
+    .preview-box{
+      background:#334155;padding:30px;border-radius:16px;height:600px;position:sticky;top:100px;display:flex;align-items:center;justify-content:center;
+      text-align:center;color:#fff;border:4px solid #e2e8f0;
+    }
+    footer{background:var(--primary);color:#fff;padding:40px 10%;margin-top:60px;text-align:center;font-size:.9rem;}
+    .f-link{color:#94a3b8;text-decoration:none;margin:0 10px;transition:.2s;}
+    .f-link:hover{color:#fff;}
+    @media(max-width:800px){.container{grid-template-columns:1fr}.preview-box{display:none}.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="brand">
+      <div class="brand-icon"><i class="ph ph-house-line"></i></div>
+      Inzu<span>Link</span>
+    </a>
+    <div class="nav-center">
+      <a href="index.html" class="nav-link"><i class="ph ph-house"></i> <span data-i18n="nav_home">Home</span></a>
+      <a href="feed.html" class="nav-link"><i class="ph ph-globe"></i> <span data-i18n="nav_feed">Browse Feed</span></a>
+    </div>
+    <div style="font-weight:700;color:var(--primary);font-size:.9rem;display:flex;align-items:center;gap:5px;">
+      <i class="ph ph-file-text" style="color:var(--accent);"></i> <span data-i18n="nav_contract">Contract Tool</span>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="form-box">
+      <a href="index.html" class="btn-back"><i class="ph ph-arrow-left"></i> <span data-i18n="back_home">Back to Home</span></a>
+
+      <h1><span data-i18n="title">Lease Generator</span></h1>
+      <p style="color:#64748b;font-size:.95rem;line-height:1.5;" data-i18n="subtitle">
+        Generate a residential lease agreement for signing. Choose English or Kinyarwanda and download the PDF.
+      </p>
+
+      <div class="note" data-i18n="note_html"></div>
+
+      <form id="contractForm" onsubmit="generatePDF(event)">
+        <span class="section-label" data-i18n="sec0">0. Language</span>
+        <div class="input-group">
+          <label data-i18n="lang_label">Language</label>
+          <select id="lang">
+            <option value="en">English</option>
+            <option value="rw">Kinyarwanda</option>
+          </select>
+        </div>
+
+        <span class="section-label" data-i18n="sec1">1. Landlord Details</span>
+        <div class="input-group">
+          <label data-i18n="lName_label">Landlord Full Name</label>
+          <input type="text" id="lName" data-i18n-ph="lName_ph" placeholder="e.g. MUGABO Jean" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="lID_label">Landlord ID / Passport</label>
+            <input type="text" id="lID" data-i18n-ph="lID_ph" placeholder="e.g. 1 19..." required />
+          </div>
+          <div class="input-group">
+            <label data-i18n="lPhone_label">Landlord Phone</label>
+            <input type="text" id="lPhone" data-i18n-ph="lPhone_ph" placeholder="e.g. +25078..." required />
+          </div>
+        </div>
+
+        <span class="section-label" data-i18n="sec2">2. Tenant Details</span>
+        <div class="input-group">
+          <label data-i18n="tName_label">Tenant Full Name</label>
+          <input type="text" id="tName" data-i18n-ph="tName_ph" placeholder="e.g. KEZA Sarah" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="tID_label">Tenant ID / Passport</label>
+            <input type="text" id="tID" data-i18n-ph="tID_ph" placeholder="e.g. 1 1990..." required />
+          </div>
+          <div class="input-group">
+            <label data-i18n="tPhone_label">Tenant Phone</label>
+            <input type="text" id="tPhone" data-i18n-ph="tPhone_ph" placeholder="e.g. +25078..." required />
+          </div>
+        </div>
+
+        <span class="section-label" data-i18n="sec3">3. Property Details</span>
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="district_label">District</label>
+            <input type="text" id="pDistrict" data-i18n-ph="district_ph" placeholder="e.g. Kicukiro" required />
+          </div>
+          <div class="input-group">
+            <label data-i18n="sector_label">Sector</label>
+            <input type="text" id="pSector" data-i18n-ph="sector_ph" placeholder="e.g. Kanombe" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="cell_label">Cell</label>
+            <input type="text" id="pCell" data-i18n-ph="cell_ph" placeholder="e.g. Rubirizi" required />
+          </div>
+          <div class="input-group">
+            <label data-i18n="village_label">Village</label>
+            <input type="text" id="pVillage" data-i18n-ph="village_ph" placeholder="e.g. Umudugudu wa 5" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="ptype_label">Property Type</label>
+            <select id="propertyType" required>
+              <option value="House" data-i18n="ptype_house">House</option>
+              <option value="Apartment" data-i18n="ptype_apartment">Apartment</option>
+              <option value="Room" data-i18n="ptype_room">Room</option>
+              <option value="Studio" data-i18n="ptype_studio">Studio</option>
+              <option value="Other" data-i18n="ptype_other">Other</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label data-i18n="bedrooms_label">Bedrooms (optional)</label>
+            <input type="number" id="bedrooms" data-i18n-ph="bedrooms_ph" placeholder="e.g. 2" min="0" />
+          </div>
+        </div>
+
+        <span class="section-label" data-i18n="sec4">4. Payment & Term</span>
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="rent_label">Monthly Rent (RWF)</label>
+            <input type="number" id="rentAmount" data-i18n-ph="rent_ph" placeholder="50000" required min="0" />
+          </div>
+          <div class="input-group">
+            <label data-i18n="deposit_label">Security Deposit (RWF)</label>
+            <input type="number" id="depositAmount" data-i18n-ph="deposit_ph" placeholder="e.g. 50000" required min="0" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="cycle_label">Payment Cycle</label>
+            <select id="cycle">
+              <option value="Monthly" data-i18n="cycle_monthly">Monthly</option>
+              <option value="Quarterly (3 Months)" data-i18n="cycle_quarterly">Quarterly (3 Months)</option>
+              <option value="Bi-Annually (6 Months)" data-i18n="cycle_biannually">6 Months</option>
+              <option value="Annually (1 Year)" data-i18n="cycle_annually">1 Year</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label data-i18n="due_label">Rent Due Day (1-28)</label>
+            <input type="number" id="dueDay" value="5" min="1" max="28" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="start_label">Start Date</label>
+            <input type="date" id="startDate" required />
+          </div>
+          <div class="input-group">
+            <label data-i18n="duration_label">Duration (Months)</label>
+            <input type="number" id="duration" data-i18n-ph="duration_ph" placeholder="e.g. 12" required min="1" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label data-i18n="utilities_label">Utilities Paid By</label>
+            <select id="utilities">
+              <option value="Tenant" data-i18n="u_tenant">Tenant</option>
+              <option value="Landlord" data-i18n="u_landlord">Landlord</option>
+              <option value="Shared" data-i18n="u_shared">Shared</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label data-i18n="notice_label">Notice Period to Terminate (Days)</label>
+            <input type="number" id="noticeDays" value="30" min="1" required />
+          </div>
+        </div>
+
+        <span class="section-label" data-i18n="sec5">5. Extra Clauses (optional)</span>
+        <div class="input-group">
+          <label data-i18n="special_label">Special Terms (Optional)</label>
+          <input type="text" id="specialTerms" data-i18n-ph="special_ph" placeholder="e.g. No subletting, no pets, etc." />
+        </div>
+
+        <button type="submit" class="btn-generate">
+          <i class="ph ph-download-simple"></i> <span data-i18n="btn">Download PDF Contract</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="preview-box">
+      <div style="opacity:.9">
+        <i class="ph ph-file-pdf" style="font-size:5rem;color:#cbd5e1;margin-bottom:20px;"></i>
+        <h3 style="font-size:1.5rem;margin:0 0 10px 0;" data-i18n="preview_title">PDF Output</h3>
+        <p style="color:#94a3b8;" data-i18n="preview_sub">Choose a language then download.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="margin-bottom:15px;font-weight:800;font-size:1.2rem;">Inzu<span style="color:var(--accent);">Link</span></div>
+    <p style="color:#94a3b8;margin-bottom:20px;" data-i18n="footer_line">
+      Making housing accessible, affordable, and transparent for everyone in Rwanda.
+    </p>
+    <div>
+      <a href="#" class="f-link" data-i18n="footer_terms">Terms</a> •
+      <a href="#" class="f-link" data-i18n="footer_privacy">Privacy</a> •
+      <a href="#" class="f-link" data-i18n="footer_support">Support</a>
+    </div>
+    <div style="margin-top:20px;color:#64748b;font-size:.8rem;" data-i18n="footer_copy">
+      © 2026 InzuLink. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    // ---------- i18n ----------
+    const I18N = {
+      en: {
+        htmlLang: "en",
+        nav_home: "Home",
+        nav_feed: "Browse Feed",
+        nav_contract: "Contract Tool",
+        back_home: "Back to Home",
+        title: "Lease Generator",
+        subtitle: "Generate a residential lease agreement for signing. Choose English or Kinyarwanda and download the PDF.",
+        note_html:
+          `For local backend: open browser console and run:<br/>
+           <b>localStorage.setItem("API_BASE","http://127.0.0.1:3000")</b> then refresh.`,
+        sec0: "0. Language",
+        lang_label: "Language",
+        sec1: "1. Landlord Details",
+        lName_label: "Landlord Full Name",
+        lName_ph: "e.g. MUGABO Jean",
+        lID_label: "Landlord ID / Passport",
+        lID_ph: "e.g. 1 19...",
+        lPhone_label: "Landlord Phone",
+        lPhone_ph: "e.g. +25078...",
+        sec2: "2. Tenant Details",
+        tName_label: "Tenant Full Name",
+        tName_ph: "e.g. KEZA Sarah",
+        tID_label: "Tenant ID / Passport",
+        tID_ph: "e.g. 1 1990...",
+        tPhone_label: "Tenant Phone",
+        tPhone_ph: "e.g. +25078...",
+        sec3: "3. Property Details",
+        district_label: "District",
+        district_ph: "e.g. Kicukiro",
+        sector_label: "Sector",
+        sector_ph: "e.g. Kanombe",
+        cell_label: "Cell",
+        cell_ph: "e.g. Rubirizi",
+        village_label: "Village",
+        village_ph: "e.g. Umudugudu wa 5",
+        ptype_label: "Property Type",
+        ptype_house: "House",
+        ptype_apartment: "Apartment",
+        ptype_room: "Room",
+        ptype_studio: "Studio",
+        ptype_other: "Other",
+        bedrooms_label: "Bedrooms (optional)",
+        bedrooms_ph: "e.g. 2",
+        sec4: "4. Payment & Term",
+        rent_label: "Monthly Rent (RWF)",
+        rent_ph: "50000",
+        deposit_label: "Security Deposit (RWF)",
+        deposit_ph: "e.g. 50000",
+        cycle_label: "Payment Cycle",
+        cycle_monthly: "Monthly",
+        cycle_quarterly: "Quarterly (3 Months)",
+        cycle_biannually: "6 Months",
+        cycle_annually: "1 Year",
+        due_label: "Rent Due Day (1-28)",
+        start_label: "Start Date",
+        duration_label: "Duration (Months)",
+        duration_ph: "e.g. 12",
+        utilities_label: "Utilities Paid By",
+        u_tenant: "Tenant",
+        u_landlord: "Landlord",
+        u_shared: "Shared",
+        notice_label: "Notice Period to Terminate (Days)",
+        sec5: "5. Extra Clauses (optional)",
+        special_label: "Special Terms (Optional)",
+        special_ph: "e.g. No subletting, no pets, etc.",
+        btn: "Download PDF Contract",
+        preview_title: "PDF Output",
+        preview_sub: "Choose a language then download.",
+        footer_line: "Making housing accessible, affordable, and transparent for everyone in Rwanda.",
+        footer_terms: "Terms",
+        footer_privacy: "Privacy",
+        footer_support: "Support",
+        footer_copy: "© 2026 InzuLink. All rights reserved."
+      },
+      rw: {
+        htmlLang: "rw",
+        nav_home: "Ahabanza",
+        nav_feed: "Reba Inzu Zose",
+        nav_contract: "Ibikoresho by'Amasezerano",
+        back_home: "Subira Ahabanza",
+        title: "Gukora Amasezerano y'Ubukode",
+        subtitle: "Kora amasezerano y'ubukode yiteguye gusinywa. Hitamo Icyongereza cyangwa Ikinyarwanda, uhite ukuramo PDF.",
+        note_html:
+          `Ku gukoresha server yo kuri mudasobwa yawe: fungura Console ya browser ugire:<br/>
+           <b>localStorage.setItem("API_BASE","http://127.0.0.1:3000")</b> hanyuma usubiremo (refresh).`,
+        sec0: "0. Ururimi",
+        lang_label: "Ururimi",
+        sec1: "1. Amakuru ya Nyir'inzu",
+        lName_label: "Amazina ya Nyir'inzu",
+        lName_ph: "urugero: MUGABO Jean",
+        lID_label: "Indangamuntu / Pasiporo ya Nyir'inzu",
+        lID_ph: "urugero: 1 19...",
+        lPhone_label: "Telefoni ya Nyir'inzu",
+        lPhone_ph: "urugero: +25078...",
+        sec2: "2. Amakuru y'Umukodesha",
+        tName_label: "Amazina y'Umukodesha",
+        tName_ph: "urugero: KEZA Sarah",
+        tID_label: "Indangamuntu / Pasiporo y'Umukodesha",
+        tID_ph: "urugero: 1 1990...",
+        tPhone_label: "Telefoni y'Umukodesha",
+        tPhone_ph: "urugero: +25078...",
+        sec3: "3. Aho Inzu Iherereye",
+        district_label: "Akarere",
+        district_ph: "urugero: Kicukiro",
+        sector_label: "Umurenge",
+        sector_ph: "urugero: Kanombe",
+        cell_label: "Akagari",
+        cell_ph: "urugero: Rubirizi",
+        village_label: "Umudugudu",
+        village_ph: "urugero: Umudugudu wa 5",
+        ptype_label: "Ubwoko bw'Inzu",
+        ptype_house: "Inzu",
+        ptype_apartment: "Aparitima",
+        ptype_room: "Icyumba",
+        ptype_studio: "Situliyo",
+        ptype_other: "Ibindi",
+        bedrooms_label: "Umubare w'Ibyumba (si ngombwa)",
+        bedrooms_ph: "urugero: 2",
+        sec4: "4. Ubukode n'igihe",
+        rent_label: "Ubukode buri kwezi (RWF)",
+        rent_ph: "50000",
+        deposit_label: "Ingwate (RWF)",
+        deposit_ph: "urugero: 50000",
+        cycle_label: "Uko ubukode bwishyurwa",
+        cycle_monthly: "Buri kwezi",
+        cycle_quarterly: "Buri mezi 3",
+        cycle_biannually: "Buri mezi 6",
+        cycle_annually: "Buri mwaka",
+        due_label: "Umunsi wo kwishyura (1-28)",
+        start_label: "Itariki itangiriraho",
+        duration_label: "Igihe (amezi)",
+        duration_ph: "urugero: 12",
+        utilities_label: "Amazi/Umuriro n'ibindi byishyurwa na",
+        u_tenant: "Umukodesha",
+        u_landlord: "Nyir'inzu",
+        u_shared: "Bombi",
+        notice_label: "Igihe cyo gutanga itangazo ryo gusoza (iminsi)",
+        sec5: "5. Ibyiyongeraho (si ngombwa)",
+        special_label: "Andi mabwiriza (si ngombwa)",
+        special_ph: "urugero: Nta gukodeshereza undi, nta matungo, n'ibindi.",
+        btn: "Kuramo Amasezerano (PDF)",
+        preview_title: "PDF",
+        preview_sub: "Hitamo ururimi hanyuma ukuremo.",
+        footer_line: "Dufasha abantu kubona inzu byoroshye, ku giciro gikwiye, kandi mu mucyo mu Rwanda.",
+        footer_terms: "Amabwiriza",
+        footer_privacy: "Ibanga",
+        footer_support: "Ubufasha",
+        footer_copy: "© 2026 InzuLink. Uburenganzira bwose burabitswe."
+      }
+    };
+
+    function applyLang(lang){
+      const dict = I18N[lang] || I18N.en;
+      document.documentElement.lang = dict.htmlLang || "en";
+
+      // text nodes
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (key && dict[key] !== undefined) {
+          // allow HTML for note
+          if (key.endsWith("_html")) el.innerHTML = dict[key];
+          else el.textContent = dict[key];
+        }
+      });
+
+      // placeholders
+      document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+        const key = el.getAttribute("data-i18n-ph");
+        if (key && dict[key] !== undefined) el.placeholder = dict[key];
+      });
+
+      // update page title (tab)
+      document.title = (lang === "rw")
+        ? "Gukora Amasezerano - InzuLink"
+        : "Lease Generator - InzuLink";
+    }
+
+    // ---------- helpers ----------
+    function nfRWF(n){
+      const x = Number(n || 0);
+      return new Intl.NumberFormat("en-RW").format(x);
+    }
+    function getApiBase(){
+      const base = (localStorage.getItem("API_BASE") || "").trim();
+      if (base) return base.replace(/\/$/, "");
+      return "https://inzulink-v1.onrender.com";
+    }
+    async function safeLogContract(payload){
+      const api = getApiBase();
+      try{
+        await fetch(`${api}/api/contracts`, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+      }catch(e){
+        console.log("Log failed (offline/server). PDF continues.");
+      }
+    }
+    function addWrapped(doc, text, x, y, maxWidth, lineHeight, bottomLimit){
+      const lines = doc.splitTextToSize(String(text), maxWidth);
+      for (const line of lines){
+        if (y > bottomLimit){
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, x, y);
+        y += lineHeight;
+      }
+      return y;
+    }
+
+    // ---------- PDF content (same as before) ----------
+    function enText(data){
+      const {
+        lName, lID, lPhone, tName, tID, tPhone,
+        district, sector, cell, village,
+        propertyType, bedrooms,
+        rentVal, depositVal, cycle, dueDay,
+        startDate, durationMonths, utilities, noticeDays, specialTerms
+      } = data;
+
+      const bedText = bedrooms ? `, Bedrooms: ${bedrooms}` : "";
+
+      return {
+        title: "RESIDENTIAL LEASE AGREEMENT",
+        subtitle: "Made for signing in the Republic of Rwanda.",
+        sections: [
+          { h: "1. PARTIES", p: [
+            `This Residential Lease Agreement (“Agreement”) is made between:`,
+            `Landlord: ${lName} (ID/Passport: ${lID}), Phone: ${lPhone}`,
+            `Tenant: ${tName} (ID/Passport: ${tID}), Phone: ${tPhone}`
+          ]},
+          { h: "2. PROPERTY", p: [
+            `The Landlord leases to the Tenant the following property for residential use only:`,
+            `Location: District ${district}, Sector ${sector}, Cell ${cell}, Village ${village}`,
+            `Type: ${propertyType}${bedText}`
+          ]},
+          { h: "3. TERM", p: [
+            `Start Date: ${startDate}`,
+            `Duration: ${durationMonths} month(s)`,
+            `Unless renewed in writing, the tenancy ends at the expiry of the stated term.`
+          ]},
+          { h: "4. RENT & SECURITY DEPOSIT", p: [
+            `Monthly Rent: ${nfRWF(rentVal)} RWF`,
+            `Payment Cycle: ${cycle}. Rent is due by day ${dueDay} of each cycle (unless agreed otherwise in writing).`,
+            `Security Deposit: ${nfRWF(depositVal)} RWF. Deposit may cover unpaid rent, damages beyond normal wear, and lawful deductions. Any balance should be returned after move-out, subject to inspection and agreed deductions.`
+          ]},
+          { h: "5. UTILITIES & SERVICES", p: [
+            `Utilities (water, electricity, internet, etc.) are paid by: ${utilities}.`,
+            `If the Tenant pays utilities, the Tenant must keep accounts current and provide proof upon request.`
+          ]},
+          { h: "6. USE, CARE & RULES", p: [
+            `The Tenant shall use the property for residential purposes only, keep it clean, and avoid nuisance or illegal activities.`,
+            `The Tenant shall not make major alterations without the Landlord’s written consent.`,
+            `Subletting or assignment is not allowed unless the Landlord provides written approval.`
+          ]},
+          { h: "7. MAINTENANCE & REPAIRS", p: [
+            `The Landlord shall keep the structure reasonably fit for habitation. The Tenant shall promptly report damages or issues.`,
+            `The Tenant is responsible for damage caused by misuse or negligence by the Tenant/guests.`
+          ]},
+          { h: "8. LANDLORD ACCESS", p: [
+            `The Landlord may access the property at reasonable times for inspection/repairs, preferably with prior notice, except in emergencies.`
+          ]},
+          { h: "9. TERMINATION & NOTICE", p: [
+            `Either party may terminate according to this Agreement and applicable laws, with a notice period of ${noticeDays} day(s), unless a different lawful notice is agreed in writing.`,
+            `Where there is serious breach, parties should follow lawful procedures and avoid self-help eviction.`
+          ]},
+          { h: "10. DISPUTE RESOLUTION", p: [
+            `The parties agree to attempt amicable resolution first. If unresolved, they may proceed to mediation and/or competent authorities/courts in Rwanda.`
+          ]},
+          { h: "11. SPECIAL TERMS (IF ANY)", p: [
+            specialTerms ? specialTerms : "None."
+          ]}
+        ],
+        sign: {
+          header: "SIGNATURES",
+          place: "Signed at (Place): ____________________________",
+          date: "Date: ____ / ____ / ______",
+          lSig: "LANDLORD SIGNATURE",
+          tSig: "TENANT SIGNATURE",
+          w1: "WITNESS (Name & Signature)",
+          w2: "WITNESS (Name & Signature)",
+          footer: "Generated by InzuLink. Parties should keep a signed copy."
+        },
+        filename: `Lease_${tName.replace(/\s+/g,"_")}.pdf`
+      };
+    }
+
+    function rwText(data){
+      const {
+        lName, lID, lPhone, tName, tID, tPhone,
+        district, sector, cell, village,
+        propertyType, bedrooms,
+        rentVal, depositVal, cycle, dueDay,
+        startDate, durationMonths, utilities, noticeDays, specialTerms
+      } = data;
+
+      const bedText = bedrooms ? `, Ibyumba: ${bedrooms}` : "";
+
+      return {
+        title: "AMASEZERANO Y’UBUKODE BW’INZU",
+        subtitle: "Yateguwe kugira ngo isinywe mu Rwanda.",
+        sections: [
+          { h: "1. ABAGIRANA AMASEZERANO", p: [
+            `Aya masezerano y’ubukode (“Amasezerano”) agizwe hagati ya:`,
+            `Nyir’inzu: ${lName} (Indangamuntu/Passport: ${lID}), Tel: ${lPhone}`,
+            `Umukodesha: ${tName} (Indangamuntu/Passport: ${tID}), Tel: ${tPhone}`
+          ]},
+          { h: "2. INZU IKODESHWA", p: [
+            `Nyir’inzu akodesha Umukodesha iyi nzu ikoreshwa gusa mu guturamo:`,
+            `Aho iherereye: Akarere ka ${district}, Umurenge wa ${sector}, Akagari ka ${cell}, Umudugudu wa ${village}`,
+            `Ubwoko bw’inzu: ${propertyType}${bedText}`
+          ]},
+          { h: "3. IGIHE AMASEZERANO AMARA", p: [
+            `Itariki atangiriraho: ${startDate}`,
+            `Igihe amara: amezi ${durationMonths}`,
+            `Keretse habaye kongerera mu nyandiko, ubukode burangira igihe cyavuzwe kirangiye.`
+          ]},
+          { h: "4. UBUKODE N’INGWATE", p: [
+            `Ubukode buri kwezi: ${nfRWF(rentVal)} RWF`,
+            `Uko bwishyurwa: ${cycle}. Ubukode bwishyurwa bitarenze umunsi wa ${dueDay} wa buri cyiciro (keretse habaye indi myumvire mu nyandiko).`,
+            `Ingwate: ${nfRWF(depositVal)} RWF. Ingwate ishobora gukoreshwa ku bukode butishyuwe, ibyangiritse birenze “gushira bisanzwe”, n’ibindi byemewe n’amategeko. Asigaye asubizwa nyuma yo gusohoka, hakabaho isuzuma n’ibyo impande zombi zumvikanyeho.`
+          ]},
+          { h: "5. AMAzi, UMURIR0 N’IBINDI", p: [
+            `Amazi/umuriro/internet n’ibindi byishyurwa na: ${utilities}.`,
+            `Niba Umukodesha ari we ubyishyura, agomba kubikora ku gihe kandi agatanga gihamya iyo abisabwe.`
+          ]},
+          { h: "6. IKORESHWA RY’INZU N’AMATEGEKO", p: [
+            `Umukodesha azakoresha inzu mu guturamo gusa, ayibungabunge isuku kandi yirinde ibikorwa binyuranyije n’amategeko cyangwa bibangamira abandi.`,
+            `Nta mpinduka nini azakora ku nzu atabiherewe uburenganzira mu nyandiko na Nyir’inzu.`,
+            `Gukodeshereza undi (subletting) cyangwa kuyitanga ku wundi ntibyemewe keretse byemejwe mu nyandiko na Nyir’inzu.`
+          ]},
+          { h: "7. GUSANA NO KUBUNGABUNGA", p: [
+            `Nyir’inzu azakomeza kubungabunga inyubako ku buryo iturwa. Umukodesha agomba gutanga amakuru vuba ku kibazo cyangwa ibyangiritse.`,
+            `Ibyangijwe n’uburangare cyangwa imikoreshereze mibi byatewe na Umukodesha/abashyitsi be bizishyurwa na bo.`
+          ]},
+          { h: "8. KWINJIRA MU NZU (NYIR’INZU)", p: [
+            `Nyir’inzu ashobora kwinjira mu nzu mu bihe bikwiye hagamijwe igenzura/gusana, byiza abanje kubimenyesha, keretse mu gihe cy’urgence.`
+          ]},
+          { h: "9. GUSESAGURA AMASEZERANO & ITANGAZA", p: [
+            `Impande zombi zishobora gusesa amasezerano hakurikijwe aya masezerano n’amategeko, zitangiye itangazo ry’iminsi ${noticeDays}, keretse habaye indi myumvire yemewe mu nyandiko.`,
+            `Iyo habayeho kutubahiriza bikomeye, bagomba gukurikiza inzira zemewe n’amategeko kandi bakirinda “kwirukana ku gahato” bidakurikije amategeko.`
+          ]},
+          { h: "10. GUKEMURA AMAKIMBIRANE", p: [
+            `Impande zombi zibanza kugerageza kumvikana mu mahoro. Nibidakunda, bashobora kwifashisha abunzi n’inzego zibifitiye ububasha/courts mu Rwanda.`
+          ]},
+          { h: "11. IBINDI BYUMVIKANYEHO", p: [
+            specialTerms ? specialTerms : "Nta bindi."
+          ]}
+        ],
+        sign: {
+          header: "IMIKONO",
+          place: "Byakorewe (Ahantu): ____________________________",
+          date: "Itariki: ____ / ____ / ______",
+          lSig: "UMUKONO WA NYIR’INZU",
+          tSig: "UMUKONO W’UMUKODESHA",
+          w1: "UMUHAMYA (Izina & Umukono)",
+          w2: "UMUHAMYA (Izina & Umukono)",
+          footer: "Byakozwe na InzuLink. Impande zombi zigumana kopi isinywe."
+        },
+        filename: `Amasezerano_${tName.replace(/\s+/g,"_")}.pdf`
+      };
+    }
+
+    async function generatePDF(e){
+      e.preventDefault();
+
+      const lang = document.getElementById("lang").value;
+
+      const data = {
+        lName: document.getElementById("lName").value.trim().toUpperCase(),
+        lID: document.getElementById("lID").value.trim(),
+        lPhone: document.getElementById("lPhone").value.trim(),
+        tName: document.getElementById("tName").value.trim().toUpperCase(),
+        tID: document.getElementById("tID").value.trim(),
+        tPhone: document.getElementById("tPhone").value.trim(),
+        district: document.getElementById("pDistrict").value.trim(),
+        sector: document.getElementById("pSector").value.trim(),
+        cell: document.getElementById("pCell").value.trim(),
+        village: document.getElementById("pVillage").value.trim(),
+        propertyType: document.getElementById("propertyType").value,
+        bedrooms: document.getElementById("bedrooms").value,
+        rentVal: document.getElementById("rentAmount").value,
+        depositVal: document.getElementById("depositAmount").value,
+        cycle: document.getElementById("cycle").value,
+        dueDay: document.getElementById("dueDay").value,
+        startDate: document.getElementById("startDate").value,
+        durationMonths: document.getElementById("duration").value,
+        utilities: document.getElementById("utilities").value,
+        noticeDays: document.getElementById("noticeDays").value,
+        specialTerms: document.getElementById("specialTerms").value.trim()
+      };
+
+      await safeLogContract({
+        lName: data.lName,
+        tName: data.tName,
+        tID: data.tID,
+        district: data.district,
+        rent: Number(data.rentVal || 0)
+      });
+
+      const content = (lang === "rw") ? rwText(data) : enText(data);
+
+      const doc = new jsPDF();
+      const left = 18;
+      const right = 192;
+      const maxWidth = 170;
+      const line = 6;
+      const bottomLimit = 275;
+
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(16);
+      doc.text(content.title, 105, 18, null, null, "center");
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(10);
+      doc.text(content.subtitle, 105, 24, null, null, "center");
+
+      doc.setLineWidth(0.4);
+      doc.line(left, 28, right, 28);
+
+      let y = 38;
+
+      function section(title){
+        doc.setFont("helvetica","bold");
+        doc.setFontSize(11);
+        doc.text(title, left, y);
+        y += 7;
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(10);
+      }
+
+      for (const s of content.sections){
+        section(s.h);
+        for (const paragraph of s.p){
+          y = addWrapped(doc, paragraph, left, y, maxWidth, line, bottomLimit);
+        }
+        y += 4;
+      }
+
+      if (y > 230){ doc.addPage(); y = 20; }
+
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(11);
+      doc.text(content.sign.header, left, y);
+      y += 10;
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(10);
+      doc.text(content.sign.place, left, y);
+      doc.text(content.sign.date, 135, y);
+      y += 16;
+
+      doc.line(left, y, 90, y);
+      doc.line(120, y, right, y);
+      y += 5;
+      doc.text(content.sign.lSig, left, y);
+      doc.text(content.sign.tSig, 120, y);
+      y += 14;
+
+      doc.line(left, y, 90, y);
+      doc.line(120, y, right, y);
+      y += 5;
+      doc.text(content.sign.w1, left, y);
+      doc.text(content.sign.w2, 120, y);
+      y += 14;
+
+      doc.setFontSize(8.5);
+      doc.text(content.sign.footer, 105, 285, null, null, "center");
+
+      doc.save(content.filename);
+    }
+
+    // init language and listen changes
+    (function init(){
+      const sel = document.getElementById("lang");
+
+      // default: keep last selection
+      const saved = localStorage.getItem("CONTRACT_LANG");
+      if (saved === "rw" || saved === "en") sel.value = saved;
+
+      applyLang(sel.value);
+
+      sel.addEventListener("change", () => {
+        localStorage.setItem("CONTRACT_LANG", sel.value);
+        applyLang(sel.value);
+      });
+
+      // fill note_html once at start if not filled
+      const note = document.querySelector("[data-i18n='note_html']");
+      if (note && !note.innerHTML.trim()){
+        note.innerHTML = I18N[sel.value].note_html;
+      }
+    })();
+  </script>
+</body>
+</html>
