@@ -10,17 +10,23 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
-// Optional dotenv for local dev (won’t crash if not installed)
-try { require('dotenv').config(); } catch (_) {}
+require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
-console.log("DATABASE_URL =", process.env.DATABASE_URL);
 // --------------------
 // BASIC MIDDLEWARE
 // --------------------
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: (origin, cb) => cb(null, true),
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '2mb' }));
@@ -82,8 +88,8 @@ app.get('/health', async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER || 'ephremdushime250@gmail.com',
-    pass: process.env.EMAIL_APP_PASS || 'xxxx xxxx xxxx xxxx'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASS
   }
 });
 
@@ -139,66 +145,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     if (user.status === 'Banned') return res.status(403).json({ error: "Account Banned" });
 
-    // =================================================
-// SEED ADMIN (create once)
-// =================================================
-// POST /api/auth/seed-admin
-// Body: { secret, fullName, email, phone, nida, password }
-app.post('/api/auth/seed-admin', async (req, res) => {
-  try {
-    const {
-      secret,
-      fullName = "InzuLink Admin",
-      email = "admin@inzulink.rw",
-      phone = "0780000000",
-      nida = "1199000000000000",
-      password = "Admin@1234"
-    } = req.body || {};
-
-    // Must match env ADMIN_SEED_SECRET
-    if (!process.env.ADMIN_SEED_SECRET) {
-      return res.status(500).json({ error: "ADMIN_SEED_SECRET is not set on server" });
-    }
-    if (!secret || secret !== process.env.ADMIN_SEED_SECRET) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const adminEmail = String(email).trim().toLowerCase();
-
-    // If already exists, don’t recreate
-    const exists = await pool.query("SELECT user_id, email, role FROM Users WHERE LOWER(email) = $1", [adminEmail]);
-    if (exists.rows.length > 0) {
-      return res.json({
-        message: "Admin already exists",
-        admin: { user_id: exists.rows[0].user_id, email: exists.rows[0].email, role: exists.rows[0].role }
-      });
-    }
-
-    if (!password || String(password).length < 8) {
-      return res.status(400).json({ error: "Password must be at least 8 characters" });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(String(password), salt);
-
-    const r = await pool.query(
-      `INSERT INTO Users (full_name, email, phone, nida_number, password, role, is_verified_agent, subscription_plan, status)
-       VALUES ($1,$2,$3,$4,$5,'Admin',TRUE,'Pro','Active')
-       RETURNING user_id, email, role`,
-      [fullName, adminEmail, phone, nida, hashedPassword]
-    );
-
-    res.json({
-      message: "Admin created successfully",
-      admin: r.rows[0]
-    });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server Error" });
-  }
-});
-
-    // Subscription expiry check
+        // Subscription expiry check
     if (user.subscription_plan === 'Pro' && user.subscription_end_date && new Date(user.subscription_end_date) < new Date()) {
       await pool.query("UPDATE Users SET subscription_plan = 'Free', is_verified_agent = FALSE WHERE user_id = $1", [user.user_id]);
       user.subscription_plan = 'Free';
