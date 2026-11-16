@@ -1,6 +1,6 @@
 # Render Blueprint for InzuLink — https://render.com/docs/blueprint-spec
 # PREFERRED PATH: keep your existing `inzulink-v1` web service (frontend pages
-# default to https://inzulink-v1.onrender.com), update its env vars, and redeploy.
+# default to https://inzulink-00l5.onrender.com), update its env vars, and redeploy.
 # Use this file only for a fresh setup or disaster recovery.
 services:
   # ---- Backend API (Node + Express + Neon Postgres) ----
@@ -34,4 +34,4 @@ services:
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://inzulink-v1.onrender.com/api/:splat
+        destination: https://inzulink-00l5.onrender.com/api/:splat
