@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>InzuLink — Rwanda’s Digital Real Estate Partner</title>
+  <meta name="theme-color" content="#05080f" />
+  <title>InzuLink — Rwanda's Property Marketplace</title>
 
   <!-- SEO -->
-  <meta name="description" content="InzuLink helps you find rentals and homes in Rwanda with trusted listings, direct contact, and instant contract generation." />
+  <meta name="description" content="InzuLink is Rwanda's property marketplace: discover houses and land, contact sellers directly, and generate contracts in minutes." />
   <meta name="robots" content="index,follow" />
 
   <!-- Social preview -->
-  <meta property="og:title" content="InzuLink — Rwanda’s Digital Real Estate Partner" />
-  <meta property="og:description" content="Trusted listings, direct landlord contact, and instant contract generation." />
+  <meta property="og:title" content="InzuLink — Rwanda's Property Marketplace" />
+  <meta property="og:description" content="Discover houses and land, contact sellers directly, generate contracts." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -20,381 +20,125 @@
   <!-- Fonts + icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Shared navbar styles -->
+  <!-- Shared styles -->
   <link rel="stylesheet" href="assets/app.css" />
+  <link rel="stylesheet" href="assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --accent-hover:#d97706;
-      --bg:#f8fafc;
-      --text:#0b1220;
-      --muted:#64748b;
-      --card:#ffffff;
-      --border:#e2e8f0;
-      --shadow: 0 20px 40px -10px rgba(2,6,23,0.12);
-      --shadow-sm: 0 10px 25px rgba(2,6,23,0.08);
-      --radius: 18px;
-    }
-
-    *{ box-sizing:border-box; }
-    body{ margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
-    a{ color:inherit; text-decoration:none; }
-    button,input{ font-family:inherit; }
-
-    /* Page layout container */
-    .page-wrap{
-      width:min(1150px, 92%);
-      margin: 0 auto;
-    }
-
-    /* HERO */
+    /* ---------- Hero ---------- */
     .hero{
-  margin-top: 14px;
-  border-radius: 22px;
-  overflow: hidden;
-  position: relative;
-
-  /* Brighter, clearer image */
-  background:
-    linear-gradient(110deg, rgba(15,23,42,0.38), rgba(15,23,42,0.58)),
-    url("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2200&auto=format&fit=crop");
-
-  background-size: cover;
-  background-position: center;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(2,6,23,0.08);
-}
-
-/* Optional: gentle clarity + contrast without darkening too much */
-.hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(255,255,255,0.02);
-  mix-blend-mode: overlay;
-  pointer-events:none;
-}
-
-    .hero-inner{
-  padding: 110px 42px;        /* ⬅ more vertical space */
-  display:grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 32px;
-  align-items: center;
-  color: #fff;
-  min-height: 72vh;           /* ⬅ makes hero feel BIG */
-}
-
-
-    .hero h1{
-  margin: 0 0 16px;
-  font-weight: 900;
-  font-size: clamp(2.4rem, 4.6vw, 3.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.9px;
-}
-
-    .hero p{
-      margin: 0 0 18px;
-      color: #cbd5e1;
-      line-height: 1.7;
-      max-width: 560px;
-      font-size: 1.05rem;
-    }
-    .hero-ctas{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      font-weight: 900;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      user-select: none;
-    }
-    .pill:active{ transform: translateY(1px); }
-    .pill-primary{
-      background: var(--accent);
-      color: #111827;
-      box-shadow: 0 18px 35px rgba(245,158,11,0.25);
-    }
-    .pill-primary:hover{ background: var(--accent-hover); }
-    .pill-ghost{
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.18);
-      color: #fff;
-    }
-    .pill-ghost:hover{ background: rgba(255,255,255,0.16); }
-
-    /* Hero right card */
-    .hero h1{
-  margin: 0 0 12px;
-  font-weight: 900;
-  font-size: clamp(2.1rem, 4vw, 3.25rem);
-  line-height: 1.08;
-  letter-spacing: -0.8px;
-}
-
-    .hero-card h3{
-      margin: 0 0 8px;
-      font-weight: 900;
-      letter-spacing: -0.2px;
-      font-size: 1.05rem;
-    }
-    .hero-card ul{
-      margin: 0;
-      padding-left: 18px;
-      color: #e2e8f0;
-      line-height: 1.7;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    @media (min-width: 1200px){
-  .hero-inner{
-    padding-top: 130px;
-    padding-bottom: 130px;
-  }
-}
-
-    /* LIVE STATS */
-    .stats{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .stat{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 25px rgba(2,6,23,0.05);
-      padding: 18px 18px;
-    }
-    .stat .num{
-      font-weight: 900;
-      font-size: 1.6rem;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
-    .stat .label{
-      margin-top: 4px;
-      color: var(--muted);
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-    }
-
-    /* SECTION */
-    .section{
-      margin-top: 26px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow-sm);
-      padding: 34px 26px;
-    }
-    .section-head{
-      display:flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-    .kicker{
-      color: var(--accent);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 0.78rem;
-    }
-    .title{
-      margin: 6px 0 0;
-      font-size: 1.9rem;
-      font-weight: 900;
-      letter-spacing: -0.6px;
-      color: var(--primary);
-    }
-    .desc{
-      margin: 10px 0 0;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 720px;
-      font-weight: 600;
-    }
-
-    /* CARDS GRID */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 18px;
-    }
-    .card{
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 20px rgba(2,6,23,0.04);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .card:hover{ transform: translateY(-3px); box-shadow: 0 18px 35px rgba(2,6,23,0.10); }
-    .icon{
-      width: 46px; height: 46px;
-      border-radius: 14px;
-      display:grid;
-      place-items:center;
-      font-size: 1.35rem;
-      margin-bottom: 10px;
-    }
-    .card h3{
-      margin: 0 0 6px;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing: -0.2px;
-    }
-    .card p{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    /* TRUST STRIP */
-    .strip{
-      margin-top: 14px;
-      display:flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      padding: 16px 18px;
-      border-radius: 18px;
-      border: 1px solid #fde68a;
-      background: #fffbeb;
-    }
-    .strip strong{ color: #92400e; }
-    .strip span{ color: #7c2d12; font-weight: 700; }
-    .strip .actions{ display:flex; gap:10px; flex-wrap: wrap; }
-
-    /* FOOTER */
-    .footer{
-      margin-top: 26px;
-      border-radius: 22px;
+      margin-top:16px;
+      border-radius:32px;
       overflow:hidden;
-      background: var(--primary);
-      color: #cbd5e1;
-      border: 1px solid rgba(255,255,255,0.10);
-      box-shadow: var(--shadow-sm);
+      position:relative;
+      border:1px solid var(--line-soft);
+      background:
+        linear-gradient(100deg, rgba(5,8,15,.94) 20%, rgba(5,8,15,.72) 48%, rgba(5,8,15,.30) 75%),
+        url("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2200&auto=format&fit=crop");
+      background-size:cover;
+      background-position:center;
+      box-shadow:var(--shadow);
     }
-    .footer-inner{
-      padding: 28px 22px;
+    .hero-inner{
+      padding:88px 48px;
       display:grid;
-      grid-template-columns: 1.3fr 1fr 1fr 1fr;
-      gap: 16px;
-    }
-    .fbrand{
-      display:flex; align-items:center; gap:10px;
-      font-weight: 900;
-      color:#fff;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-    .fbrand .brand-icon{
-      width: 34px; height: 34px;
-      border-radius: 10px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-    }
-    .footer a{ color:#94a3b8; font-weight: 800; }
-    .footer a:hover{ color:#fff; }
-    .fcol strong{
-      display:block;
-      color:#fff;
-      margin-bottom: 10px;
-      font-weight: 900;
-    }
-    .flink{ display:flex; align-items:center; gap:10px; padding: 8px 0; }
-    .copy{
-      padding: 14px 22px;
-      border-top: 1px solid rgba(255,255,255,0.12);
-      text-align:center;
-      font-size: 0.85rem;
-      color:#94a3b8;
-    }
-
-    /* MODAL */
-    .modal-overlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      background: rgba(2,6,23,0.60);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      padding: 18px;
+      grid-template-columns:1.25fr .75fr;
+      gap:40px;
       align-items:center;
-      justify-content:center;
+      min-height:62vh;
     }
-    .modal{
-      width: min(900px, 96%);
-      background: #fff;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 18px;
-      max-height: 82vh;
-      overflow:auto;
-      position: relative;
-    }
-    .modal h2{
-      margin: 0 0 8px;
-      font-weight: 900;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-    .modal .content{
-      color:#334155;
-      line-height: 1.75;
-      font-weight: 600;
-    }
-    .x{
-      position:absolute; right:14px; top:12px;
-      cursor:pointer;
-      color:#64748b;
-      font-size: 1.5rem;
-    }
-    .x:hover{ color: var(--primary); }
+    .hero h1{font-size:clamp(2.5rem,5vw,4rem);max-width:12ch}
+    .hero h1 .accent{color:var(--cyan)}
+    .hero .lede{margin:18px 0 26px;max-width:52ch;font-size:1.05rem}
+    .hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+    .hero-proof{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px}
+    .hero-proof span{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.85rem;font-weight:700}
+    .hero-proof i{color:var(--cyan);font-size:1.05rem}
 
-    /* Responsive */
-    @media (max-width: 980px){
-      .hero-inner{ grid-template-columns: 1fr; }
-      .stats{ grid-template-columns: 1fr; }
-      .grid{ grid-template-columns: 1fr; }
-      .footer-inner{ grid-template-columns: 1fr 1fr; }
+    .hero-side{
+      background:rgba(9,14,26,.82);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:24px;
+      backdrop-filter:blur(10px);
     }
-    @media (max-width: 520px){
-      .hero-inner{ padding: 54px 18px; }
-      .footer-inner{ grid-template-columns: 1fr; }
-      .title{ font-size: 1.6rem; }
-    }
+    .hero-side h3{margin:0 0 4px;font-family:var(--font-display);font-size:1.05rem;color:#fff;display:flex;align-items:center;gap:9px}
+    .hero-side h3 i{color:var(--cyan)}
+    .hero-side p{margin:0 0 16px;color:var(--muted);font-size:.87rem;line-height:1.6}
+    .spec{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-soft);font-size:.88rem;font-weight:700}
+    .spec i{font-size:1.25rem;color:var(--cyan);flex-shrink:0}
+    .spec small{display:block;color:var(--faint);font-weight:600}
 
-    @media (prefers-reduced-motion: reduce){
-      *{ scroll-behavior:auto !important; transition:none !important; }
+    /* ---------- Stats band ---------- */
+    .stats{
+      margin-top:16px;
+      display:grid;grid-template-columns:repeat(3,1fr);
+      background:var(--bg1);
+      border:1px solid var(--line-soft);
+      border-radius:20px;
+      overflow:hidden;
+    }
+    .stat{padding:20px 24px;display:flex;align-items:center;gap:14px}
+    .stat + .stat{border-left:1px solid var(--line-soft)}
+    .stat .glyph{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.4rem;background:#0d1a2e;color:var(--cyan);border:1px solid var(--line-soft);flex-shrink:0}
+    .stat .num{font-family:var(--font-display);font-weight:800;font-size:1.55rem;color:#fff;letter-spacing:-.5px;line-height:1.1}
+    .stat .label{color:var(--faint);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:.7rem;margin-top:3px}
+
+    /* ---------- Featured ---------- */
+    .featured-shell{padding:30px 26px}
+    .featured-note{
+      display:flex;align-items:center;gap:10px;
+      color:var(--muted);font-weight:600;font-size:.92rem;
+      border:1px dashed var(--line);border-radius:14px;padding:18px;
+    }
+    .featured-note a{color:var(--cyan);font-weight:800}
+
+    /* ---------- Editorial feature rows ---------- */
+    .feature-rows{padding:10px 26px 30px}
+    .frow{
+      display:grid;grid-template-columns:72px 1fr auto;
+      gap:18px;align-items:center;
+      padding:22px 0;
+      border-top:1px solid var(--line-soft);
+    }
+    .frow:first-child{border-top:none}
+    .frow .n{font-family:var(--font-display);font-size:1.9rem;font-weight:800;color:#1b2947}
+    .frow h3{margin:0 0 5px;font-size:1.08rem;color:#fff;letter-spacing:-.2px}
+    .frow p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.65;max-width:62ch}
+    .frow .go{
+      width:46px;height:46px;border-radius:14px;flex-shrink:0;
+      display:grid;place-items:center;font-size:1.25rem;
+      border:1px solid var(--line);color:var(--cyan);background:#0a1120;
+      transition:border-color .15s ease,background .15s ease;
+    }
+    .frow .go:hover{border-color:var(--cyan);background:#0e1c30}
+
+    /* ---------- Safety strip ---------- */
+    .safety{
+      margin-top:26px;
+      display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+      padding:20px 24px;
+      border-radius:20px;
+      border:1px solid #574410;
+      background:linear-gradient(180deg,#171106,#0d0a05);
+    }
+    .safety strong{color:var(--warn)}
+    .safety p{margin:4px 0 0;color:#b8a27a;font-size:.9rem;font-weight:600}
+    .safety .actions{display:flex;gap:10px;flex-wrap:wrap}
+
+    @media (max-width:980px){
+      .hero-inner{grid-template-columns:1fr;padding:56px 26px;min-height:0}
+      .stats{grid-template-columns:1fr}
+      .stat + .stat{border-left:none;border-top:1px solid var(--line-soft)}
+      .frow{grid-template-columns:52px 1fr}
+      .frow .go{display:none}
+    }
+    @media (max-width:520px){
+      .hero{border-radius:24px}
+      .featured-shell{padding:22px 16px}
     }
   </style>
 </head>
@@ -403,140 +147,167 @@
   <!-- Shared navbar mount -->
   <div id="appNavbar"></div>
 
-  <main class="page-wrap">
+  <main class="wrap">
     <!-- HERO -->
     <section class="hero" aria-label="InzuLink introduction">
       <div class="hero-inner">
         <div>
-          <h1>
-            Find Your Next Home<br />
-            <span style="color:var(--accent);">With Trust & Speed.</span>
+          <span class="kicker">Rwanda's property marketplace</span>
+          <h1 class="display" style="margin-top:14px">
+            Find home.<br /><span class="accent">Own the search.</span>
           </h1>
-          <p>
-            InzuLink connects seekers and landlords across Rwanda — browse listings, contact directly, and generate clear contracts in minutes.
+          <p class="lede">
+            Houses, apartments and land across Rwanda — verified listings,
+            direct seller contact, and contracts in minutes. No middlemen, no guesswork.
           </p>
 
           <div class="hero-ctas" id="heroCtas">
-            <a class="pill pill-primary" href="feed.html">
-              Browse Listings <i class="ph ph-arrow-right"></i>
+            <a class="btn btn-solid" href="feed.html">
+              Browse listings <i class="ph ph-arrow-right"></i>
             </a>
-            <a class="pill pill-ghost" href="signup.html">
-              Create Account <i class="ph ph-user-plus"></i>
+            <a class="btn btn-line" href="signup.html">
+              Create account <i class="ph ph-user-plus"></i>
             </a>
+          </div>
+
+          <div class="hero-proof">
+            <span><i class="ph ph-shield-check"></i> Verified sellers</span>
+            <span><i class="ph ph-chat-circle-text"></i> Direct contact</span>
+            <span><i class="ph ph-file-text"></i> Instant contracts</span>
           </div>
         </div>
 
-        <div class="hero-card" aria-label="Key benefits">
-          <h3><i class="ph ph-sparkle"></i> Built for Rwanda</h3>
-          <ul>
-            <li>Cleaner listings & safer browsing</li>
-            <li>Direct landlord contact</li>
-            <li>Instant contract generation</li>
-            <li>Roommate option (for students)</li>
-          </ul>
-        </div>
+        <aside class="hero-side" aria-label="How it works">
+          <h3><i class="ph ph-lightning"></i> Three steps to moved-in</h3>
+          <p>Built for how Rwanda actually rents and buys.</p>
+          <div class="spec"><i class="ph ph-magnifying-glass"></i><div>Discover<small>Filter by district, budget and type</small></div></div>
+          <div class="spec"><i class="ph ph-phone-call"></i><div>Connect<small>Call or message the seller directly</small></div></div>
+          <div class="spec"><i class="ph ph-pen-nib"></i><div>Close<small>Generate a clear contract on the spot</small></div></div>
+        </aside>
       </div>
     </section>
 
     <!-- STATS -->
-    <section class="stats" aria-label="Platform stats">
+    <section class="stats rv" aria-label="Platform stats">
       <div class="stat">
-        <div class="num" id="statListings">—</div>
-        <div class="label">Active Listings</div>
+        <div class="glyph"><i class="ph ph-buildings"></i></div>
+        <div><div class="num" id="statListings">—</div><div class="label">Active listings</div></div>
       </div>
       <div class="stat">
-        <div class="num" id="statUsers">—</div>
-        <div class="label">Users</div>
+        <div class="glyph"><i class="ph ph-users-three"></i></div>
+        <div><div class="num" id="statUsers">—</div><div class="label">Users</div></div>
       </div>
       <div class="stat">
-        <div class="num">Safety</div>
-        <div class="label">Scam Awareness</div>
+        <div class="glyph"><i class="ph ph-shield-check"></i></div>
+        <div><div class="num">Safety</div><div class="label">Scam awareness</div></div>
       </div>
     </section>
 
-    <!-- FEATURES -->
-    <section class="section" aria-label="Features">
-      <div class="section-head">
-        <div>
-          <div class="kicker">Why InzuLink</div>
-          <div class="title">Everything You Need</div>
-          <div class="desc">
-            Designed for real situations: reducing scams, saving time, and making renting/selling easier.
+    <!-- FEATURED LISTINGS (live) -->
+    <section class="section rv" aria-label="Featured listings">
+      <div class="panel featured-shell">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Fresh on the market</span>
+            <h2 class="section-title">Featured properties</h2>
+          </div>
+          <a class="btn btn-dark btn-sm" href="feed.html">View all <i class="ph ph-arrow-right"></i></a>
+        </div>
+        <div class="prop-grid" id="featuredGrid" aria-live="polite">
+          <div class="skel" style="height:230px"></div>
+          <div class="skel" style="height:230px"></div>
+          <div class="skel" style="height:230px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY INZULINK -->
+    <section class="section rv" aria-label="Features">
+      <div class="panel">
+        <div class="section-head" style="padding:30px 26px 0">
+          <div>
+            <span class="kicker">Why InzuLink</span>
+            <h2 class="section-title">Built for trust, tuned for speed</h2>
+          </div>
+        </div>
+        <div class="feature-rows">
+          <div class="frow">
+            <div class="n">01</div>
+            <div>
+              <h3>Listings you can verify</h3>
+              <p>Verified seller badges, viewable history and reporting push fraud out — every listing carries a real contact and a real location.</p>
+            </div>
+            <a class="go" href="feed.html" aria-label="Browse listings"><i class="ph ph-arrow-right"></i></a>
+          </div>
+          <div class="frow">
+            <div class="n">02</div>
+            <div>
+              <h3>Discovery by district and budget</h3>
+              <p>From Kimironko to Musanze: filter houses, apartments and land by district, price and type, and save favourites to compare later.</p>
+            </div>
+            <a class="go" href="feed.html" aria-label="Browse listings"><i class="ph ph-arrow-right"></i></a>
+          </div>
+          <div class="frow">
+            <div class="n">03</div>
+            <div>
+              <h3>Contracts in minutes, in two languages</h3>
+              <p>Generate a clear EN/RW rental agreement from the listing details — no lawyer visit for a standard lease.</p>
+            </div>
+            <a class="go" href="contract.html" aria-label="Open contract tool"><i class="ph ph-arrow-right"></i></a>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="grid">
-        <div class="card">
-          <div class="icon" style="background:#dcfce7;color:#16a34a;"><i class="ph ph-shield-check"></i></div>
-          <h3>Safer Listings</h3>
-          <p>Encourages verification and promotes safer practices to reduce fraud and fake posts.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon" style="background:#e0f2fe;color:#0284c7;"><i class="ph ph-buildings"></i></div>
-          <h3>Smart Discovery</h3>
-          <p>Filter properties by district, budget, and type — quickly find what matches your needs.</p>
-        </div>
-
-        <div class="card">
-          <div class="icon" style="background:#fff7ed;color:#ea580c;"><i class="ph ph-file-text"></i></div>
-          <h3>Instant Contracts</h3>
-          <p>Create a simple lease agreement quickly using the built-in contract tool.</p>
-        </div>
+    <!-- SAFETY -->
+    <section class="safety rv" role="note" aria-label="Safety notice">
+      <div>
+        <strong>Never pay before visiting the property and meeting the seller.</strong>
+        <p>Daytime visits, verified identity, written agreement — the three rules.</p>
       </div>
-
-      <div class="strip" role="note" aria-label="Safety notice">
-        <div>
-          <strong>Safety tip:</strong>
-          <span>Never pay money before visiting the property and meeting the landlord.</span>
-        </div>
-        <div class="actions">
-          <button class="pill pill-primary" style="padding:10px 14px;" onclick="openModal('safety')">
-            Safety Tips <i class="ph ph-warning-circle"></i>
-          </button>
-          <a class="pill pill-ghost" style="padding:10px 14px;" href="contract.html">
-            Contract Tool <i class="ph ph-arrow-right"></i>
-          </a>
-        </div>
+      <div class="actions">
+        <button class="btn btn-solid btn-sm" onclick="openModal('safety')">
+          Safety tips <i class="ph ph-warning-circle"></i>
+        </button>
+        <a class="btn btn-line btn-sm" href="contract.html">
+          Contract tool <i class="ph ph-arrow-right"></i>
+        </a>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer" aria-label="Footer">
-      <div class="footer-inner">
+    <footer class="site-footer rv" aria-label="Footer">
+      <div class="foot-grid">
         <div class="fcol">
-          <div class="fbrand">
+          <div class="foot-brand">
             <span class="brand-icon"><i class="ph ph-house-line"></i></span>
-            Inzu<span style="color:var(--accent);">Link</span>
+            Inzu<em>Link</em>
           </div>
-          <div style="color:#94a3b8;line-height:1.7;font-weight:700;">
-            Simplifying real estate in Rwanda through technology and trust.
-          </div>
-          <div class="flink" style="cursor:pointer;" onclick="openModal('about')">
-            <i class="ph ph-info"></i> <span style="font-weight:900;color:#cbd5e1;">About</span>
+          <div class="foot-tag">Rwanda's property marketplace — discover, connect, close.</div>
+          <div class="flink" onclick="openModal('about')">
+            <i class="ph ph-info"></i> <span>About</span>
           </div>
         </div>
 
         <div class="fcol">
           <strong>Platform</strong>
-          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse Listings</a></div>
-          <div class="flink"><i class="ph ph-plus-circle"></i> <a href="post-property.html">List a Property</a></div>
-          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract Tool</a></div>
+          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse listings</a></div>
+          <div class="flink"><i class="ph ph-plus-circle"></i> <a href="post-property.html">List a property</a></div>
+          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract tool</a></div>
         </div>
 
         <div class="fcol">
           <strong>Legal</strong>
-          <div class="flink" style="cursor:pointer;" onclick="openModal('terms')"><i class="ph ph-scale"></i> <span style="color:#94a3b8;font-weight:800;">Terms</span></div>
-          <div class="flink" style="cursor:pointer;" onclick="openModal('privacy')"><i class="ph ph-lock"></i> <span style="color:#94a3b8;font-weight:800;">Privacy</span></div>
-          <div class="flink" style="cursor:pointer;" onclick="openModal('safety')"><i class="ph ph-warning-circle"></i> <span style="color:#94a3b8;font-weight:800;">Safety</span></div>
+          <div class="flink" onclick="openModal('terms')"><i class="ph ph-scale"></i> <span>Terms</span></div>
+          <div class="flink" onclick="openModal('privacy')"><i class="ph ph-lock"></i> <span>Privacy</span></div>
+          <div class="flink" onclick="openModal('safety')"><i class="ph ph-warning-circle"></i> <span>Safety</span></div>
         </div>
 
         <div class="fcol">
           <strong>Contact</strong>
-          <div class="flink"><i class="ph ph-phone"></i> <span style="font-weight:800;color:#94a3b8;">+250 789 446 462</span></div>
-          <div class="flink"><i class="ph ph-envelope"></i> <span style="font-weight:800;color:#94a3b8;">info@inzulink.rw</span></div>
-          <div class="flink"><i class="ph ph-map-pin"></i> <span style="font-weight:800;color:#94a3b8;">Kigali, Rwanda</span></div>
+          <div class="flink"><i class="ph ph-phone"></i> <span>+250 789 446 462</span></div>
+          <div class="flink"><i class="ph ph-envelope"></i> <span>info@inzulink.rw</span></div>
+          <div class="flink"><i class="ph ph-map-pin"></i> <span>Kigali, Rwanda</span></div>
         </div>
       </div>
       <div class="copy">© 2026 InzuLink. Built for Rwanda.</div>
@@ -544,8 +315,8 @@
   </main>
 
   <!-- MODAL -->
-  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Information modal">
-    <div class="modal">
+  <div class="overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Information modal">
+    <div class="sheet">
       <i class="ph ph-x x" onclick="closeModal()" aria-label="Close modal"></i>
       <h2 id="modalTitle">Title</h2>
       <div class="content" id="modalBody">Content</div>
@@ -560,43 +331,111 @@
     // HOSTING SAFE API BASE (no crashing if backend not reachable)
     // =========================================================
     const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop";
 
-    // Role-aware hero CTAs (small polish)
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem("user")); } catch (_) {}
-    if (user?.role === "Landlord") {
-      document.getElementById("heroCtas").innerHTML =
-        `<a class="pill pill-primary" href="landlord.html">Open Dashboard <i class="ph ph-arrow-right"></i></a>`;
-    } else if (user?.role === "Admin") {
-      document.getElementById("heroCtas").innerHTML =
-        `<a class="pill pill-primary" href="dashboard.html">Open Admin Panel <i class="ph ph-arrow-right"></i></a>`;
-    }
-
-    // Stats: safe fetch with timeout + fallback
     function fetchWithTimeout(url, timeoutMs = 6000) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
     }
 
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+
+    // Role-aware hero CTAs
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem("user")); } catch (_) {}
+    if (user?.role === "Landlord") {
+      document.getElementById("heroCtas").innerHTML =
+        `<a class="btn btn-solid" href="landlord.html">Open dashboard <i class="ph ph-arrow-right"></i></a>`;
+    } else if (user?.role === "Admin") {
+      document.getElementById("heroCtas").innerHTML =
+        `<a class="btn btn-solid" href="dashboard.html">Open admin panel <i class="ph ph-arrow-right"></i></a>`;
+    }
+
+    // Stats: safe fetch with timeout + fallback
     async function loadStats() {
       const elListings = document.getElementById("statListings");
       const elUsers = document.getElementById("statUsers");
-      // default fallback values (for demos/offline)
       elListings.textContent = "500+";
       elUsers.textContent = "1k+";
-
       try {
         const res = await fetchWithTimeout(`${API_BASE}/api/analytics/stats`, 6500);
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data.properties === "number") elListings.textContent = `${data.properties}+`;
         if (typeof data.users === "number") elUsers.textContent = `${data.users}+`;
+      } catch (e) { /* keep fallback values */ }
+    }
+
+    // Featured listings: live data, graceful offline state
+    function imgUrl(p) {
+      const first = p.images && p.images[0];
+      if (!first) return FALLBACK_IMG;
+      const s = String(first).replace(/\\/g, "/");
+      if (/^https?:\/\//i.test(s)) return s;
+      return `${API_BASE}/${s.replace(/^\//, "")}`;
+    }
+
+    function priceLabel(p) {
+      const n = Number(p.price_per_month);
+      if (!Number.isFinite(n)) return "Price on request";
+      const suffix = String(p.listing_type || "").toLowerCase() === "rent" ? "<small>/month</small>" : "";
+      return `${n.toLocaleString("en-RW")} RWF ${suffix}`;
+    }
+
+    function featuredCard(p) {
+      const isRent = String(p.listing_type || "").toLowerCase() === "rent";
+      const loc = [p.sector, p.district].filter(Boolean).join(", ");
+      return `
+        <a class="prop" href="feed.html">
+          <div class="prop-media">
+            <img loading="lazy" src="${esc(imgUrl(p))}" alt="${esc(p.title || "Property")}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'" />
+            <span class="chip ${isRent ? "chip-rent" : "chip-sale"}">${esc(p.listing_type || "Sale")}</span>
+          </div>
+          <div class="prop-body">
+            <div class="prop-price">${priceLabel(p)}</div>
+            <h3 class="prop-title">${esc(p.title || "Untitled property")}</h3>
+            <div class="prop-meta">
+              ${loc ? `<span><i class="ph ph-map-pin"></i>${esc(loc)}</span>` : ""}
+              ${p.bedrooms ? `<span><i class="ph ph-bed"></i>${esc(p.bedrooms)} bd</span>` : ""}
+              ${p.is_verified_agent ? `<span><i class="ph ph-seal-check"></i>Verified</span>` : ""}
+            </div>
+          </div>
+        </a>`;
+    }
+
+    async function loadFeatured() {
+      const grid = document.getElementById("featuredGrid");
+      try {
+        const res = await fetchWithTimeout(`${API_BASE}/api/properties`, 8000);
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        const list = (Array.isArray(data) ? data : []).filter(p => p.status === "Available").slice(0, 6);
+        if (!list.length) throw new Error("empty");
+        grid.innerHTML = list.map(featuredCard).join("");
       } catch (e) {
-        // keep fallback values
+        grid.innerHTML = `
+          <div class="featured-note" style="grid-column:1/-1">
+            <i class="ph ph-cloud-slash" style="font-size:1.4rem;color:var(--cyan)"></i>
+            <span>Live listings are unreachable right now (backend offline). <a href="feed.html">Open the marketplace →</a></span>
+          </div>`;
       }
     }
+
     loadStats();
+    loadFeatured();
+
+    // Scroll reveal
+    try {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+      }, { threshold: 0.12 });
+      document.querySelectorAll(".rv").forEach(el => io.observe(el));
+    } catch (e) {
+      document.querySelectorAll(".rv").forEach(el => el.classList.add("in"));
+    }
 
     // Modal content
     const modalOverlay = document.getElementById("modalOverlay");
@@ -607,12 +446,12 @@
       about: {
         title: "About InzuLink",
         body: `
-          <p><strong>InzuLink</strong> is a platform connecting landlords and seekers across Rwanda.</p>
+          <p><strong>InzuLink</strong> is Rwanda's property marketplace, connecting sellers, landlords and seekers.</p>
           <ul>
-            <li>Browse property listings with clearer details.</li>
-            <li>Contact landlords directly.</li>
+            <li>Browse houses, apartments and land with clearer details.</li>
+            <li>Contact sellers and landlords directly.</li>
             <li>Use safety tips to reduce scams.</li>
-            <li>Generate simple rental contracts faster.</li>
+            <li>Generate simple contracts faster.</li>
           </ul>
         `
       },
@@ -649,7 +488,7 @@
       safety: {
         title: "Safety Tips",
         body: `
-          <p style="color:#dc2626;font-weight:900;">Never pay before visiting the property and meeting the landlord.</p>
+          <p style="color:#fb7185;font-weight:800;">Never pay before visiting the property and meeting the seller.</p>
           <ul>
             <li>Visit during daytime and go with a friend if possible.</li>
             <li>Confirm identity and ownership details.</li>

@@ -4,646 +4,187 @@
   <meta charset="UTF-8" />
   <title>Browse Properties — InzuLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#05080f" />
+  <meta name="description" content="Browse houses, apartments and land across Rwanda. Filter by location, budget and type." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
-  <!-- Shared navbar styles -->
+  <!-- Shared styles -->
   <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --accent-hover:#d97706;
-      --success:#10b981;
-      --bg-page:#f8fafc;
-      --text-main:#334155;
-      --text-light:#64748b;
-      --border:#e2e8f0;
-      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+    /* ---------- Search panel ---------- */
+    .search-panel{margin-top:16px;padding:28px 26px 22px}
+    .search-panel h1{font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.7px;color:#fff;margin:10px 0 6px}
+    .search-panel .sub{color:var(--muted);font-weight:600;margin:0 0 18px}
+    .search-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:10px}
+    .search-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .search-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+    #resultCount{color:var(--faint);font-size:.85rem;font-weight:700;margin-left:auto}
 
-      --danger:#dc2626;
-      --danger-bg:#fef2f2;
-      --warn:#f59e0b;
-      --warn-bg:#fffbeb;
-      --card:#ffffff;
-    }
+    /* ---------- Map ---------- */
+    #feedMap{height:420px;width:100%;margin-top:14px;border-radius:18px;display:none;border:1px solid var(--line);overflow:hidden;background:#070c16}
+    .leaflet-container{background:#070c16;font-family:var(--font-body)}
+    .leaflet-popup-content-wrapper{background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:12px}
+    .leaflet-popup-content{color:var(--text);font-weight:600}
+    .leaflet-popup-tip{background:#0d1528;border:1px solid var(--line)}
+    .leaflet-bar a{background:#0d1528;color:var(--text);border-color:var(--line)}
+    .leaflet-control-attribution{background:rgba(5,8,15,.7) !important;color:var(--faint) !important;font-size:.65rem !important}
+    .leaflet-control-attribution a{color:var(--faint) !important}
 
-    body{
-      font-family: Inter, system-ui, Arial, sans-serif;
-      background: var(--bg-page);
-      margin:0;
-      padding:0;
-      color: var(--text-main);
-    }
-
-    /* Page layout */
-    .wrap{
-      width:min(1200px, 92%);
-      margin: 0 auto;
-      padding: 18px 0 46px;
-    }
-
-    /* HERO SEARCH */
-    .hero{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 28px 18px 18px;
-    }
-    .hero h1{
-      margin:0 0 8px;
-      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-      color: var(--primary);
-      letter-spacing:-0.6px;
-      font-weight: 900;
-      text-align:center;
-    }
-    .hero p{
-      margin:0 0 18px;
-      color: var(--text-light);
-      text-align:center;
-      font-weight: 600;
-      line-height:1.6;
-    }
-
-    .search-bar{
-      background:#fff;
-      margin: 0 auto;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .search-input, .search-select{
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      min-width: 200px;
-      flex: 1;
-      font-family: inherit;
-      font-size: 0.92rem;
-      outline:none;
-      background:#fff;
-      transition: box-shadow .15s ease, border-color .15s ease;
-    }
-    .search-input:focus, .search-select:focus{
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
-    }
-
-    .btn{
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 0.92rem;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      user-select:none;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      white-space: nowrap;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn-primary{ background: var(--primary); color:#fff; }
-    .btn-primary:hover{ background:#1e293b; }
-    .btn-accent{ background: var(--accent); color:#111827; }
-    .btn-accent:hover{ background: var(--accent-hover); color:#111827; }
-    .btn-outline{
-      background:#fff;
-      color: var(--primary);
-      border-color: var(--border);
-      font-weight: 900;
-      text-decoration:none;
-    }
-    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
-
-    .mini-row{
-      display:flex;
-      justify-content:center;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    /* MAP */
-    #feedMap{
-      height: 420px;
-      width: 100%;
-      margin-top: 16px;
-      border-radius: 16px;
-      display:none;
-      border: 1px solid var(--border);
-      overflow:hidden;
-    }
-
-    /* SAFETY BANNER */
+    /* ---------- Safety banner ---------- */
     .safety-banner{
-      margin: 18px auto 18px;
-      background: var(--danger-bg);
-      border: 1px solid #fecaca;
-      padding: 14px 14px;
-      border-radius: 16px;
-      color: #991b1b;
-      font-size: 0.92rem;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      line-height:1.55;
-      font-weight: 700;
-      width:min(1200px, 92%);
+      margin:16px 0 0;
+      background:#170d12;
+      border:1px solid #5c1a2a;
+      padding:13px 16px;
+      border-radius:16px;
+      color:#fda4b5;
+      font-size:.88rem;
+      display:flex;gap:10px;align-items:flex-start;line-height:1.55;font-weight:600;
     }
+    .safety-banner i{font-size:1.2rem;color:var(--danger);flex-shrink:0;margin-top:1px}
+    .safety-banner strong{color:#fff}
 
-    /* FEED GRID */
-    .feed-container{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 22px;
-      padding: 12px 0 30px;
+    /* ---------- Feed grid (extends theme .prop) ---------- */
+    .feed-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 14px;flex-wrap:wrap}
+    .feed-head h2{font-family:var(--font-display);font-size:1.3rem;color:#fff;margin:0;letter-spacing:-.4px}
+    .prop{cursor:pointer}
+    .prop.is-sold{opacity:.75}
+    .prop.is-sold .prop-media img{filter:grayscale(45%)}
+    .prop.featured{border-color:#574410;order:-1}
+    .featured-flag{
+      position:absolute;top:12px;right:12px;z-index:5;
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(20,14,3,.85);border:1px solid #574410;color:var(--warn);
+      font-size:.72rem;font-weight:800;padding:5px 11px;border-radius:999px;
+      text-transform:uppercase;letter-spacing:.05em;
     }
-
-    .card{
-      background:#fff;
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid var(--border);
-      transition: transform .2s, box-shadow .2s;
-      cursor:pointer;
-      position: relative;
-      display:flex;
-      flex-direction: column;
-      box-shadow: 0 10px 25px rgba(2,6,23,0.06);
-    }
-    .card:hover{ transform: translateY(-4px); box-shadow: 0 18px 35px rgba(2,6,23,0.12); }
-    .card.is-sold{ opacity:.85; filter: grayscale(18%); }
-
-    .card.featured{
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 18px rgba(245,158,11,0.22);
-      order: -1;
-    }
-
-    .featured-badge{
-      position:absolute;
-      top: 44px;
-      left: 0;
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+    .prop.featured .prop-fav{top:52px}
+    .type-band{
+      position:absolute;top:0;left:0;width:100%;z-index:4;
+      padding:9px 0;text-align:center;
+      font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
       color:#fff;
-      padding: 5px 12px;
-      border-top-right-radius: 999px;
-      border-bottom-right-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      z-index: 25;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      box-shadow: 2px 3px 10px rgba(2,6,23,0.22);
     }
-
-    .card-img-wrap{ height: 220px; overflow:hidden; position:relative; background:#cbd5e1; }
-    .card-img{ width:100%; height:100%; object-fit: cover; }
-
-    .badge{
-      position:absolute;
-      top:0; left:0; width:100%;
-      padding: 12px 0;
-      text-align:center;
-      font-size: .85rem;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color:#fff;
-      z-index: 15;
+    .bg-rent{background:rgba(5,8,15,.85)}
+    .bg-sale{background:rgba(11,60,38,.88)}
+    .bg-sold{background:rgba(92,26,42,.9)}
+    .bg-shared{background:rgba(8,47,57,.88)}
+    .rate-badge{
+      position:absolute;bottom:10px;left:10px;z-index:5;
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(5,8,15,.78);border:1px solid var(--line);
+      color:var(--warn);font-size:.8rem;font-weight:800;
+      padding:4px 10px;border-radius:999px;
     }
-    .bg-rent{ background: rgba(15,23,42,0.92); }
-    .bg-sale{ background: rgba(245,158,11,0.92); }
-    .bg-sold{ background: rgba(239,68,68,0.92); }
-    .bg-shared{ background: rgba(168,85,247,0.92); }
-
-    .fav-btn{
-      position:absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 25;
-      background:#fff;
-      border:none;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor:pointer;
-      font-size: 1.2rem;
-      color:#ef4444;
-      box-shadow: 0 8px 20px rgba(2,6,23,0.20);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition: transform .12s ease, background .12s ease;
-    }
-    .fav-btn:hover{ transform: scale(1.06); background:#fee2e2; }
-
     .vid-badge{
-      position:absolute;
-      bottom:10px; right:10px;
-      background: rgba(2,6,23,0.75);
-      color:#fff;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      z-index: 20;
+      position:absolute;bottom:10px;right:10px;z-index:5;
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(5,8,15,.78);border:1px solid var(--line);
+      color:#fff;font-size:.76rem;font-weight:800;
+      padding:4px 10px;border-radius:999px;
     }
+    .verified-line{display:flex;align-items:center;gap:6px;color:var(--cyan);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .prop-contact{width:100%;justify-content:center}
+    .prop-contact:disabled{background:#1a2745;border-color:var(--line);color:var(--faint);cursor:not-allowed;box-shadow:none}
+    .feed-empty{
+      grid-column:1/-1;text-align:center;padding:44px 20px;
+      border:1px dashed var(--line);border-radius:18px;color:var(--muted);font-weight:600;
+    }
+    .feed-empty i{font-size:2rem;color:var(--cyan);display:block;margin-bottom:10px}
 
-    .star-badge{
-      position:absolute;
-      bottom:10px; left:10px;
-      background:#fff;
-      color: var(--accent);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 900;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      z-index: 20;
-      box-shadow: 0 6px 16px rgba(2,6,23,0.12);
+    /* ---------- Detail modal ---------- */
+    .detail{width:min(1020px,96vw);background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;max-height:92vh;position:relative}
+    .detail-close{
+      position:absolute;top:12px;right:12px;z-index:30;
+      width:40px;height:40px;border-radius:12px;
+      background:rgba(5,8,15,.7);border:1px solid var(--line);color:#fff;
+      display:grid;place-items:center;font-size:1.2rem;cursor:pointer;
     }
-
-    .card-body{ padding: 18px; display:flex; flex-direction:column; flex: 1; }
-    .verified-badge{
-      color: #16a34a;
-      font-size: 0.75rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      margin-bottom: 6px;
+    .detail-close:hover{border-color:var(--danger);color:var(--danger)}
+    .detail-gallery{position:relative;background:#04070d;display:flex;align-items:center;justify-content:center;min-height:340px}
+    .detail-gallery img{width:100%;height:100%;max-height:92vh;object-fit:contain}
+    .g-arrow{
+      position:absolute;top:50%;transform:translateY(-50%);z-index:20;
+      width:44px;height:44px;border-radius:12px;
+      background:rgba(5,8,15,.7);border:1px solid var(--line);color:#fff;
+      font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
     }
-
-    .price{ font-size: 1.22rem; font-weight: 900; color: var(--primary); }
-    .title{ font-size: 1.02rem; font-weight: 800; margin: 6px 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .location{ font-size: 0.88rem; color: var(--text-light); margin-bottom: 12px; font-weight: 650; }
-
-    .card-meta{
-      margin-top:auto;
-      padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.86rem;
-      font-weight: 800;
-      color:#334155;
-      margin-bottom: 12px;
+    .g-arrow:hover{border-color:var(--cyan);color:var(--cyan)}
+    .g-prev{left:12px}.g-next{right:12px}
+    .Detail-info{padding:24px;overflow:auto}
+    .Detail-title{margin:0 0 4px;font-family:var(--font-display);font-size:1.4rem;color:#fff;letter-spacing:-.4px;line-height:1.2}
+    .Detail-loc{color:var(--muted);font-weight:600;font-size:.9rem;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .Detail-loc i{color:var(--cyan)}
+    .Detail-price{font-family:var(--font-display);font-size:1.7rem;font-weight:800;color:#fff;margin:0 0 16px;letter-spacing:-.5px}
+    .Detail-price small{font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--faint)}
+    .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+    .spec-box{border:1px solid var(--line-soft);border-radius:14px;padding:11px 13px;background:var(--bg1)}
+    .spec-label{display:block;color:var(--faint);font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+    .spec-value{display:block;color:#fff;font-weight:800;margin-top:4px;font-size:.93rem}
+    .Detail-desc{color:var(--muted);line-height:1.7;font-size:.92rem}
+    .Detail-desc strong{display:block;color:#fff;margin-bottom:6px;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+    .Detail-video{margin-top:16px;border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;background:#04070d}
+    .Detail-video video{width:100%;height:auto;display:block}
+    .wa-btn{
+      width:100%;margin-top:18px;justify-content:center;
+      background:#16a34a;color:#fff;
     }
-
-    .card-action-btn{
-      width:100%;
-      padding: 11px;
-      border-radius: 12px;
-      font-weight: 900;
-      text-decoration:none;
-      border:none;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition: background .12s ease;
-      user-select:none;
-    }
-    .btn-call-card{ background: var(--success); color:#fff; }
-    .btn-call-card:hover{ background:#059669; }
-    .btn-sold-card{ background:#e2e8f0; color:#94a3b8; cursor:not-allowed; pointer-events:none; }
-
-    /* Footer */
-    footer{
-      margin-top: 18px;
-      background: var(--primary);
-      border-radius: 22px;
-      padding: 22px 16px;
-      color:#94a3b8;
-      text-align:center;
-    }
-    .footer-links{
-      display:flex;
-      justify-content:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin: 10px 0 12px;
-    }
-    .footer-links a, .footer-links span{
-      color:#94a3b8;
-      font-weight: 800;
-      font-size: 0.9rem;
-      cursor:pointer;
-      text-decoration:none;
-    }
-    .footer-links a:hover, .footer-links span:hover{ color:#fff; }
-
-    /* Modals (kept from your project, styled cleanly) */
-    .modal-overlay{
-      position: fixed; inset:0;
-      background: rgba(2,6,23,0.60);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 2000;
-      padding: 18px;
-    }
-    .modal-content{
-      width:min(980px, 96vw);
-      background:#fff;
-      border-radius: 18px;
-      overflow:hidden;
-      display:grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      max-height: 92vh;
-    }
-    @media (max-width: 980px){
-      .modal-content{ grid-template-columns: 1fr; max-height: 94vh; }
-    }
-
-    .close-btn{
-      position:absolute;
-      top: 10px; right: 10px;
-      background:#fff;
-      border:1px solid var(--border);
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 900;
-      cursor:pointer;
-      z-index: 25;
-    }
-
-    .modal-gallery{
-      position: relative;
-      background:#0b1220;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height: 320px;
-    }
-    .main-display{
-      width: 100%;
-      height: 100%;
-      max-height: 92vh;
-      object-fit: contain;
-    }
-    .nav-arrow{
-      position:absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.22);
-      color:#fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index: 20;
-      backdrop-filter: blur(10px);
-    }
-    .prev-btn{ left: 12px; }
-    .next-btn{ right: 12px; }
-
-    .modal-info{
-      padding: 18px;
-      overflow:auto;
-    }
-    .tag-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 0.82rem;
-      color:#fff;
-      margin-bottom: 10px;
-    }
-    .modal-title{
-      margin: 0 0 6px;
-      font-size: 1.35rem;
-      color: var(--primary);
-      letter-spacing:-0.5px;
-      font-weight: 900;
-    }
-    .modal-price{
-      font-size: 1.5rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin: 10px 0 14px;
-    }
-    .specs-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 10px 0 14px;
-    }
-    .spec-box{
-      border:1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px;
-      background:#fff;
-    }
-    .spec-label{ display:block; color: var(--text-light); font-weight: 800; font-size: 0.82rem; }
-    .spec-value{ display:block; color: var(--primary); font-weight: 900; margin-top: 4px; }
-
-    .call-btn{
-      width:100%;
-      border:none;
-      border-radius: 14px;
-      padding: 12px;
-      background: #22c55e;
-      color:#fff;
-      font-weight: 900;
-      cursor:pointer;
-      margin-top: 14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-    }
-    .call-btn:hover{ background:#16a34a; }
-
-    .video-container{
-      margin-top: 14px;
-      border:1px solid var(--border);
-      border-radius: 16px;
-      overflow:hidden;
-      background:#0b1220;
-    }
-    .video-container video{
-      width:100%;
-      height:auto;
-      display:block;
-    }
+    .wa-btn:hover{background:#22c55e;color:#04120a}
 
     /* Reviews */
-    .modal-reviews{
-      margin-top: 16px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 16px;
-    }
-    .review-item{
-      background:#f8fafc;
-      border: 1px solid #eef2f7;
-      padding: 12px;
-      border-radius: 14px;
-      margin-bottom: 10px;
-    }
-    .review-header{
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.85rem;
-      font-weight: 900;
-      margin-bottom: 6px;
-      color:#0f172a;
-    }
-    .review-text{ font-size: 0.92rem; color:#475569; line-height:1.6; font-weight: 650; }
-    .star-input i{ font-size: 1.45rem; color:#cbd5e1; cursor:pointer; transition:.12s; }
-    .star-input i.active{ color: var(--accent); }
+    .reviews{margin-top:20px;border-top:1px solid var(--line-soft);padding-top:18px}
+    .reviews h3{margin:0 0 12px;color:#fff;font-size:1.02rem}
+    #reviewsList{max-height:220px;overflow:auto;margin-bottom:14px;display:flex;flex-direction:column;gap:10px}
+    .review-item{background:var(--bg1);border:1px solid var(--line-soft);padding:12px 14px;border-radius:14px}
+    .review-header{display:flex;justify-content:space-between;gap:10px;font-size:.84rem;font-weight:800;margin-bottom:6px;color:#fff}
+    .review-header .stars{color:var(--warn)}
+    .review-header time{color:var(--faint);font-weight:600;font-size:.78rem}
+    .review-text{font-size:.9rem;color:var(--muted);line-height:1.6}
+    .review-form{background:var(--bg1);padding:16px;border-radius:16px;border:1px solid var(--line-soft)}
+    .review-form strong{display:block;margin-bottom:10px;color:#fff;font-size:.9rem}
+    .star-input{display:flex;gap:4px;margin-bottom:12px}
+    .star-input i{font-size:1.5rem;color:#2a3a63;cursor:pointer;transition:color .12s ease}
+    .star-input i.active{color:var(--warn)}
 
-    /* Auth popup */
-    .auth-popup{
-      position: fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background: rgba(2,6,23,0.65);
-      z-index: 2100;
-      padding: 18px;
-    }
-    .auth-box{
-      width:min(520px, 96vw);
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 22px;
-      text-align:center;
-    }
-    .auth-btn-row{ display:flex; gap:12px; margin-top: 14px; justify-content:center; flex-wrap:wrap; }
-    .auth-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-weight: 900;
-      text-decoration:none;
-      border:1px solid transparent;
-    }
-    .btn-login{ background: var(--primary); color:#fff; }
-    .btn-signup{ background: var(--accent); color:#111827; }
-
-    /* Simple modal for About/Terms/Privacy/Safety + Report */
-    .modal-box{
-      width:min(760px, 96vw);
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      position: relative;
-      max-height: 92vh;
-      overflow:auto;
-    }
-    .close-modal{
-      position:absolute;
-      top: 10px; right: 10px;
-      cursor:pointer;
-      font-size: 1.5rem;
-      color:#64748b;
-    }
-    .close-modal:hover{ color:#ef4444; }
-    .modal-title2{
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing:-0.4px;
-      font-size: 1.2rem;
-      margin: 6px 0 10px;
-    }
-    .modal-content-text{
-      color:#475569;
-      line-height:1.75;
-      font-weight: 650;
-    }
-
-    .form-group{ margin-bottom: 14px; }
-    .form-label{ display:block; font-weight: 900; margin-bottom: 8px; color:#334155; }
-    .form-input{
-      width:100%;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      box-sizing:border-box;
-      font-family: inherit;
-      outline:none;
-    }
-    .form-input:focus{
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
-    }
+    /* Auth + content + report sheets */
+    .sheet-narrow{width:min(480px,96%) !important;text-align:center}
+    .sheet-narrow h2{font-size:1.3rem !important}
+    .report-form{text-align:left;margin-top:6px}
+    .report-form .btn{width:100%;justify-content:center}
 
     /* Sticky ad */
     .sticky-ad{
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100%;
-      height: 56px;
-      background:#fff;
-      border-top: 1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow: 0 -6px 18px rgba(2,6,23,0.08);
-      z-index: 1000;
+      position:fixed;bottom:0;left:0;width:100%;
+      background:rgba(9,14,26,.94);border-top:1px solid var(--line-soft);
+      display:flex;align-items:center;justify-content:center;
+      padding:12px;z-index:900;
+      backdrop-filter:blur(10px);
     }
     .ad-placeholder{
-      background:#f1f5f9;
-      color:#64748b;
-      font-weight: 900;
-      font-size: 0.82rem;
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px dashed #cbd5e1;
+      color:var(--faint);font-weight:700;font-size:.82rem;
+      padding:7px 16px;border-radius:999px;border:1px dashed #2a3a63;
     }
+    .spacer-bottom{height:72px}
 
-    .spacer-bottom{ height: 70px; } /* for sticky-ad */
+    @media (max-width:980px){
+      .search-grid{grid-template-columns:1fr 1fr}
+      .Detail{grid-template-columns:1fr;max-height:94vh}
+      .Detail-gallery{min-height:260px}
+      .Detail-gallery img{max-height:44vh}
+    }
+    @media (max-width:600px){
+      .search-grid{grid-template-columns:1fr}
+      .search-panel{padding:22px 18px}
+    }
   </style>
 </head>
 
@@ -652,103 +193,124 @@
   <div id="appNavbar"></div>
 
   <main class="wrap">
-    <section class="hero" aria-label="Search properties">
-      <h1>Find Your Next Property</h1>
-      <p>Search houses, land, and shared rooms across Rwanda.</p>
+    <section class="panel search-panel" aria-label="Search properties">
+      <span class="kicker">Marketplace</span>
+      <h1>Find your next property</h1>
+      <p class="sub">Houses, apartments, land and shared rooms across Rwanda.</p>
 
-      <div class="search-bar">
-        <input type="text" id="sLocation" class="search-input" placeholder="📍 Location (e.g. Kigali)..." />
-        <select id="sType" class="search-select">
-          <option value="All">All Types</option>
-          <option value="Rent">For Rent</option>
-          <option value="Shared">Roommate / Shared</option>
-          <option value="Sale">For Sale</option>
+      <div class="search-grid">
+        <input type="text" id="sLocation" class="input" placeholder="Location — e.g. Kigali, Musanze…" />
+        <select id="sType" class="select">
+          <option value="All">All types</option>
+          <option value="Rent">For rent</option>
+          <option value="Shared">Roommate / shared</option>
+          <option value="Sale">For sale</option>
         </select>
-        <select id="sCategory" class="search-select">
-          <option value="All">All Categories</option>
+        <select id="sCategory" class="select">
+          <option value="All">All categories</option>
           <option value="House">House</option>
           <option value="Apartment">Apartment</option>
           <option value="Land">Land</option>
         </select>
-        <input type="number" id="sMaxPrice" class="search-input" placeholder="💰 Max Price" />
+        <input type="number" id="sMaxPrice" class="input" placeholder="Max price (RWF)" min="0" />
+      </div>
 
-        <button class="btn btn-primary" id="btnSearch" type="button" onclick="applyFilters()">
+      <div class="search-actions">
+        <button class="btn btn-solid" id="btnSearch" type="button" onclick="applyFilters()">
           <i class="ph ph-magnifying-glass"></i> Search
         </button>
-
-        <button class="btn btn-accent" type="button" onclick="findNearMe()">
-          <i class="ph ph-navigation-arrow"></i> Near Me
+        <button class="btn btn-line" type="button" onclick="findNearMe()">
+          <i class="ph ph-navigation-arrow"></i> Near me
         </button>
-
-        <a class="btn btn-outline" href="contract.html">
-          <i class="ph ph-file-text"></i> Contract Tool
+        <button class="btn btn-dark" type="button" onclick="toggleMap()">
+          <i class="ph ph-map-trifold"></i> Map
+        </button>
+        <a class="btn btn-dark" href="contract.html">
+          <i class="ph ph-file-text"></i> Contract tool
         </a>
       </div>
 
-      <div class="mini-row">
-        <button class="btn btn-outline" type="button" onclick="toggleMap()">
-          <i class="ph ph-map-trifold"></i> Show/Hide Map
-        </button>
-
-        <button class="btn btn-outline" type="button" onclick="openReportModal()">
+      <div class="search-meta">
+        <button class="btn btn-dark btn-sm" type="button" onclick="openReportModal()">
           <i class="ph ph-warning-circle"></i> Report an issue
         </button>
+        <span id="resultCount"></span>
       </div>
 
       <div id="feedMap" aria-label="Map view"></div>
     </section>
-  </main>
 
-  <main class="wrap">
-    <section class="feed-container" id="houseList" aria-label="Property listings">
-      <div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">
-        Loading properties...
-      </div>
+    <div class="safety-banner" role="note">
+      <i class="ph ph-shield-warning"></i>
+      <div><strong>Stay safe:</strong> always visit the property and meet the seller before paying anything. Listing contacts unlock after you log in.</div>
+    </div>
+
+    <div class="feed-head">
+      <h2>Latest listings</h2>
+      <a class="btn btn-dark btn-sm" href="post-property.html"><i class="ph ph-plus-circle"></i> List a property</a>
+    </div>
+
+    <section class="prop-grid" id="houseList" aria-label="Property listings" aria-live="polite">
+      <div class="skel" style="height:300px"></div>
+      <div class="skel" style="height:300px"></div>
+      <div class="skel" style="height:300px"></div>
     </section>
 
-    <footer>
-      <div style="font-weight:900; font-size:1.15rem; color:#fff;">
-        Inzu<span style="color:var(--accent);">Link</span>
+    <footer class="site-footer" aria-label="Footer">
+      <div class="foot-grid">
+        <div class="fcol">
+          <div class="foot-brand">
+            <span class="brand-icon"><i class="ph ph-house-line"></i></span>
+            Inzu<em>Link</em>
+          </div>
+          <div class="foot-tag">Rwanda's property marketplace — discover, connect, close.</div>
+        </div>
+        <div class="fcol">
+          <strong>Platform</strong>
+          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse listings</a></div>
+          <div class="flink"><i class="ph ph-plus-circle"></i> <a href="post-property.html">List a property</a></div>
+          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract tool</a></div>
+        </div>
+        <div class="fcol">
+          <strong>Trust</strong>
+          <div class="flink" onclick="openContentModal('about')"><i class="ph ph-info"></i> <span>About</span></div>
+          <div class="flink" onclick="openContentModal('terms')"><i class="ph ph-scale"></i> <span>Terms</span></div>
+          <div class="flink" onclick="openContentModal('privacy')"><i class="ph ph-lock"></i> <span>Privacy</span></div>
+          <div class="flink" onclick="openContentModal('safety')"><i class="ph ph-warning-circle"></i> <span>Safety</span></div>
+        </div>
+        <div class="fcol">
+          <strong>Contact</strong>
+          <div class="flink"><i class="ph ph-phone"></i> <span>+250 789 446 462</span></div>
+          <div class="flink"><i class="ph ph-envelope"></i> <span>info@inzulink.rw</span></div>
+          <div class="flink"><i class="ph ph-map-pin"></i> <span>Kigali, Rwanda</span></div>
+        </div>
       </div>
-
-      <div class="footer-links">
-        <span onclick="openContentModal('about')">About</span>
-        <span onclick="openContentModal('terms')">Terms</span>
-        <span onclick="openContentModal('privacy')">Privacy</span>
-        <span onclick="openContentModal('safety')">Safety</span>
-        <a href="contract.html" style="color:var(--accent);">Contract Tool</a>
-      </div>
-
-      <div style="font-size:0.86rem; color:#94a3b8; font-weight:700;">
-        © 2026 InzuLink. Kigali, Rwanda.
-      </div>
+      <div class="copy">© 2026 InzuLink. Kigali, Rwanda.</div>
     </footer>
 
     <div class="spacer-bottom"></div>
   </main>
 
   <div class="sticky-ad">
-    <div class="ad-placeholder">📢 AD SPACE: Moving? Call +250 788... (Your Future Client)</div>
+    <div class="ad-placeholder">Ad space — moving services, furniture, internet providers</div>
   </div>
 
   <!-- DETAIL MODAL -->
-  <div class="modal-overlay" id="detailModal">
-    <div class="modal-content">
-      <div class="close-btn" onclick="closeModal()">✕</div>
+  <div class="overlay" id="detailModal">
+    <div class="detail">
+      <button class="detail-close" onclick="closeModal()" aria-label="Close">✕</button>
 
-      <div class="modal-gallery">
-        <button class="nav-arrow prev-btn" id="btnPrev" onclick="changeModalImage(-1)">&#10094;</button>
-        <img src="" class="main-display" id="fullImage" alt="Property image" />
-        <button class="nav-arrow next-btn" id="btnNext" onclick="changeModalImage(1)">&#10095;</button>
+      <div class="Detail-gallery">
+        <button class="g-arrow g-prev" id="btnPrev" onclick="changeModalImage(-1)">&#10094;</button>
+        <img src="" id="fullImage" alt="Property image" />
+        <button class="g-arrow g-next" id="btnNext" onclick="changeModalImage(1)">&#10095;</button>
       </div>
 
-      <div class="modal-info">
-        <div>
-          <span id="modalTypeBadge" class="tag-pill bg-rent">Rent</span>
-          <h2 class="modal-title" id="modalTitle">Title</h2>
-          <div style="color:#64748b; font-weight:750; margin-bottom: 10px;" id="modalLocation">📍 Location</div>
-          <div class="modal-price" id="modalPrice">RWF 0</div>
-        </div>
+      <div class="Detail-info">
+        <span id="modalTypeBadge" class="chip chip-rent">Rent</span>
+        <h2 class="Detail-title" id="modalTitle" style="margin-top:10px">Title</h2>
+        <div class="Detail-loc" id="modalLocation"><i class="ph ph-map-pin"></i> Location</div>
+        <p class="Detail-price" id="modalPrice">RWF 0</p>
 
         <div class="specs-grid">
           <div class="spec-box"><span class="spec-label">Category</span><span class="spec-value" id="modalCat">-</span></div>
@@ -756,44 +318,35 @@
           <div class="spec-box" id="upiBox" style="display:none;"><span class="spec-label">UPI</span><span class="spec-value" id="modalUPI">-</span></div>
         </div>
 
-        <div style="line-height:1.7; color:#475569; font-weight:650;">
-          <strong style="color:var(--primary); display:block; margin-bottom:6px;">Description</strong>
+        <div class="Detail-desc">
+          <strong>Description</strong>
           <span id="modalDesc">...</span>
         </div>
 
         <div id="serviceArea"></div>
-        <div id="modalVideoArea" class="video-container" style="display:none;"></div>
+        <div id="modalVideoArea" class="Detail-video" style="display:none;"></div>
 
-        <div class="modal-reviews">
-          <h3 style="margin:0 0 10px; color:var(--primary); letter-spacing:-0.4px;">Reviews</h3>
-
-          <div id="reviewsList" style="max-height:200px; overflow:auto; margin-bottom:12px;">
-            <div style="color:#94a3b8; font-weight:900;">Loading reviews...</div>
+        <div class="reviews">
+          <h3>Reviews</h3>
+          <div id="reviewsList">
+            <div class="muted">Loading reviews…</div>
           </div>
 
-          <div style="background:#fffbeb; padding:14px; border-radius:16px; border:1px solid #fde68a;">
-            <strong style="display:block; margin-bottom:10px; color:#7c2d12;">Write a Review</strong>
-
-            <div class="star-input" id="starInput" style="margin-bottom:10px;">
+          <div class="review-form">
+            <strong>Write a review</strong>
+            <div class="star-input" id="starInput">
               <i class="ph ph-star" onclick="setRating(1)"></i>
               <i class="ph ph-star" onclick="setRating(2)"></i>
               <i class="ph ph-star" onclick="setRating(3)"></i>
               <i class="ph ph-star" onclick="setRating(4)"></i>
               <i class="ph ph-star" onclick="setRating(5)"></i>
             </div>
-
-            <textarea id="reviewComment"
-              style="width:100%; padding:10px; border-radius:12px; border:1px solid #cbd5e1; box-sizing:border-box; font-family:inherit;"
-              placeholder="How was this property?"></textarea>
-
-            <button onclick="submitReview()"
-              style="background:var(--primary); color:#fff; border:none; padding:10px 14px; border-radius:12px; font-weight:900; cursor:pointer; margin-top:10px;">
-              Post Review
-            </button>
+            <textarea id="reviewComment" class="input" placeholder="How was this property?"></textarea>
+            <button class="btn btn-solid btn-sm" style="margin-top:10px" onclick="submitReview()">Post review</button>
           </div>
         </div>
 
-        <button class="call-btn" id="modalPhone">
+        <button class="btn wa-btn" id="modalPhone">
           <i class="ph ph-whatsapp-logo"></i> Chat on WhatsApp
         </button>
       </div>
@@ -801,67 +354,54 @@
   </div>
 
   <!-- AUTH POPUP -->
-  <div class="auth-popup" id="loginModal">
-    <div class="auth-box">
-      <i class="ph ph-lock-key" style="font-size: 2.7rem; color: var(--accent);"></i>
-      <h2 style="margin:10px 0 8px; color:var(--primary); letter-spacing:-0.4px;">Log In to Contact</h2>
-      <p style="color:#64748b; line-height:1.7; font-weight:650; margin:0;">
-        To improve safety, please login to view phone numbers and contact landlords.
-      </p>
-
-      <div class="auth-btn-row">
-        <a href="login.html" class="auth-btn btn-login">Log In</a>
-        <a href="signup.html" class="auth-btn btn-signup">Sign Up</a>
+  <div class="overlay" id="loginModal">
+    <div class="sheet sheet-narrow">
+      <i class="ph ph-lock-key" style="font-size:2.6rem;color:var(--cyan)"></i>
+      <h2 style="margin:12px 0 8px">Log in to contact</h2>
+      <div class="content">To improve safety, please log in to view phone numbers and contact sellers.</div>
+      <div class="row" style="justify-content:center;margin-top:16px">
+        <a href="login.html" class="btn btn-solid btn-sm">Log in</a>
+        <a href="signup.html" class="btn btn-line btn-sm">Sign up</a>
       </div>
-
-      <div style="margin-top:14px; font-size:0.95rem; color:#94a3b8; cursor:pointer; text-decoration:underline; font-weight:800;"
-        onclick="closeAuthModal()">Continue browsing</div>
+      <div class="muted" style="margin-top:14px;font-size:.9rem;cursor:pointer;text-decoration:underline" onclick="closeAuthModal()">Continue browsing</div>
     </div>
   </div>
 
   <!-- CONTENT MODAL -->
-  <div class="modal-overlay" id="contentModal">
-    <div class="modal-box">
-      <i class="ph ph-x close-modal" onclick="closeModals()"></i>
-      <div class="modal-title2" id="mTitle">Title</div>
-      <div class="modal-content-text" id="mBody">...</div>
+  <div class="overlay" id="contentModal">
+    <div class="sheet">
+      <i class="ph ph-x x" onclick="closeModals()"></i>
+      <h2 id="mTitle">Title</h2>
+      <div class="content" id="mBody">…</div>
     </div>
   </div>
 
   <!-- REPORT MODAL -->
-  <div class="modal-overlay" id="reportModal">
-    <div class="modal-box">
-      <i class="ph ph-x close-modal" onclick="closeModals()"></i>
-      <div class="modal-title2" style="color:#ef4444;">
-        <i class="ph ph-warning-circle"></i> Report an Issue
-      </div>
-      <p style="color:#64748b; font-weight:650; line-height:1.7; margin-top:6px;">
-        Did you find a fake listing or experience a bug? Let us know.
-      </p>
-
-      <form onsubmit="submitReport(event)">
-        <div class="form-group">
-          <label class="form-label">Issue Type</label>
-          <select class="form-input" id="reportType">
+  <div class="overlay" id="reportModal">
+    <div class="sheet">
+      <i class="ph ph-x x" onclick="closeModals()"></i>
+      <h2 style="color:var(--danger)"><i class="ph ph-warning-circle"></i> Report an issue</h2>
+      <div class="content">Found a fake listing or hit a bug? Let us know.</div>
+      <form class="report-form" onsubmit="submitReport(event)">
+        <div class="field">
+          <label>Issue type</label>
+          <select class="select" id="reportType">
             <option>Fake Listing / Scam</option>
             <option>Technical Bug</option>
             <option>Harassment</option>
             <option>Other</option>
           </select>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Details</label>
-          <textarea class="form-input" id="reportDetails" rows="4" placeholder="Please describe what happened..." required></textarea>
+        <div class="field">
+          <label>Details</label>
+          <textarea class="input" id="reportDetails" rows="4" placeholder="Please describe what happened…" required></textarea>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Your Email (Optional)</label>
-          <input type="email" class="form-input" id="reportEmail" placeholder="For follow up" />
+        <div class="field">
+          <label>Your email (optional)</label>
+          <input type="email" class="input" id="reportEmail" placeholder="For follow up" />
         </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%;">
-          <i class="ph ph-paper-plane-tilt"></i> Submit Report
+        <button type="submit" class="btn btn-solid">
+          <i class="ph ph-paper-plane-tilt"></i> Submit report
         </button>
       </form>
     </div>
@@ -873,6 +413,7 @@
   <script>
     // Hosting-safe API base
     const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop";
 
     // User
     let currentUser = null;
@@ -891,15 +432,36 @@
     let mapVisible = false;
     let mapMarkers = [];
 
+    // ---- Field helpers (backend uses property_id / price_per_month / contact_phone) ----
+    function propId(h){ return Number(h.property_id ?? h.id); }
+    function propPrice(h){ return Number(h.price_per_month ?? h.price ?? 0); }
+    function propPhone(h){ return String(h.contact_phone ?? h.phone ?? ""); }
+    function propLocation(h){
+      return [h.sector, h.district].filter(Boolean).join(", ")
+        || String(h.location || h.village || "Rwanda");
+    }
+    function propVerified(h){ return !!(h.is_verified_agent ?? h.is_verified); }
+    function propImage(h, i){
+      const list = h.images || [];
+      const raw = list[i || 0];
+      if (!raw) return FALLBACK_IMG;
+      const s = String(raw).replace(/\\/g, "/");
+      if (/^https?:\/\//i.test(s)) return s;
+      return `${API_BASE}/${s.replace(/^\//, "")}`;
+    }
+
     function money(v){
       const n = Number(v || 0);
       if (!Number.isFinite(n)) return "RWF 0";
-      return "RWF " + n.toLocaleString();
+      return "RWF " + n.toLocaleString("en-RW");
     }
 
-    function safeText(v){
-      return (v === null || v === undefined) ? "" : String(v);
+    function esc(v){
+      return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     }
+
+    // Back-compat alias used across handlers
+    function safeText(v){ return esc(v); }
 
     function normalizeType(t){
       const x = (t || "").toLowerCase();
@@ -919,6 +481,14 @@
       return "bg-rent";
     }
 
+    function typeChip(type){
+      const t = normalizeType(type);
+      if (t === "Sale") return "chip-sale";
+      if (t === "Shared") return "chip-live";
+      if (t === "Sold") return "chip-warn";
+      return "chip-rent";
+    }
+
     async function fetchWithTimeout(url, options = {}, timeoutMs = 12000){
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -928,7 +498,7 @@
 
     async function loadFeed(){
       const container = document.getElementById("houseList");
-      container.innerHTML = `<div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">Loading properties...</div>`;
+      container.innerHTML = `<div class="skel" style="height:300px"></div><div class="skel" style="height:300px"></div><div class="skel" style="height:300px"></div>`;
 
       // Optional analytics (non-blocking)
       try { fetch(`${API_BASE}/api/analytics/visit`, { method: "POST" }); } catch(_) {}
@@ -946,9 +516,10 @@
 
       } catch(err){
         container.innerHTML = `
-          <div style="text-align:center; padding:34px; color:#ef4444; grid-column:1/-1; font-weight:900;">
-            Could not load properties. Please check your server / API_BASE.
-            <div style="margin-top:10px; color:#64748b; font-weight:800;">Tip: localStorage.setItem("API_BASE","https://YOUR-BACKEND.onrender.com")</div>
+          <div class="feed-empty">
+            <i class="ph ph-cloud-slash"></i>
+            <div>Could not load properties — the backend looks offline.</div>
+            <div style="margin-top:8px;font-size:.85rem">Tip: <code>localStorage.setItem("API_BASE","https://YOUR-BACKEND.onrender.com")</code></div>
           </div>
         `;
       }
@@ -956,69 +527,56 @@
 
     function renderFeed(list){
       const container = document.getElementById("houseList");
+      const count = document.getElementById("resultCount");
+      if (count) count.textContent = `${(list || []).length} result${(list || []).length === 1 ? "" : "s"}`;
+
       if (!list || list.length === 0){
-        container.innerHTML = `<div style="text-align:center; padding:34px; color:#94a3b8; grid-column:1/-1; font-weight:900;">No results found.</div>`;
+        container.innerHTML = `<div class="feed-empty"><i class="ph ph-magnifying-glass"></i><div>No results found. Try widening your filters.</div></div>`;
         return;
       }
 
       container.innerHTML = list.map(h => {
+        const id = propId(h);
         const type = normalizeType(h.type || h.listing_type || "Rent");
-        const isSold = type === "Sold" || (h.is_sold === true);
-
-        const featured = (h.is_featured === true) ? "featured" : "";
-        const soldClass = isSold ? "is-sold" : "";
-
-        const images = (h.images && h.images.length > 0)
-          ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
-          : ["https://via.placeholder.com/800x500?text=InzuLink+Property"];
-
-        const showVideo = !!h.video_path;
-        const hasStars = Number.isFinite(Number(h.avg_rating)) && Number(h.avg_rating) > 0;
-
-        const bedrooms = h.bedrooms ?? h.beds ?? "-";
-        const rooms = h.rooms ?? "-";
+        const isSold = type === "Sold" || h.is_sold === true || h.status === "Sold";
+        const featured = h.is_featured === true;
+        const price = propPrice(h);
+        const isRent = type === "Rent";
+        const rating = Number(h.avg_rating);
+        const hasStars = Number.isFinite(rating) && rating > 0;
+        const bedrooms = h.bedrooms ?? h.beds ?? null;
         const category = h.category || "-";
 
-        const label2 = (type === "Land" || category === "Land") ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
-        const value2 = (type === "Land" || category === "Land") ? (h.upi || h.UPI || "-") : (type === "Shared" ? rooms : bedrooms);
-
-        const location = h.location || h.district || "Rwanda";
-
         return `
-          <article class="card ${featured} ${soldClass}" onclick="openModal(${Number(h.id)})">
-            ${featured ? `<div class="featured-badge"><i class="ph ph-crown"></i> Featured</div>` : ""}
-            <div class="card-img-wrap">
-              <div class="badge ${badgeClass(type)}">${type}</div>
-
-              ${hasStars ? `<div class="star-badge"><i class="ph ph-star-fill"></i> ${Number(h.avg_rating).toFixed(1)}</div>` : ""}
-              ${showVideo ? `<div class="vid-badge"><i class="ph ph-video-camera"></i> Video</div>` : ""}
-
-              <button class="fav-btn" onclick="event.stopPropagation(); toggleFavorite(${Number(h.id)});" title="Save">
+          <article class="prop ${featured ? "featured" : ""} ${isSold ? "is-sold" : ""}" onclick="openModal(${id})">
+            <div class="prop-media">
+              <div class="type-band ${badgeClass(type)}">${esc(type)}</div>
+              ${featured ? `<span class="featured-flag"><i class="ph ph-crown"></i> Featured</span>` : ""}
+              ${hasStars ? `<span class="rate-badge"><i class="ph ph-star-fill"></i> ${rating.toFixed(1)}</span>` : ""}
+              ${h.video_path ? `<span class="vid-badge"><i class="ph ph-video-camera"></i> Video</span>` : ""}
+              <button class="prop-fav" onclick="event.stopPropagation(); toggleFavorite(${id}, this);" title="Save to wishlist" aria-label="Save to wishlist">
                 <i class="ph ph-heart"></i>
               </button>
-
-              <img class="card-img" src="${images[0]}" alt="Property photo" loading="lazy" />
+              <img src="${esc(propImage(h))}" alt="${esc(h.title || "Property")}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'" />
             </div>
-
-            <div class="card-body">
-              ${h.is_verified ? `<div class="verified-badge"><i class="ph ph-seal-check"></i> Verified</div>` : ""}
-
-              <div class="price">${money(h.price)}</div>
-              <div class="title">${safeText(h.title || "Property")}</div>
-              <div class="location">📍 ${safeText(location)}</div>
-
-              <div class="card-meta">
-                <span>${safeText(category)}</span>
-                <span>${label2}: ${safeText(value2)}</span>
+            <div class="prop-body">
+              ${propVerified(h) ? `<div class="verified-line"><i class="ph ph-seal-check"></i> Verified seller</div>` : ""}
+              <div class="prop-price">${money(price)}${isRent ? " <small>/month</small>" : ""}</div>
+              <h3 class="prop-title">${esc(h.title || "Property")}</h3>
+              <div class="prop-meta">
+                <span><i class="ph ph-map-pin"></i>${esc(propLocation(h))}</span>
+                ${bedrooms !== null && bedrooms !== "" ? `<span><i class="ph ph-bed"></i>${esc(bedrooms)} bd</span>` : ""}
+                <span><i class="ph ph-tag"></i>${esc(category)}</span>
               </div>
-
-              ${
-                isSold
-                  ? `<button class="card-action-btn btn-sold-card"><i class="ph ph-lock"></i> Not available</button>`
-                  : `<button class="card-action-btn btn-call-card" onclick="event.stopPropagation(); contactHouse(${Number(h.id)});">
-                       <i class="ph ph-whatsapp-logo"></i> Contact
-                     </button>`
-              }
+              <div class="prop-foot">
+                ${
+                  isSold
+                    ? `<button class="btn btn-dark btn-sm prop-contact" disabled><i class="ph ph-lock"></i> Not available</button>`
+                    : `<button class="btn btn-solid btn-sm prop-contact" onclick="event.stopPropagation(); contactHouse(${id});">
+                         <i class="ph ph-whatsapp-logo"></i> Contact
+                       </button>`
+                }
+              </div>
             </div>
           </article>
         `;
@@ -1032,16 +590,14 @@
       const maxP = Number(document.getElementById("sMaxPrice").value || 0);
 
       filteredProperties = allProperties.filter(h => {
-        const location = (h.location || h.district || "").toLowerCase();
-        const title = (h.title || "").toLowerCase();
+        const hay = [h.location, h.district, h.sector, h.cell, h.village, h.title].filter(Boolean).join(" ").toLowerCase();
         const c = (h.category || "").toLowerCase();
-
         const hType = normalizeType(h.type || h.listing_type || "Rent");
 
-        const okLoc = !loc || location.includes(loc) || title.includes(loc);
+        const okLoc = !loc || hay.includes(loc);
         const okType = (type === "All") || (hType === type);
         const okCat = (cat === "All") || (c === cat.toLowerCase());
-        const okPrice = (!maxP || Number(h.price || 0) <= maxP);
+        const okPrice = (!maxP || propPrice(h) <= maxP);
 
         return okLoc && okType && okCat && okPrice;
       });
@@ -1061,6 +617,12 @@
       updateMapMarkers(filteredProperties);
     }
 
+    // Enter key triggers search
+    ["sLocation", "sMaxPrice"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("keydown", e => { if (e.key === "Enter") applyFilters(); });
+    });
+
     function toggleMap(){
       mapVisible = !mapVisible;
       const el = document.getElementById("feedMap");
@@ -1070,20 +632,23 @@
         setTimeout(() => {
           initMapIfNeeded();
           try { feedMap.invalidateSize(); } catch(_) {}
+          updateMapMarkers(filteredProperties);
         }, 80);
       }
     }
 
     function initMapIfNeeded(){
-      if (feedMap) return;
+      if (feedMap || typeof L === "undefined") return;
 
       feedMap = L.map("feedMap").setView([-1.9441, 30.0619], 12); // Kigali default
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap"
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: "© OpenStreetMap © CARTO",
+        maxZoom: 19
       }).addTo(feedMap);
     }
 
     function clearMarkers(){
+      if (!feedMap) return;
       mapMarkers.forEach(m => { try { feedMap.removeLayer(m); } catch(_) {} });
       mapMarkers = [];
     }
@@ -1091,16 +656,17 @@
     function updateMapMarkers(list){
       if (!mapVisible) return;
       initMapIfNeeded();
+      if (!feedMap) return;
       clearMarkers();
 
       (list || []).forEach(h => {
-        const lat = Number(h.latitude || h.lat);
-        const lng = Number(h.longitude || h.lng);
+        const lat = Number(h.latitude ?? h.lat);
+        const lng = Number(h.longitude ?? h.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
         const marker = L.marker([lat, lng]).addTo(feedMap);
-        marker.bindPopup(`<b>${safeText(h.title || "Property")}</b><br/>${money(h.price)}<br/>📍 ${safeText(h.location || "")}`);
-        marker.on("click", () => openModal(Number(h.id)));
+        marker.bindPopup(`<b>${esc(h.title || "Property")}</b><br/>${money(propPrice(h))}<br/>${esc(propLocation(h))}`);
+        marker.on("click", () => openModal(propId(h)));
         mapMarkers.push(marker);
       });
     }
@@ -1113,13 +679,13 @@
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
 
-        // Show map automatically
         if (!mapVisible) toggleMap();
         initMapIfNeeded();
+        if (!feedMap) return;
         feedMap.setView([latitude, longitude], 13);
 
-        // Add "You" marker
-        L.circleMarker([latitude, longitude], { radius: 8 }).addTo(feedMap).bindPopup("You are here").openPopup();
+        L.circleMarker([latitude, longitude], { radius: 8, color: "#2fd8ff", fillColor: "#2fd8ff", fillOpacity: .8 })
+          .addTo(feedMap).bindPopup("You are here").openPopup();
 
       }, () => {
         alert("Location permission denied. Please allow location access and try again.");
@@ -1127,7 +693,7 @@
     }
 
     function openModal(id){
-      const house = allProperties.find(x => Number(x.id) === Number(id));
+      const house = allProperties.find(x => propId(x) === Number(id));
       if (!house) return;
 
       currentModalHouse = house;
@@ -1137,35 +703,31 @@
 
       const type = normalizeType(house.type || house.listing_type || "Rent");
       const badge = document.getElementById("modalTypeBadge");
-      badge.className = `tag-pill ${badgeClass(type)}`;
+      badge.className = `chip ${typeChip(type)}`;
       badge.textContent = type;
 
-      document.getElementById("modalTitle").textContent = safeText(house.title || "Property");
-      document.getElementById("modalLocation").textContent = `📍 ${safeText(house.location || house.district || "Rwanda")}`;
-      document.getElementById("modalPrice").textContent = money(house.price);
+      document.getElementById("modalTitle").textContent = house.title || "Property";
+      document.getElementById("modalLocation").innerHTML = `<i class="ph ph-map-pin"></i> ${esc(propLocation(house))}`;
+      const isRent = type === "Rent";
+      document.getElementById("modalPrice").innerHTML = `${money(propPrice(house))}${isRent ? " <small>/month</small>" : ""}`;
 
-      document.getElementById("modalCat").textContent = safeText(house.category || "-");
+      document.getElementById("modalCat").textContent = house.category || "-";
 
       const isLand = (house.category || "").toLowerCase() === "land" || type === "Land";
       document.getElementById("dynLabel").textContent = isLand ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
       document.getElementById("dynValue").textContent = isLand
-        ? safeText(house.upi || house.UPI || "-")
-        : (type === "Shared" ? safeText(house.rooms ?? "-") : safeText(house.bedrooms ?? house.beds ?? "-"));
+        ? (house.upi || house.UPI || "-")
+        : (type === "Shared" ? (house.rooms ?? "-") : (house.bedrooms ?? house.beds ?? "-"));
 
-      // If you keep a separate UPI box in your DB, show/hide:
-      const upiBox = document.getElementById("upiBox");
-      if (isLand) {
-        upiBox.style.display = "none"; // already shown in dynLabel/dynValue
-      } else {
-        upiBox.style.display = "none";
-      }
+      document.getElementById("upiBox").style.display = "none";
 
-      document.getElementById("modalDesc").textContent = safeText(house.description || "No description provided.");
+      document.getElementById("modalDesc").textContent = house.description || "No description provided.";
 
       // Images
-      currentModalImages = (house.images && house.images.length > 0)
-        ? house.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
-        : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
+      const imgs = house.images || [];
+      currentModalImages = imgs.length > 0
+        ? imgs.map((_, i) => propImage(house, i))
+        : [FALLBACK_IMG];
 
       currentModalIndex = 0;
       setModalImage();
@@ -1173,9 +735,10 @@
       // Video
       const vArea = document.getElementById("modalVideoArea");
       if (house.video_path){
-        const vUrl = `${API_BASE}/${String(house.video_path).replace(/\\/g, "/")}`;
+        const raw = String(house.video_path).replace(/\\/g, "/");
+        const vUrl = /^https?:\/\//i.test(raw) ? raw : `${API_BASE}/${raw.replace(/^\//, "")}`;
         vArea.style.display = "block";
-        vArea.innerHTML = `<video controls playsinline src="${vUrl}"></video>`;
+        vArea.innerHTML = `<video controls playsinline src="${esc(vUrl)}"></video>`;
       } else {
         vArea.style.display = "none";
         vArea.innerHTML = "";
@@ -1183,17 +746,19 @@
 
       // WhatsApp button
       const phoneBtn = document.getElementById("modalPhone");
-      phoneBtn.onclick = () => contactHouse(Number(house.id));
+      phoneBtn.onclick = () => contactHouse(Number(propId(house)));
 
       // Load reviews
-      loadReviews(Number(house.id));
+      loadReviews(Number(propId(house)));
 
       // Open modal
       document.getElementById("detailModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
     }
 
     function closeModal(){
       document.getElementById("detailModal").style.display = "none";
+      document.body.style.overflow = "";
     }
 
     function changeModalImage(step){
@@ -1209,6 +774,14 @@
       document.getElementById("btnNext").style.display = (currentModalImages.length > 1) ? "flex" : "none";
     }
 
+    // Keyboard: Esc closes, arrows flip gallery
+    document.addEventListener("keydown", (e) => {
+      const open = document.getElementById("detailModal").style.display === "flex";
+      if (e.key === "Escape") { closeModal(); closeModals(); closeAuthModal(); }
+      if (open && e.key === "ArrowLeft") changeModalImage(-1);
+      if (open && e.key === "ArrowRight") changeModalImage(1);
+    });
+
     function showAuthModal(){ document.getElementById("loginModal").style.display = "flex"; }
     function closeAuthModal(){ document.getElementById("loginModal").style.display = "none"; }
 
@@ -1218,22 +791,23 @@
         return;
       }
 
-      const house = allProperties.find(x => Number(x.id) === Number(id));
+      const house = allProperties.find(x => propId(x) === Number(id));
       if (!house) return;
 
-      const phone = safeText(house.phone || house.contact_phone || "");
-      const cleanPhone = phone.replace(/[^\d]/g, "");
+      const cleanPhone = propPhone(house).replace(/[^\d]/g, "");
 
       if (!cleanPhone){
         alert("Contact not available for this listing.");
         return;
       }
 
-      const text = encodeURIComponent(`Hello! I'm interested in this property on InzuLink: "${safeText(house.title)}". Can you share more details?`);
-      window.open(`https://wa.me/${cleanPhone}?text=${text}`, "_blank");
+      const text = encodeURIComponent(`Hello! I'm interested in this property on InzuLink: "${house.title || ""}". Can you share more details?`);
+      let digits = cleanPhone;
+      if (digits.length === 10 && digits.startsWith("07")) digits = "250" + digits.slice(1);
+      window.open(`https://wa.me/${digits}?text=${text}`, "_blank");
     }
 
-    async function toggleFavorite(propertyId){
+    async function toggleFavorite(propertyId, btn){
       if (!currentUser){
         showAuthModal();
         return;
@@ -1246,7 +820,7 @@
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data?.error || "Failed");
-        // Small feedback (silent)
+        if (btn) btn.classList.toggle("on", data.action === "added");
       } catch(_){
         alert("Could not save. Please try again.");
       }
@@ -1254,7 +828,7 @@
 
     async function loadReviews(pid){
       const list = document.getElementById("reviewsList");
-      list.innerHTML = `<div style="color:#94a3b8; font-weight:900;">Loading reviews...</div>`;
+      list.innerHTML = `<div class="muted">Loading reviews…</div>`;
 
       try{
         const res = await fetchWithTimeout(`${API_BASE}/api/reviews/${Number(pid)}`);
@@ -1263,25 +837,27 @@
 
         const reviews = Array.isArray(data) ? data : [];
         if (reviews.length === 0){
-          list.innerHTML = `<div style="color:#94a3b8; font-weight:900;">No reviews yet.</div>`;
+          list.innerHTML = `<div class="muted">No reviews yet — be the first.</div>`;
           return;
         }
 
         list.innerHTML = reviews.map(r => {
           const stars = "★".repeat(Math.max(0, Math.min(5, Number(r.rating || 0))));
+          const who = r.full_name || r.name || "User";
+          const when = r.created_at ? String(r.created_at).slice(0, 10) : "";
           return `
             <div class="review-item">
               <div class="review-header">
-                <span>${safeText(r.name || "User")} • ${stars}</span>
-                <span style="color:#94a3b8; font-weight:800;">${safeText(r.created_at || "")}</span>
+                <span>${esc(who)} · <span class="stars">${stars}</span></span>
+                <time>${esc(when)}</time>
               </div>
-              <div class="review-text">${safeText(r.comment || "")}</div>
+              <div class="review-text">${esc(r.comment || "")}</div>
             </div>
           `;
         }).join("");
 
       } catch(_){
-        list.innerHTML = `<div style="color:#ef4444; font-weight:900;">Failed to load reviews.</div>`;
+        list.innerHTML = `<div style="color:var(--danger);font-weight:700">Failed to load reviews.</div>`;
       }
     }
 
@@ -1310,8 +886,8 @@
           method:"POST",
           headers:{ "Content-Type":"application/json" },
           body: JSON.stringify({
-            userId: currentUser.id,
-            propertyId: Number(currentModalHouse.id),
+            property_id: propId(currentModalHouse),
+            user_id: currentUser.id,
             rating: currentRating,
             comment
           })
@@ -1321,7 +897,7 @@
 
         document.getElementById("reviewComment").value = "";
         setRating(0);
-        loadReviews(Number(currentModalHouse.id));
+        loadReviews(propId(currentModalHouse));
 
       } catch(_){
         alert("Could not post review. Please try again.");
@@ -1336,7 +912,7 @@
       const content = {
         about: {
           t: "About InzuLink",
-          b: "InzuLink helps seekers and landlords connect through clearer listings and safer practices. Our goal is to reduce fraud and speed up housing search across Rwanda."
+          b: "InzuLink is Rwanda's property marketplace, connecting sellers, landlords and seekers through clearer listings and safer practices."
         },
         terms: {
           t: "Terms",
@@ -1344,11 +920,11 @@
         },
         privacy: {
           t: "Privacy",
-          b: "We store account details to run the service. We do not sell personal data. Passwords should be stored securely (hashed) on the server."
+          b: "We store account details to run the service. We do not sell personal data. Passwords are stored securely (hashed) on the server."
         },
         safety: {
           t: "Safety",
-          b: "Never pay before visiting. Meet the landlord. Avoid pressure to send ‘booking fees’. Report suspicious listings immediately."
+          b: "Never pay before visiting. Meet the seller. Avoid pressure to send 'booking fees'. Report suspicious listings immediately."
         }
       };
 
@@ -1383,7 +959,7 @@
 
     // Close on overlay click
     document.getElementById("detailModal").addEventListener("click", (e) => {
-      if (e.target.id === "detailModal") closeModal();
+      if (e.target.id === "DetailModal") closeModal();
     });
     document.getElementById("contentModal").addEventListener("click", (e) => {
       if (e.target.id === "contentModal") closeModals();

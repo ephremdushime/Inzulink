@@ -4,396 +4,85 @@
   <meta charset="UTF-8" />
   <title>My Saved Homes — InzuLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#05080f" />
   <meta name="description" content="Your saved properties on InzuLink." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Shared navbar styles -->
+  <!-- Shared styles -->
   <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+    .page-head{margin-top:16px;padding:24px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .page-head h1{font-family:var(--font-display);font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.6px;color:#fff;margin:8px 0 6px}
+    .page-head .sub{color:var(--muted);font-weight:600;margin:0;line-height:1.65}
 
-      --danger:#dc2626;
-      --danger-bg:#fef2f2;
-      --success:#10b981;
+    .saved-grid{margin-top:18px}
+    .prop{cursor:pointer}
+    .type-band{
+      position:absolute;top:0;left:0;width:100%;z-index:4;
+      padding:9px 0;text-align:center;
+      font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;
     }
+    .bg-rent{background:rgba(5,8,15,.85)}
+    .bg-sale{background:rgba(11,60,38,.88)}
+    .bg-sold{background:rgba(92,26,42,.9)}
+    .bg-shared{background:rgba(8,47,57,.88)}
+    .verified-line{display:flex;align-items:center;gap:6px;color:var(--cyan);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .remove-btn{width:100%;justify-content:center;background:#1c0b12;border:1px solid #5c1a2a;color:#fda4b5}
+    .remove-btn:hover{background:#2a0f18;border-color:var(--danger);color:#fff}
 
-    body{
-      font-family: Inter, system-ui, Arial, sans-serif;
-      background: var(--bg);
-      margin:0;
-      color: var(--text);
-    }
+    .empty-state{margin-top:18px;padding:48px 24px;text-align:center}
+    .empty-state i{font-size:3.2rem;color:#1c2947}
+    .empty-state h2{font-family:var(--font-display);color:#fff;margin:12px 0 6px}
+    .empty-state p{color:var(--muted);margin:0 0 18px}
 
-    .wrap{
-      width:min(1200px, 92%);
-      margin: 0 auto;
-      padding: 18px 0 46px;
+    /* Detail modal */
+    .detail{width:min(1020px,96vw);background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;max-height:92vh;position:relative}
+    .detail-close{
+      position:absolute;top:12px;right:12px;z-index:30;
+      width:40px;height:40px;border-radius:12px;
+      background:rgba(5,8,15,.7);border:1px solid var(--line);color:#fff;
+      display:grid;place-items:center;font-size:1.1rem;cursor:pointer;
     }
+    .detail-close:hover{border-color:var(--danger);color:var(--danger)}
+    .Detail-gallery{position:relative;background:#04070d;display:flex;align-items:center;justify-content:center;min-height:340px}
+    .Detail-gallery img{width:100%;height:100%;max-height:92vh;object-fit:contain}
+    .g-arrow{
+      position:absolute;top:50%;transform:translateY(-50%);z-index:20;
+      width:44px;height:44px;border-radius:12px;
+      background:rgba(5,8,15,.7);border:1px solid var(--line);color:#fff;
+      font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    }
+    .g-arrow:hover{border-color:var(--cyan);color:var(--cyan)}
+    .g-prev{left:12px}.g-next{right:12px}
+    .Detail-info{padding:24px;overflow:auto}
+    .Detail-title{margin:10px 0 4px;font-family:var(--font-display);font-size:1.4rem;color:#fff;letter-spacing:-.4px;line-height:1.2}
+    .Detail-loc{color:var(--muted);font-weight:600;font-size:.9rem;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .Detail-loc i{color:var(--cyan)}
+    .Detail-price{font-family:var(--font-display);font-size:1.7rem;font-weight:800;color:#fff;margin:0 0 16px;letter-spacing:-.5px}
+    .Detail-price small{font-family:var(--font-body);font-size:.85rem;font-weight:700;color:var(--faint)}
+    .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+    .spec-box{border:1px solid var(--line-soft);border-radius:14px;padding:11px 13px;background:var(--bg1)}
+    .spec-label{display:block;color:var(--faint);font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+    .spec-value{display:block;color:#fff;font-weight:800;margin-top:4px;font-size:.93rem}
+    .Detail-desc{color:var(--muted);line-height:1.7;font-size:.92rem}
+    .Detail-desc strong{display:block;color:#fff;margin-bottom:6px;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+    .wa-btn{width:100%;margin-top:18px;justify-content:center;background:#16a34a;color:#fff}
+    .wa-btn:hover{background:#22c55e;color:#04120a}
 
-    .header{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 20px 18px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 14px;
-      flex-wrap:wrap;
-    }
+    .mini-foot{margin:26px 0;text-align:center;color:var(--faint);font-size:.85rem;font-weight:600}
+    .mini-foot a{color:var(--cyan);font-weight:800}
 
-    .title{
-      margin:0;
-      font-size: clamp(1.4rem, 2.6vw, 2rem);
-      font-weight: 900;
-      letter-spacing: -0.6px;
-      color: var(--primary);
+    @media (max-width:980px){
+      .Detail{grid-template-columns:1fr;max-height:94vh}
+      .Detail-gallery{min-height:260px}
+      .Detail-gallery img{max-height:44vh}
     }
-    .sub{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-weight: 650;
-      line-height: 1.6;
-      max-width: 780px;
-    }
-
-    .actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-left:auto;
-    }
-
-    .btn{
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 0.92rem;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      user-select:none;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      text-decoration:none;
-      white-space: nowrap;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn-primary{ background: var(--primary); color:#fff; }
-    .btn-primary:hover{ background:#1e293b; }
-    .btn-outline{
-      background:#fff;
-      color: var(--primary);
-      border-color: var(--border);
-    }
-    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
-
-    /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 22px;
-      padding: 16px 0 0;
-    }
-
-    .card{
-      background:#fff;
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 25px rgba(2,6,23,0.06);
-      transition: transform .2s, box-shadow .2s;
-      cursor:pointer;
-      display:flex;
-      flex-direction: column;
-    }
-    .card:hover{ transform: translateY(-4px); box-shadow: 0 18px 35px rgba(2,6,23,0.12); }
-
-    .imgWrap{
-      height: 220px;
-      overflow:hidden;
-      position:relative;
-      background:#cbd5e1;
-    }
-    .imgWrap img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    .badge{
-      position:absolute;
-      top:0; left:0; width:100%;
-      padding: 12px 0;
-      text-align:center;
-      font-size: .82rem;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color:#fff;
-      z-index: 10;
-      background: rgba(15,23,42,0.92);
-    }
-    .bg-rent{ background: rgba(15,23,42,0.92); }
-    .bg-sale{ background: rgba(245,158,11,0.92); color:#111827; }
-    .bg-shared{ background: rgba(168,85,247,0.92); }
-    .bg-sold{ background: rgba(239,68,68,0.92); }
-
-    .body{
-      padding: 18px;
-      display:flex;
-      flex-direction: column;
-      flex:1;
-    }
-    .verified{
-      color:#16a34a;
-      font-size: .75rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      margin-bottom: 6px;
-    }
-    .price{
-      font-size: 1.22rem;
-      font-weight: 900;
-      color: var(--primary);
-    }
-    .t{
-      font-size: 1rem;
-      font-weight: 800;
-      margin: 6px 0 4px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .loc{
-      font-size: .88rem;
-      color: var(--muted);
-      margin-bottom: 12px;
-      font-weight: 650;
-    }
-    .meta{
-      margin-top:auto;
-      padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: .86rem;
-      font-weight: 800;
-      color:#334155;
-      margin-bottom: 12px;
-    }
-
-    .btn-remove{
-      width:100%;
-      padding: 11px;
-      border-radius: 12px;
-      border: 1px solid #fecaca;
-      background: var(--danger-bg);
-      color: var(--danger);
-      font-weight: 900;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition: background .12s ease;
-    }
-    .btn-remove:hover{ background:#fee2e2; }
-
-    /* Empty */
-    .empty{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 38px 18px;
-      text-align:center;
-      margin-top: 16px;
-    }
-    .empty i{ font-size: 3.6rem; color:#e2e8f0; }
-    .empty h2{ margin: 10px 0 8px; color: var(--primary); font-weight: 900; letter-spacing:-0.4px; }
-    .empty p{ margin:0; color: var(--muted); font-weight: 650; line-height:1.7; }
-
-    /* Modal (details) */
-    .overlay{
-      position: fixed;
-      inset:0;
-      background: rgba(2,6,23,0.60);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index: 2000;
-      padding: 18px;
-    }
-    .modal{
-      width:min(980px, 96vw);
-      background:#fff;
-      border-radius: 18px;
-      overflow:hidden;
-      display:grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      max-height: 92vh;
-      position:relative;
-    }
-    @media (max-width: 980px){
-      .modal{ grid-template-columns: 1fr; max-height: 94vh; }
-    }
-
-    .close{
-      position:absolute;
-      top: 10px; right: 10px;
-      background:#fff;
-      border:1px solid var(--border);
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 900;
-      cursor:pointer;
-      z-index: 25;
-    }
-
-    .gallery{
-      position: relative;
-      background:#0b1220;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height: 320px;
-    }
-    .mainImg{
-      width: 100%;
-      height: 100%;
-      max-height: 92vh;
-      object-fit: contain;
-    }
-    .arrow{
-      position:absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.22);
-      color:#fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index: 20;
-      backdrop-filter: blur(10px);
-    }
-    .prev{ left: 12px; }
-    .next{ right: 12px; }
-
-    .info{
-      padding: 18px;
-      overflow:auto;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 0.82rem;
-      color:#fff;
-      margin-bottom: 10px;
-      background: rgba(15,23,42,0.92);
-    }
-    .mTitle{
-      margin: 0 0 6px;
-      font-size: 1.35rem;
-      color: var(--primary);
-      letter-spacing:-0.5px;
-      font-weight: 900;
-    }
-    .mLoc{
-      color:#64748b;
-      font-weight: 750;
-      margin-bottom: 10px;
-    }
-    .mPrice{
-      font-size: 1.5rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin: 10px 0 14px;
-    }
-    .specs{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 10px 0 14px;
-    }
-    .spec{
-      border:1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px;
-      background:#fff;
-    }
-    .spec small{ display:block; color: var(--muted); font-weight: 800; font-size: 0.82rem; }
-    .spec b{ display:block; color: var(--primary); font-weight: 900; margin-top: 4px; }
-
-    .desc{
-      line-height:1.7;
-      color:#475569;
-      font-weight: 650;
-    }
-
-    .cta{
-      width:100%;
-      border:none;
-      border-radius: 14px;
-      padding: 12px;
-      background: var(--success);
-      color:#fff;
-      font-weight: 900;
-      cursor:pointer;
-      margin-top: 14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-    }
-    .cta:hover{ background:#059669; }
-
-    footer{
-      margin-top: 18px;
-      background: var(--primary);
-      border-radius: 22px;
-      padding: 22px 16px;
-      color:#94a3b8;
-      text-align:center;
-    }
-    footer a{ color:#94a3b8; font-weight:800; text-decoration:none; }
-    footer a:hover{ color:#fff; }
   </style>
 
   <script>
@@ -411,57 +100,59 @@
   <div id="appNavbar"></div>
 
   <main class="wrap">
-    <section class="header" aria-label="Saved homes header">
+    <section class="panel page-head" aria-label="Saved homes header">
       <div>
-        <h1 class="title">My Saved Homes</h1>
+        <span class="kicker">Wishlist</span>
+        <h1>My saved homes</h1>
         <p class="sub">Properties you bookmarked for later. Click a card to view details.</p>
       </div>
-
-      <div class="actions">
-        <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse feed</a>
-        <button class="btn btn-primary" type="button" onclick="loadFavorites(true)">
+      <div class="row">
+        <a class="btn btn-dark btn-sm" href="feed.html"><i class="ph ph-globe"></i> Marketplace</a>
+        <button class="btn btn-line btn-sm" type="button" onclick="loadFavorites(true)">
           <i class="ph ph-arrows-clockwise"></i> Refresh
         </button>
       </div>
     </section>
 
     <section id="contentArea">
-      <div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading favorites...</div>
+      <div class="prop-grid saved-grid">
+        <div class="skel" style="height:300px"></div>
+        <div class="skel" style="height:300px"></div>
+        <div class="skel" style="height:300px"></div>
+      </div>
     </section>
 
-    <footer>
-      © 2026 InzuLink • <a href="contract.html">Contract Tool</a>
-    </footer>
+    <div class="mini-foot">© 2026 InzuLink · <a href="contract.html">Contract tool</a></div>
   </main>
 
   <!-- Detail modal -->
   <div class="overlay" id="detailOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-label="Property details">
-      <div class="close" onclick="closeModal()">✕</div>
+    <div class="detail" role="dialog" aria-label="Property details">
+      <button class="detail-close" onclick="closeModal()" aria-label="Close">✕</button>
 
-      <div class="gallery">
-        <button class="arrow prev" id="btnPrev" onclick="moveImg(-1)">&#10094;</button>
-        <img class="mainImg" id="mainImg" alt="Property image" />
-        <button class="arrow next" id="btnNext" onclick="moveImg(1)">&#10095;</button>
+      <div class="Detail-gallery">
+        <button class="g-arrow g-prev" id="btnPrev" onclick="moveImg(-1)">&#10094;</button>
+        <img id="mainImg" alt="Property image" />
+        <button class="g-arrow g-next" id="btnNext" onclick="moveImg(1)">&#10095;</button>
       </div>
 
-      <div class="info">
-        <div class="pill" id="mType">Rent</div>
-        <h2 class="mTitle" id="mTitle">Title</h2>
-        <div class="mLoc" id="mLoc">📍 Location</div>
-        <div class="mPrice" id="mPrice">RWF 0</div>
+      <div class="Detail-info">
+        <span id="mType" class="chip chip-rent">Rent</span>
+        <h2 class="Detail-title" id="mTitle">Title</h2>
+        <div class="Detail-loc" id="mLoc"><i class="ph ph-map-pin"></i> Location</div>
+        <p class="Detail-price" id="mPrice">RWF 0</p>
 
-        <div class="specs">
-          <div class="spec"><small>Category</small><b id="mCat">-</b></div>
-          <div class="spec"><small id="mDynLabel">Bedrooms</small><b id="mDynValue">-</b></div>
+        <div class="specs-grid">
+          <div class="spec-box"><span class="spec-label">Category</span><span class="spec-value" id="mCat">-</span></div>
+          <div class="spec-box"><span class="spec-label" id="mDynLabel">Bedrooms</span><span class="spec-value" id="mDynValue">-</span></div>
         </div>
 
-        <div class="desc">
-          <strong style="color:var(--primary); display:block; margin-bottom:6px;">Description</strong>
+        <div class="Detail-desc">
+          <strong>Description</strong>
           <span id="mDesc">—</span>
         </div>
 
-        <button class="cta" id="mCta">
+        <button class="btn wa-btn" id="mCta">
           <i class="ph ph-whatsapp-logo"></i> Chat on WhatsApp
         </button>
       </div>
@@ -473,6 +164,7 @@
 
   <script>
     const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop";
 
     let user = null;
     try { user = JSON.parse(localStorage.getItem("user")); } catch(_) {}
@@ -487,9 +179,19 @@
     function money(v){
       const n = Number(v || 0);
       if (!Number.isFinite(n)) return "RWF 0";
-      return "RWF " + n.toLocaleString();
+      return "RWF " + n.toLocaleString("en-RW");
     }
-    function safe(v){ return (v === null || v === undefined) ? "" : String(v); }
+    function esc(v){
+      return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+    function imgFor(h, i){
+      const list = (h.images && Array.isArray(h.images)) ? h.images : [];
+      const raw = list[i || 0];
+      if (!raw) return FALLBACK_IMG;
+      const s = String(raw).replace(/\\/g, "/");
+      if (/^https?:\/\//i.test(s)) return s;
+      return `${API_BASE}/${s.replace(/^\//, "")}`;
+    }
 
     function normalizeType(t){
       const x = (t || "").toLowerCase();
@@ -506,6 +208,13 @@
       if (t === "Sold") return "bg-sold";
       return "bg-rent";
     }
+    function typeChip(type){
+      const t = normalizeType(type);
+      if (t === "Sale") return "chip-sale";
+      if (t === "Shared") return "chip-live";
+      if (t === "Sold") return "chip-warn";
+      return "chip-rent";
+    }
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = 12000){
       const controller = new AbortController();
@@ -516,65 +225,58 @@
 
     function renderEmpty(){
       contentArea.innerHTML = `
-        <div class="empty">
+        <div class="panel empty-state">
           <i class="ph ph-heart-break"></i>
           <h2>No favorites yet</h2>
-          <p>Browse the feed and tap the heart icon to save homes here.</p>
-          <div style="margin-top:18px;">
-            <a class="btn btn-primary" href="feed.html"><i class="ph ph-globe"></i> Browse properties</a>
-          </div>
+          <p>Browse the marketplace and tap the heart icon to save homes here.</p>
+          <a class="btn btn-solid" href="feed.html"><i class="ph ph-globe"></i> Browse properties</a>
         </div>
       `;
     }
 
     function buildCards(list){
-      contentArea.innerHTML = `<div class="grid" id="grid"></div>`;
+      contentArea.innerHTML = `
+        <div class="feed-head spread" style="margin:20px 0 14px">
+          <h2 style="font-family:var(--font-display);font-size:1.2rem;color:#fff;margin:0">${list.length} saved propert${list.length === 1 ? "y" : "ies"}</h2>
+        </div>
+        <div class="prop-grid" id="grid"></div>
+      `;
       const grid = document.getElementById("grid");
 
       list.forEach(h => {
-        // Flexible field names (to avoid crashes)
         const id = Number(h.property_id ?? h.id ?? h.propertyId);
-        const title = safe(h.title || "Property");
-        const location = safe(h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda");
-        const category = safe(h.category || "-");
-
+        const title = h.title || "Property";
+        const location = h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda";
+        const category = h.category || "-";
         const type = normalizeType(h.listing_type || h.type || h.status || "Rent");
         const isVerified = !!(h.is_verified || h.is_verified_agent);
-
-        const priceRaw = h.price_per_month ?? h.price ?? 0;
-        const priceText = money(priceRaw);
-
-        const imgs = (h.images && Array.isArray(h.images) && h.images.length)
-          ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
-          : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
-
-        const metaText = (category || "").toLowerCase() === "land"
-          ? `UPI: ${safe(h.upi || h.UPI || h.land_upi || "N/A")}`
-          : `Beds: ${safe(h.bedrooms ?? h.beds ?? "—")}`;
+        const price = money(h.price_per_month ?? h.price ?? 0);
+        const isRent = type === "Rent";
+        const beds = h.bedrooms ?? h.beds;
 
         const card = document.createElement("article");
-        card.className = "card";
+        card.className = "prop";
         card.onclick = () => openModal(h);
 
         card.innerHTML = `
-          <div class="imgWrap">
-            <div class="badge ${typeBadgeClass(type)}">${safe(type)}</div>
-            <img src="${imgs[0]}" alt="Property photo" loading="lazy" />
+          <div class="prop-media">
+            <div class="type-band ${typeBadgeClass(type)}">${esc(type)}</div>
+            <img src="${esc(imgFor(h))}" alt="${esc(title)}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'" />
           </div>
-          <div class="body">
-            ${isVerified ? `<div class="verified"><i class="ph ph-seal-check"></i> Verified</div>` : ``}
-            <div class="price">${priceText}</div>
-            <div class="t">${title}</div>
-            <div class="loc">📍 ${location}</div>
-
-            <div class="meta">
-              <span>${safe(category)}</span>
-              <span>${metaText}</span>
+          <div class="prop-body">
+            ${isVerified ? `<div class="verified-line"><i class="ph ph-seal-check"></i> Verified seller</div>` : ``}
+            <div class="prop-price">${esc(price)}${isRent ? " <small>/month</small>" : ""}</div>
+            <h3 class="prop-title">${esc(title)}</h3>
+            <div class="prop-meta">
+              <span><i class="ph ph-map-pin"></i>${esc(location)}</span>
+              ${beds !== null && beds !== undefined && beds !== "" ? `<span><i class="ph ph-bed"></i>${esc(beds)} bd</span>` : ""}
+              <span><i class="ph ph-tag"></i>${esc(category)}</span>
             </div>
-
-            <button class="btn-remove" onclick="event.stopPropagation(); removeFav(${id});">
-              <i class="ph ph-trash"></i> Remove
-            </button>
+            <div class="prop-foot">
+              <button class="btn btn-sm remove-btn" onclick="event.stopPropagation(); removeFav(${id});">
+                <i class="ph ph-trash"></i> Remove
+              </button>
+            </div>
           </div>
         `;
 
@@ -585,7 +287,12 @@
     async function loadFavorites(force=false){
       if (!user) return window.location.replace("login.html?next=seeker.html");
 
-      contentArea.innerHTML = `<div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading favorites...</div>`;
+      contentArea.innerHTML = `
+        <div class="prop-grid saved-grid">
+          <div class="skel" style="height:300px"></div>
+          <div class="skel" style="height:300px"></div>
+          <div class="skel" style="height:300px"></div>
+        </div>`;
 
       try{
         const res = await fetchWithTimeout(`${API_BASE}/api/favorites/${user.id}`, {}, 15000);
@@ -599,13 +306,13 @@
 
       } catch(err){
         contentArea.innerHTML = `
-          <div class="empty" style="border-color:#fecaca;">
-            <i class="ph ph-warning-circle" style="color:#fecaca;"></i>
-            <h2 style="color:#991b1b;">Could not load favorites</h2>
+          <div class="panel empty-state" style="border-color:#5c1a2a">
+            <i class="ph ph-warning-circle" style="color:#5c1a2a"></i>
+            <h2>Could not load favorites</h2>
             <p>Check your server or API_BASE setting, then try again.</p>
-            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-              <button class="btn btn-primary" onclick="loadFavorites(true)"><i class="ph ph-arrows-clockwise"></i> Retry</button>
-              <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse feed</a>
+            <div class="row" style="justify-content:center">
+              <button class="btn btn-solid btn-sm" onclick="loadFavorites(true)"><i class="ph ph-arrows-clockwise"></i> Retry</button>
+              <a class="btn btn-line btn-sm" href="feed.html"><i class="ph ph-globe"></i> Marketplace</a>
             </div>
           </div>
         `;
@@ -617,7 +324,6 @@
       if (!confirm("Remove this property from your saved list?")) return;
 
       try{
-        // Your backend toggles favorite via POST /api/favorites
         const res = await fetchWithTimeout(`${API_BASE}/api/favorites`, {
           method: "POST",
           headers: { "Content-Type":"application/json" },
@@ -637,45 +343,38 @@
       modalHouse = h;
 
       const type = normalizeType(h.listing_type || h.type || h.status || "Rent");
-      const category = safe(h.category || "-");
-      const title = safe(h.title || "Property");
-      const location = safe(h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda");
-
-      const priceRaw = h.price_per_month ?? h.price ?? 0;
+      const category = h.category || "-";
+      const title = h.title || "Property";
+      const location = h.location || [h.sector, h.district].filter(Boolean).join(", ") || "Rwanda";
+      const isRent = type === "Rent";
 
       modalImages = (h.images && Array.isArray(h.images) && h.images.length)
-        ? h.images.map(p => `${API_BASE}/${String(p).replace(/\\/g, "/")}`)
-        : ["https://via.placeholder.com/900x600?text=InzuLink+Property"];
+        ? h.images.map((_, i) => imgFor(h, i))
+        : [FALLBACK_IMG];
       modalIndex = 0;
 
-      document.getElementById("mType").textContent = safe(type);
-      document.getElementById("mType").style.background =
-        type === "Sale" ? "rgba(245,158,11,0.92)" :
-        type === "Shared" ? "rgba(168,85,247,0.92)" :
-        type === "Sold" ? "rgba(239,68,68,0.92)" :
-        "rgba(15,23,42,0.92)";
+      const mType = document.getElementById("mType");
+      mType.textContent = type;
+      mType.className = `chip ${typeChip(type)}`;
 
       document.getElementById("mTitle").textContent = title;
-      document.getElementById("mLoc").textContent = `📍 ${location}`;
-      document.getElementById("mPrice").textContent = money(priceRaw);
+      document.getElementById("mLoc").innerHTML = `<i class="ph ph-map-pin"></i> ${esc(location)}`;
+      document.getElementById("mPrice").innerHTML = `${money(h.price_per_month ?? h.price ?? 0)}${isRent ? " <small>/month</small>" : ""}`;
       document.getElementById("mCat").textContent = category;
-      document.getElementById("mDesc").textContent = safe(h.description || "No description provided.");
+      document.getElementById("mDesc").textContent = h.description || "No description provided.";
 
       const isLand = (category || "").toLowerCase() === "land";
       document.getElementById("mDynLabel").textContent = isLand ? "UPI" : (type === "Shared" ? "Rooms" : "Bedrooms");
       document.getElementById("mDynValue").textContent = isLand
-        ? safe(h.upi || h.UPI || h.land_upi || "—")
-        : (type === "Shared" ? safe(h.rooms ?? "—") : safe(h.bedrooms ?? h.beds ?? "—"));
+        ? (h.upi || h.UPI || h.land_upi || "—")
+        : (type === "Shared" ? (h.rooms ?? "—") : (h.bedrooms ?? h.beds ?? "—"));
 
       // WhatsApp CTA
       const btn = document.getElementById("mCta");
       btn.onclick = () => {
-        let phone = safe(h.contact_phone || h.phone || "");
-        phone = phone.replace(/[^\d]/g, "");
+        let phone = String(h.contact_phone || h.phone || "").replace(/[^\d]/g, "");
         if (!phone) return alert("Phone number is not available for this listing.");
-
-        // normalize Rwanda formats: 07xxxxxxx -> 2507xxxxxxx
-        if (phone.startsWith("07")) phone = "250" + phone.substring(1);
+        if (phone.length === 10 && phone.startsWith("07")) phone = "250" + phone.substring(1);
 
         const text = encodeURIComponent(`Hello! I'm interested in this property on InzuLink: "${title}".`);
         window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
@@ -684,12 +383,12 @@
       setModalImage();
       document.getElementById("detailOverlay").style.display = "flex";
       document.getElementById("detailOverlay").setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
     function setModalImage(){
       const img = document.getElementById("mainImg");
       img.src = modalImages[modalIndex] || modalImages[0];
-
       document.getElementById("btnPrev").style.display = (modalImages.length > 1) ? "flex" : "none";
       document.getElementById("btnNext").style.display = (modalImages.length > 1) ? "flex" : "none";
     }
@@ -703,10 +402,17 @@
     function closeModal(){
       document.getElementById("detailOverlay").style.display = "none";
       document.getElementById("detailOverlay").setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
     }
 
     document.getElementById("detailOverlay").addEventListener("click", (e) => {
       if (e.target.id === "detailOverlay") closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      const open = document.getElementById("detailOverlay").style.display === "flex";
+      if (e.key === "Escape") closeModal();
+      if (open && e.key === "ArrowLeft") moveImg(-1);
+      if (open && e.key === "ArrowRight") moveImg(1);
     });
 
     // Init

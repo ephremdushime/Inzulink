@@ -1,0 +1,37 @@
+# Render Blueprint for InzuLink — https://render.com/docs/blueprint-spec
+# PREFERRED PATH: keep your existing `inzulink-v1` web service (frontend pages
+# default to https://inzulink-v1.onrender.com), update its env vars, and redeploy.
+# Use this file only for a fresh setup or disaster recovery.
+services:
+  # ---- Backend API (Node + Express + Neon Postgres) ----
+  - type: web
+    name: inzulink-v1
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: DATABASE_URL
+        sync: false # paste Neon connection string in Render dashboard
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_APP_PASS
+        sync: false
+      - key: ADMIN_SEED_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false # e.g. https://inzulink-app.onrender.com
+      - key: FRONTEND_URL
+        sync: false # e.g. https://inzulink-app.onrender.com
+
+  # ---- Frontend (static HTML marketplace) ----
+  - type: static
+    name: inzulink-app
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://inzulink-v1.onrender.com/api/:splat

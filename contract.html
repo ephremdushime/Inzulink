@@ -4,272 +4,272 @@
   <meta charset="UTF-8" />
   <title>Lease Generator - InzuLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <meta name="theme-color" content="#05080f" />
+  <meta name="description" content="Generate a residential lease agreement in English or Kinyarwanda and download the PDF." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+  <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
+
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --bg-page:#f8fafc;
-      --text-main:#334155;
+    .contract-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-top:16px;align-items:start}
+    .form-shell{padding:28px 26px}
+    .form-shell h1{font-family:var(--font-display);font-size:1.7rem;letter-spacing:-.6px;color:#fff;margin:10px 0 6px;display:flex;align-items:center;gap:10px}
+    .form-shell h1 i{color:var(--cyan)}
+    .form-shell .sub{color:var(--muted);font-size:.93rem;line-height:1.65;margin:0 0 6px}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-weight:700;font-size:.88rem}
+    .back-link:hover{color:var(--cyan)}
+    .local-note{
+      background:#0a1120;border:1px solid var(--line-soft);padding:12px 14px;border-radius:12px;
+      font-size:.82rem;color:var(--faint);line-height:1.6;margin-top:14px;
     }
-    body{font-family:'Inter',sans-serif;background:var(--bg-page);margin:0;color:var(--text-main);display:flex;flex-direction:column;min-height:100vh;}
-    .navbar{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:15px 5%;position:sticky;top:0;width:90%;z-index:1000;
-      background:rgba(255,255,255,.95);backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(0,0,0,.05);box-shadow:0 4px 30px rgba(0,0,0,.03);
-      margin:0 auto;
+    .local-note b{color:var(--muted)}
+    .cstep{
+      display:flex;align-items:center;gap:12px;
+      font-family:var(--font-display);font-size:1rem;font-weight:800;color:#fff;
+      margin:24px 0 14px;letter-spacing:-.2px;
     }
-    .brand{display:flex;align-items:center;gap:8px;font-size:1.4rem;font-weight:900;color:var(--primary);letter-spacing:-.5px;text-decoration:none;}
-    .brand-icon{
-      background:linear-gradient(135deg,#f59e0b,#d97706);
-      color:#fff;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+    .cstep .n{
+      width:28px;height:28px;border-radius:10px;flex-shrink:0;
+      display:grid;place-items:center;
+      background:#0d1a2e;border:1px solid var(--line);
+      color:var(--cyan);font-size:.8rem;
     }
-    .brand span{color:var(--accent);}
-    .nav-center{display:flex;gap:30px;align-items:center;}
-    .nav-link{text-decoration:none;color:var(--text-main);font-weight:600;font-size:.9rem;transition:.2s;display:flex;align-items:center;gap:6px;}
-    .nav-link:hover{color:var(--accent);}
-
-    .container{max-width:1000px;margin:40px auto;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;padding:0 20px;flex:1;}
-    .form-box{background:#fff;padding:35px;border-radius:16px;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);border:1px solid #e2e8f0;}
-    .btn-back{display:inline-flex;align-items:center;gap:5px;color:#64748b;text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:20px;}
-    .btn-back:hover{color:var(--primary);}
-
-    h1{margin-top:0;color:var(--primary);font-size:1.8rem;display:flex;align-items:center;gap:10px;font-weight:800;}
-    .section-label{font-size:.75rem;font-weight:800;text-transform:uppercase;color:#94a3b8;margin-top:25px;margin-bottom:12px;display:block;letter-spacing:.5px;}
-    .input-group{margin-bottom:15px;}
-    label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:#475569;}
-    input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-family:inherit;box-sizing:border-box;transition:.2s;}
-    input:focus,select:focus{border-color:var(--primary);outline:none;}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-
-    .btn-generate{
-      background:var(--primary);color:#fff;width:100%;padding:15px;border-radius:8px;font-weight:700;border:none;cursor:pointer;margin-top:25px;
-      display:flex;align-items:center;justify-content:center;gap:10px;font-size:1rem;transition:.2s;
+    .generate-btn{margin-top:22px;width:100%;justify-content:center;padding:15px}
+    .preview-card{
+      position:sticky;top:96px;
+      background:var(--bg1);border:1px solid var(--line-soft);border-radius:22px;
+      min-height:480px;display:flex;align-items:center;justify-content:center;text-align:center;
+      padding:30px;
     }
-    .btn-generate:hover{background:#1e293b;transform:translateY(-2px);}
-    .note{
-      background:#f1f5f9;border:1px solid #e2e8f0;padding:12px;border-radius:10px;font-size:.88rem;color:#475569;line-height:1.45;
-      margin-top:14px;
+    .preview-card i{font-size:4.5rem;color:#1c2947;margin-bottom:16px}
+    .preview-card h3{font-family:var(--font-display);font-size:1.3rem;margin:0 0 8px;color:#fff}
+    .preview-card p{color:var(--faint);margin:0;font-size:.9rem}
+    .preview-card .steps{margin-top:18px;text-align:left;display:grid;gap:10px}
+    .preview-card .steps span{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:.85rem;font-weight:700}
+    .preview-card .steps span i{font-size:1.05rem;color:var(--cyan);margin:0}
+    input[type="date"]{color-scheme:dark}
+    @media (max-width:900px){
+      .contract-grid{grid-template-columns:1fr}
+      .preview-card{display:none}
     }
-    .preview-box{
-      background:#334155;padding:30px;border-radius:16px;height:600px;position:sticky;top:100px;display:flex;align-items:center;justify-content:center;
-      text-align:center;color:#fff;border:4px solid #e2e8f0;
-    }
-    footer{background:var(--primary);color:#fff;padding:40px 10%;margin-top:60px;text-align:center;font-size:.9rem;}
-    .f-link{color:#94a3b8;text-decoration:none;margin:0 10px;transition:.2s;}
-    .f-link:hover{color:#fff;}
-    @media(max-width:800px){.container{grid-template-columns:1fr}.preview-box{display:none}.grid-2{grid-template-columns:1fr}}
   </style>
 </head>
 
 <body>
-  <nav class="navbar">
-    <a href="index.html" class="brand">
-      <div class="brand-icon"><i class="ph ph-house-line"></i></div>
-      Inzu<span>Link</span>
-    </a>
-    <div class="nav-center">
-      <a href="index.html" class="nav-link"><i class="ph ph-house"></i> <span data-i18n="nav_home">Home</span></a>
-      <a href="feed.html" class="nav-link"><i class="ph ph-globe"></i> <span data-i18n="nav_feed">Browse Feed</span></a>
-    </div>
-    <div style="font-weight:700;color:var(--primary);font-size:.9rem;display:flex;align-items:center;gap:5px;">
-      <i class="ph ph-file-text" style="color:var(--accent);"></i> <span data-i18n="nav_contract">Contract Tool</span>
-    </div>
-  </nav>
+  <div id="appNavbar"></div>
 
-  <div class="container">
-    <div class="form-box">
-      <a href="index.html" class="btn-back"><i class="ph ph-arrow-left"></i> <span data-i18n="back_home">Back to Home</span></a>
+  <main class="wrap">
+    <div class="contract-grid">
+      <div class="panel form-shell">
+        <a href="index.html" class="back-link"><i class="ph ph-arrow-left"></i> <span data-i18n="back_home">Back to Home</span></a>
 
-      <h1><span data-i18n="title">Lease Generator</span></h1>
-      <p style="color:#64748b;font-size:.95rem;line-height:1.5;" data-i18n="subtitle">
-        Generate a residential lease agreement for signing. Choose English or Kinyarwanda and download the PDF.
-      </p>
+        <h1><i class="ph ph-file-text"></i><span data-i18n="title">Lease Generator</span></h1>
+        <p class="sub" data-i18n="subtitle">
+          Generate a residential lease agreement for signing. Choose English or Kinyarwanda and download the PDF.
+        </p>
 
-      <div class="note" data-i18n="note_html"></div>
+        <div class="local-note" data-i18n="note_html"></div>
 
-      <form id="contractForm" onsubmit="generatePDF(event)">
-        <span class="section-label" data-i18n="sec0">0. Language</span>
-        <div class="input-group">
-          <label data-i18n="lang_label">Language</label>
-          <select id="lang">
-            <option value="en">English</option>
-            <option value="rw">Kinyarwanda</option>
-          </select>
-        </div>
-
-        <span class="section-label" data-i18n="sec1">1. Landlord Details</span>
-        <div class="input-group">
-          <label data-i18n="lName_label">Landlord Full Name</label>
-          <input type="text" id="lName" data-i18n-ph="lName_ph" placeholder="e.g. MUGABO Jean" required />
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="lID_label">Landlord ID / Passport</label>
-            <input type="text" id="lID" data-i18n-ph="lID_ph" placeholder="e.g. 1 19..." required />
-          </div>
-          <div class="input-group">
-            <label data-i18n="lPhone_label">Landlord Phone</label>
-            <input type="text" id="lPhone" data-i18n-ph="lPhone_ph" placeholder="e.g. +25078..." required />
-          </div>
-        </div>
-
-        <span class="section-label" data-i18n="sec2">2. Tenant Details</span>
-        <div class="input-group">
-          <label data-i18n="tName_label">Tenant Full Name</label>
-          <input type="text" id="tName" data-i18n-ph="tName_ph" placeholder="e.g. KEZA Sarah" required />
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="tID_label">Tenant ID / Passport</label>
-            <input type="text" id="tID" data-i18n-ph="tID_ph" placeholder="e.g. 1 1990..." required />
-          </div>
-          <div class="input-group">
-            <label data-i18n="tPhone_label">Tenant Phone</label>
-            <input type="text" id="tPhone" data-i18n-ph="tPhone_ph" placeholder="e.g. +25078..." required />
-          </div>
-        </div>
-
-        <span class="section-label" data-i18n="sec3">3. Property Details</span>
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="district_label">District</label>
-            <input type="text" id="pDistrict" data-i18n-ph="district_ph" placeholder="e.g. Kicukiro" required />
-          </div>
-          <div class="input-group">
-            <label data-i18n="sector_label">Sector</label>
-            <input type="text" id="pSector" data-i18n-ph="sector_ph" placeholder="e.g. Kanombe" required />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="cell_label">Cell</label>
-            <input type="text" id="pCell" data-i18n-ph="cell_ph" placeholder="e.g. Rubirizi" required />
-          </div>
-          <div class="input-group">
-            <label data-i18n="village_label">Village</label>
-            <input type="text" id="pVillage" data-i18n-ph="village_ph" placeholder="e.g. Umudugudu wa 5" required />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="ptype_label">Property Type</label>
-            <select id="propertyType" required>
-              <option value="House" data-i18n="ptype_house">House</option>
-              <option value="Apartment" data-i18n="ptype_apartment">Apartment</option>
-              <option value="Room" data-i18n="ptype_room">Room</option>
-              <option value="Studio" data-i18n="ptype_studio">Studio</option>
-              <option value="Other" data-i18n="ptype_other">Other</option>
+        <form id="contractForm" onsubmit="generatePDF(event)">
+          <div class="cstep"><span class="n">0</span><span data-i18n="sec0">0. Language</span></div>
+          <div class="field">
+            <label data-i18n="lang_label">Language</label>
+            <select id="lang" class="select">
+              <option value="en">English</option>
+              <option value="rw">Kinyarwanda</option>
             </select>
           </div>
-          <div class="input-group">
-            <label data-i18n="bedrooms_label">Bedrooms (optional)</label>
-            <input type="number" id="bedrooms" data-i18n-ph="bedrooms_ph" placeholder="e.g. 2" min="0" />
+
+          <div class="cstep"><span class="n">1</span><span data-i18n="sec1">1. Landlord Details</span></div>
+          <div class="field">
+            <label data-i18n="lName_label">Landlord Full Name</label>
+            <input type="text" id="lName" class="input" data-i18n-ph="lName_ph" placeholder="e.g. MUGABO Jean" required />
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="lID_label">Landlord ID / Passport</label>
+              <input type="text" id="lID" class="input" data-i18n-ph="lID_ph" placeholder="e.g. 1 19..." required />
+            </div>
+            <div class="field">
+              <label data-i18n="lPhone_label">Landlord Phone</label>
+              <input type="text" id="lPhone" class="input" data-i18n-ph="lPhone_ph" placeholder="e.g. +25078..." required />
+            </div>
+          </div>
+
+          <div class="cstep"><span class="n">2</span><span data-i18n="sec2">2. Tenant Details</span></div>
+          <div class="field">
+            <label data-i18n="tName_label">Tenant Full Name</label>
+            <input type="text" id="tName" class="input" data-i18n-ph="tName_ph" placeholder="e.g. KEZA Sarah" required />
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="tID_label">Tenant ID / Passport</label>
+              <input type="text" id="tID" class="input" data-i18n-ph="tID_ph" placeholder="e.g. 1 1990..." required />
+            </div>
+            <div class="field">
+              <label data-i18n="tPhone_label">Tenant Phone</label>
+              <input type="text" id="tPhone" class="input" data-i18n-ph="tPhone_ph" placeholder="e.g. +25078..." required />
+            </div>
+          </div>
+
+          <div class="cstep"><span class="n">3</span><span data-i18n="sec3">3. Property Details</span></div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="district_label">District</label>
+              <input type="text" id="pDistrict" class="input" data-i18n-ph="district_ph" placeholder="e.g. Kicukiro" required />
+            </div>
+            <div class="field">
+              <label data-i18n="sector_label">Sector</label>
+              <input type="text" id="pSector" class="input" data-i18n-ph="sector_ph" placeholder="e.g. Kanombe" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="cell_label">Cell</label>
+              <input type="text" id="pCell" class="input" data-i18n-ph="cell_ph" placeholder="e.g. Rubirizi" required />
+            </div>
+            <div class="field">
+              <label data-i18n="village_label">Village</label>
+              <input type="text" id="pVillage" class="input" data-i18n-ph="village_ph" placeholder="e.g. Umudugudu wa 5" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="ptype_label">Property Type</label>
+              <select id="propertyType" class="select" required>
+                <option value="House" data-i18n="ptype_house">House</option>
+                <option value="Apartment" data-i18n="ptype_apartment">Apartment</option>
+                <option value="Room" data-i18n="ptype_room">Room</option>
+                <option value="Studio" data-i18n="ptype_studio">Studio</option>
+                <option value="Other" data-i18n="ptype_other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="bedrooms_label">Bedrooms (optional)</label>
+              <input type="number" id="bedrooms" class="input" data-i18n-ph="bedrooms_ph" placeholder="e.g. 2" min="0" />
+            </div>
+          </div>
+
+          <div class="cstep"><span class="n">4</span><span data-i18n="sec4">4. Payment & Term</span></div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="rent_label">Monthly Rent (RWF)</label>
+              <input type="number" id="rentAmount" class="input" data-i18n-ph="rent_ph" placeholder="50000" required min="0" />
+            </div>
+            <div class="field">
+              <label data-i18n="deposit_label">Security Deposit (RWF)</label>
+              <input type="number" id="depositAmount" class="input" data-i18n-ph="deposit_ph" placeholder="e.g. 50000" required min="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="cycle_label">Payment Cycle</label>
+              <select id="cycle" class="select">
+                <option value="Monthly" data-i18n="cycle_monthly">Monthly</option>
+                <option value="Quarterly (3 Months)" data-i18n="cycle_quarterly">Quarterly (3 Months)</option>
+                <option value="Bi-Annually (6 Months)" data-i18n="cycle_biannually">6 Months</option>
+                <option value="Annually (1 Year)" data-i18n="cycle_annually">1 Year</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="due_label">Rent Due Day (1-28)</label>
+              <input type="number" id="dueDay" class="input" value="5" min="1" max="28" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="start_label">Start Date</label>
+              <input type="date" id="startDate" class="input" required />
+            </div>
+            <div class="field">
+              <label data-i18n="duration_label">Duration (Months)</label>
+              <input type="number" id="duration" class="input" data-i18n-ph="duration_ph" placeholder="e.g. 12" required min="1" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label data-i18n="utilities_label">Utilities Paid By</label>
+              <select id="utilities" class="select">
+                <option value="Tenant" data-i18n="u_tenant">Tenant</option>
+                <option value="Landlord" data-i18n="u_landlord">Landlord</option>
+                <option value="Shared" data-i18n="u_shared">Shared</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="notice_label">Notice Period to Terminate (Days)</label>
+              <input type="number" id="noticeDays" class="input" value="30" min="1" required />
+            </div>
+          </div>
+
+          <div class="cstep"><span class="n">5</span><span data-i18n="sec5">5. Extra Clauses (optional)</span></div>
+          <div class="field">
+            <label data-i18n="special_label">Special Terms (Optional)</label>
+            <input type="text" id="specialTerms" class="input" data-i18n-ph="special_ph" placeholder="e.g. No subletting, no pets, etc." />
+          </div>
+
+          <button type="submit" class="btn btn-solid generate-btn">
+            <i class="ph ph-download-simple"></i> <span data-i18n="btn">Download PDF Contract</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="preview-card">
+        <div>
+          <i class="ph ph-file-pdf"></i>
+          <h3 data-i18n="preview_title">PDF Output</h3>
+          <p data-i18n="preview_sub">Choose a language then download.</p>
+          <div class="steps">
+            <span><i class="ph ph-check-circle"></i> EN / RW templates</span>
+            <span><i class="ph ph-check-circle"></i> 11 legal sections</span>
+            <span><i class="ph ph-check-circle"></i> Signature blocks</span>
           </div>
         </div>
-
-        <span class="section-label" data-i18n="sec4">4. Payment & Term</span>
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="rent_label">Monthly Rent (RWF)</label>
-            <input type="number" id="rentAmount" data-i18n-ph="rent_ph" placeholder="50000" required min="0" />
-          </div>
-          <div class="input-group">
-            <label data-i18n="deposit_label">Security Deposit (RWF)</label>
-            <input type="number" id="depositAmount" data-i18n-ph="deposit_ph" placeholder="e.g. 50000" required min="0" />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="cycle_label">Payment Cycle</label>
-            <select id="cycle">
-              <option value="Monthly" data-i18n="cycle_monthly">Monthly</option>
-              <option value="Quarterly (3 Months)" data-i18n="cycle_quarterly">Quarterly (3 Months)</option>
-              <option value="Bi-Annually (6 Months)" data-i18n="cycle_biannually">6 Months</option>
-              <option value="Annually (1 Year)" data-i18n="cycle_annually">1 Year</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label data-i18n="due_label">Rent Due Day (1-28)</label>
-            <input type="number" id="dueDay" value="5" min="1" max="28" required />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="start_label">Start Date</label>
-            <input type="date" id="startDate" required />
-          </div>
-          <div class="input-group">
-            <label data-i18n="duration_label">Duration (Months)</label>
-            <input type="number" id="duration" data-i18n-ph="duration_ph" placeholder="e.g. 12" required min="1" />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label data-i18n="utilities_label">Utilities Paid By</label>
-            <select id="utilities">
-              <option value="Tenant" data-i18n="u_tenant">Tenant</option>
-              <option value="Landlord" data-i18n="u_landlord">Landlord</option>
-              <option value="Shared" data-i18n="u_shared">Shared</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label data-i18n="notice_label">Notice Period to Terminate (Days)</label>
-            <input type="number" id="noticeDays" value="30" min="1" required />
-          </div>
-        </div>
-
-        <span class="section-label" data-i18n="sec5">5. Extra Clauses (optional)</span>
-        <div class="input-group">
-          <label data-i18n="special_label">Special Terms (Optional)</label>
-          <input type="text" id="specialTerms" data-i18n-ph="special_ph" placeholder="e.g. No subletting, no pets, etc." />
-        </div>
-
-        <button type="submit" class="btn-generate">
-          <i class="ph ph-download-simple"></i> <span data-i18n="btn">Download PDF Contract</span>
-        </button>
-      </form>
-    </div>
-
-    <div class="preview-box">
-      <div style="opacity:.9">
-        <i class="ph ph-file-pdf" style="font-size:5rem;color:#cbd5e1;margin-bottom:20px;"></i>
-        <h3 style="font-size:1.5rem;margin:0 0 10px 0;" data-i18n="preview_title">PDF Output</h3>
-        <p style="color:#94a3b8;" data-i18n="preview_sub">Choose a language then download.</p>
       </div>
     </div>
-  </div>
 
-  <footer>
-    <div style="margin-bottom:15px;font-weight:800;font-size:1.2rem;">Inzu<span style="color:var(--accent);">Link</span></div>
-    <p style="color:#94a3b8;margin-bottom:20px;" data-i18n="footer_line">
-      Making housing accessible, affordable, and transparent for everyone in Rwanda.
-    </p>
-    <div>
-      <a href="#" class="f-link" data-i18n="footer_terms">Terms</a> •
-      <a href="#" class="f-link" data-i18n="footer_privacy">Privacy</a> •
-      <a href="#" class="f-link" data-i18n="footer_support">Support</a>
-    </div>
-    <div style="margin-top:20px;color:#64748b;font-size:.8rem;" data-i18n="footer_copy">
-      © 2026 InzuLink. All rights reserved.
-    </div>
-  </footer>
+    <footer class="site-footer" aria-label="Footer">
+      <div class="foot-grid">
+        <div class="fcol">
+          <div class="foot-brand">
+            <span class="brand-icon"><i class="ph ph-house-line"></i></span>
+            Inzu<em>Link</em>
+          </div>
+          <div class="foot-tag" data-i18n="footer_line">
+            Making housing accessible, affordable, and transparent for everyone in Rwanda.
+          </div>
+        </div>
+        <div class="fcol">
+          <strong>Platform</strong>
+          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse listings</a></div>
+          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract tool</a></div>
+        </div>
+        <div class="fcol">
+          <strong>Legal</strong>
+          <div class="flink"><i class="ph ph-scale"></i> <span data-i18n="footer_terms">Terms</span></div>
+          <div class="flink"><i class="ph ph-lock"></i> <span data-i18n="footer_privacy">Privacy</span></div>
+          <div class="flink"><i class="ph ph-lifebuoy"></i> <span data-i18n="footer_support">Support</span></div>
+        </div>
+        <div class="fcol">
+          <strong>Contact</strong>
+          <div class="flink"><i class="ph ph-envelope"></i> <span>info@inzulink.rw</span></div>
+          <div class="flink"><i class="ph ph-map-pin"></i> <span>Kigali, Rwanda</span></div>
+        </div>
+      </div>
+      <div class="copy" data-i18n="footer_copy">© 2026 InzuLink. All rights reserved.</div>
+    </footer>
+  </main>
 
+  <script src="./assets/navbar.js"></script>
   <script>
     const { jsPDF } = window.jspdf;
 
-    // ---------- i18n ----------
+    // ---------- i18n (keys unchanged) ----------
     const I18N = {
       en: {
         htmlLang: "en",
@@ -427,23 +427,19 @@
       const dict = I18N[lang] || I18N.en;
       document.documentElement.lang = dict.htmlLang || "en";
 
-      // text nodes
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         if (key && dict[key] !== undefined) {
-          // allow HTML for note
           if (key.endsWith("_html")) el.innerHTML = dict[key];
           else el.textContent = dict[key];
         }
       });
 
-      // placeholders
       document.querySelectorAll("[data-i18n-ph]").forEach(el => {
         const key = el.getAttribute("data-i18n-ph");
         if (key && dict[key] !== undefined) el.placeholder = dict[key];
       });
 
-      // update page title (tab)
       document.title = (lang === "rw")
         ? "Gukora Amasezerano - InzuLink"
         : "Lease Generator - InzuLink";
@@ -484,7 +480,7 @@
       return y;
     }
 
-    // ---------- PDF content (same as before) ----------
+    // ---------- PDF content (unchanged legal text) ----------
     function enText(data){
       const {
         lName, lID, lPhone, tName, tID, tPhone,
@@ -596,7 +592,7 @@
             `Uko bwishyurwa: ${cycle}. Ubukode bwishyurwa bitarenze umunsi wa ${dueDay} wa buri cyiciro (keretse habaye indi myumvire mu nyandiko).`,
             `Ingwate: ${nfRWF(depositVal)} RWF. Ingwate ishobora gukoreshwa ku bukode butishyuwe, ibyangiritse birenze “gushira bisanzwe”, n’ibindi byemewe n’amategeko. Asigaye asubizwa nyuma yo gusohoka, hakabaho isuzuma n’ibyo impande zombi zumvikanyeho.`
           ]},
-          { h: "5. AMAzi, UMURIR0 N’IBINDI", p: [
+          { h: "5. AMAZI, UMURIRO N’IBINDI", p: [
             `Amazi/umuriro/internet n’ibindi byishyurwa na: ${utilities}.`,
             `Niba Umukodesha ari we ubyishyura, agomba kubikora ku gihe kandi agatanga gihamya iyo abisabwe.`
           ]},
@@ -750,7 +746,6 @@
     (function init(){
       const sel = document.getElementById("lang");
 
-      // default: keep last selection
       const saved = localStorage.getItem("CONTRACT_LANG");
       if (saved === "rw" || saved === "en") sel.value = saved;
 
@@ -761,7 +756,6 @@
         applyLang(sel.value);
       });
 
-      // fill note_html once at start if not filled
       const note = document.querySelector("[data-i18n='note_html']");
       if (note && !note.innerHTML.trim()){
         note.innerHTML = I18N[sel.value].note_html;

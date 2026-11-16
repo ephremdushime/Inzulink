@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#05080f" />
   <title>Sign Up — InzuLink</title>
 
   <meta name="description" content="Create an InzuLink account to browse listings, save homes, and manage property posts." />
@@ -11,87 +11,36 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
   <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --bg:#f8fafc;
-      --text:#0b1220;
-      --muted:#64748b;
-      --card:#ffffff;
-      --border:#e2e8f0;
-      --shadow: 0 18px 35px rgba(2,6,23,0.10);
-      --danger:#dc2626;
-      --danger-bg:#fef2f2;
-      --success:#16a34a;
-      --success-bg:#f0fdf4;
-      --warn:#f59e0b;
-      --warn-bg:#fffbeb;
-    }
-    body{ margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
-    .wrap{ width:min(820px, 92%); margin:0 auto; padding:18px 0 38px; }
-    .card{
-      background:var(--card); border:1px solid var(--border);
-      border-radius:22px; box-shadow:var(--shadow);
-      padding:26px 22px;
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:999px;
-      border:1px solid #fde68a; background:#fffbeb; color:#92400e;
-      font-weight:900; font-size:.85rem;
-    }
-    h1{ margin:14px 0 8px; font-size:2rem; letter-spacing:-.8px; color:var(--primary); font-weight:900; }
-    .sub{ margin:0 0 18px; color:var(--muted); line-height:1.7; font-weight:600; }
-
-    .msg{ display:none; border-radius:14px; padding:12px; font-weight:800; line-height:1.5; border:1px solid var(--border); margin-bottom:12px; }
-    .msg.err{ display:block; background:var(--danger-bg); border-color:#fecaca; color:var(--danger); }
-    .msg.ok{ display:block; background:var(--success-bg); border-color:#bbf7d0; color:var(--success); }
-    .msg.warn{ display:block; background:var(--warn-bg); border-color:#fde68a; color:#92400e; }
-
-    .form{ display:grid; gap:12px; margin-top:10px; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width:720px){ .grid2{ grid-template-columns:1fr; } }
-
-    label{ font-size:.85rem; font-weight:800; color:#475569; margin:0 0 6px; display:block; }
-    .field{ display:grid; gap:6px; }
-    .input, .select{
-      width:100%; border:1px solid #cbd5e1; border-radius:12px;
-      padding:12px; font-size:.98rem; outline:none; background:#fff;
-      transition:border-color .15s ease, box-shadow .15s ease;
-    }
-    .input:focus, .select:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(15,23,42,.10); }
-
-    .pw-row{ display:flex; gap:10px; align-items:center; }
-    .pw-row .input{ flex:1; }
+    .auth-shell{max-width:680px;margin:26px auto 30px;padding:32px 30px}
+    .auth-shell h1{font-family:var(--font-display);font-size:2rem;letter-spacing:-.7px;color:#fff;margin:12px 0 6px}
+    .auth-shell .sub{color:var(--muted);line-height:1.65;margin:0 0 20px;font-size:.95rem}
+    .msg{display:none;border-radius:14px;padding:12px 14px;font-weight:700;font-size:.9rem;line-height:1.55;border:1px solid var(--line);margin-bottom:14px}
+    .msg.err{display:block;background:#33101a;border-color:#5c1a2a;color:#fda4b5}
+    .msg.ok{display:block;background:#0a2a1c;border-color:#14532d;color:#6ee7b7}
+    .msg.warn{display:block;background:#2c2107;border-color:#574410;color:#fcd34d}
+    .hint{color:var(--faint);font-weight:600;font-size:.82rem;line-height:1.55;margin-top:6px}
+    .hint strong{color:var(--muted)}
+    .pw-row{display:flex;gap:10px;align-items:center}
+    .pw-row .input{flex:1}
     .pw-toggle{
-      border:1px solid var(--border); background:#fff; color:var(--primary);
-      padding:12px; border-radius:12px; cursor:pointer; font-weight:900;
+      border:1px solid var(--line);background:#0a1120;color:var(--muted);
+      padding:12px 14px;border-radius:12px;cursor:pointer;font-size:1.1rem;
+      display:grid;place-items:center;
     }
-    .pw-toggle:hover{ background:#f1f5f9; }
-
-    .hint{ color:var(--muted); font-weight:700; font-size:.92rem; line-height:1.6; }
-    .hint strong{ color:var(--primary); }
-
-    .btn{
-      border:1px solid transparent; border-radius:12px; padding:12px 14px;
-      font-weight:900; font-size:1rem; cursor:pointer; user-select:none;
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      transition:transform .12s ease, background .12s ease;
-      width:100%;
-    }
-    .btn:active{ transform:translateY(1px); }
-    .btn-primary{ background:var(--primary); color:#fff; }
-    .btn-primary:hover{ background:#1e293b; }
-    .btn-outline{ background:#fff; border-color:var(--border); color:var(--primary); }
-    .btn-outline:hover{ background:#f1f5f9; }
-
-    .mini{ margin-top:14px; padding:14px; border-radius:16px; border:1px solid #fde68a; background:#fffbeb; color:#92400e; font-weight:800; line-height:1.6; }
-    .mini b{ color:#7c2d12; }
+    .pw-toggle:hover{border-color:var(--cyan);color:var(--cyan)}
+    .agree{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-weight:600;font-size:.88rem;cursor:pointer;margin-top:4px}
+    .agree input{width:17px;height:17px;margin-top:2px;accent-color:#2fd8ff;flex-shrink:0}
+    .stack{display:grid;gap:10px;margin-top:14px}
+    .why-box{margin-top:16px;padding:14px 16px;border-radius:14px;border:1px solid #574410;background:#171106;color:#d8c49a;font-size:.86rem;line-height:1.6}
+    .why-box b{color:var(--warn)}
+    .mini-foot{margin:0 0 26px;text-align:center;color:var(--faint);font-size:.85rem;font-weight:600}
   </style>
 </head>
 
@@ -99,42 +48,42 @@
   <div id="appNavbar"></div>
 
   <main class="wrap">
-    <section class="card" aria-label="Signup form">
-      <div class="badge"><i class="ph ph-user-plus"></i> Create Account</div>
+    <section class="panel auth-shell" aria-label="Signup form">
+      <span class="kicker">Create account</span>
       <h1>Join InzuLink</h1>
-      <div class="sub">Create your account to browse trusted listings, save homes, and manage your dashboard.</div>
+      <p class="sub">One account for the whole marketplace — browse as a seeker, post as a seller.</p>
 
-      <div id="msg" class="msg"></div>
+      <div id="msg" class="msg" role="alert"></div>
 
-      <form class="form" id="signupForm" novalidate>
+      <form id="signupForm" novalidate>
         <div class="field">
           <label for="fullName">Full name</label>
           <input class="input" id="fullName" type="text" placeholder="Your name" required />
         </div>
 
-        <div class="grid2">
+        <div class="form-row">
           <div class="field">
             <label for="email">Email</label>
             <input class="input" id="email" type="email" autocomplete="email" placeholder="you@example.com" required />
           </div>
           <div class="field">
             <label for="phone">Phone</label>
-            <input class="input" id="phone" type="tel" autocomplete="tel" placeholder="+2507..." required />
+            <input class="input" id="phone" type="tel" autocomplete="tel" placeholder="+2507…" required />
             <div class="hint">Format: <strong>+2507XXXXXXXX</strong> or <strong>07XXXXXXXX</strong></div>
           </div>
         </div>
 
-        <div class="grid2">
+        <div class="form-row">
           <div class="field">
-            <label for="nida">NIDA number <span style="color:#dc2626;">*</span></label>
+            <label for="nida">NIDA number *</label>
             <input class="input" id="nida" type="text" placeholder="Your NIDA number" required />
             <div class="hint">Required for identity verification and fraud prevention.</div>
           </div>
           <div class="field">
             <label for="role">Account type</label>
             <select class="select" id="role">
-              <option value="Seeker">Seeker (Find a home)</option>
-              <option value="Landlord">Landlord (Post homes)</option>
+              <option value="Seeker">Seeker (find a home)</option>
+              <option value="Landlord">Landlord (post homes)</option>
             </select>
           </div>
         </div>
@@ -155,24 +104,26 @@
           <input class="input" id="confirm" type="password" autocomplete="new-password" placeholder="Repeat password" required />
         </div>
 
-        <label class="hint" style="display:flex;gap:10px;align-items:flex-start;">
+        <label class="agree">
           <input type="checkbox" id="agree" />
           <span>I agree to the Terms and Privacy Policy.</span>
         </label>
 
-        <button class="btn btn-primary" id="btnCreate" type="submit">
-          <i class="ph ph-user-plus"></i> Create account
-        </button>
+        <div class="stack">
+          <button class="btn btn-solid btn-block" id="btnCreate" type="submit">
+            <i class="ph ph-user-plus"></i> Create account
+          </button>
+          <button class="btn btn-line btn-block" type="button" onclick="window.location.href='login.html'">
+            <i class="ph ph-sign-in"></i> I already have an account
+          </button>
+        </div>
 
-        <button class="btn btn-outline" type="button" onclick="window.location.href='login.html'">
-          <i class="ph ph-sign-in"></i> I already have an account
-        </button>
-
-        <div class="mini">
+        <div class="why-box">
           <b>Why NIDA?</b> It helps reduce fraud and improves safety for both landlords and seekers.
         </div>
       </form>
     </section>
+    <div class="mini-foot">© 2026 InzuLink · Kigali, Rwanda</div>
   </main>
 
   <script src="./assets/navbar.js"></script>
@@ -225,7 +176,7 @@
       if (!agree) return setMsg("warn", "Please accept the Terms and Privacy Policy.");
 
       btnCreate.disabled = true;
-      btnCreate.innerHTML = `<i class="ph ph-circle-notch"></i> Creating account...`;
+      btnCreate.innerHTML = `<i class="ph ph-circle-notch"></i> Creating account…`;
 
       try{
         const res = await fetchWithTimeout(`${API_BASE}/api/auth/signup`, {
@@ -244,7 +195,7 @@
           return;
         }
 
-        setMsg("ok", "Account created successfully. Redirecting to login...");
+        setMsg("ok", "Account created successfully. Redirecting to login…");
         setTimeout(() => window.location.href = "login.html", 700);
 
       } catch(err){

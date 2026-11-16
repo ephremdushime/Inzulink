@@ -1,132 +1,148 @@
-/* assets/app.css */
+/* assets/app.css — InzuLink midnight theme (navbar + shared controls)
+   Selector contract is unchanged: navbar.js and all pages keep working. */
 :root{
-  --primary:#0f172a;
-  --accent:#f59e0b;
-  --accent-hover:#d97706;
-  --bg:#f8fafc;
-  --text:#1e293b;
-  --muted:#64748b;
-  --border:#e2e8f0;
+  --primary:#e9effc;
+  --accent:#2fd8ff;
+  --accent-hover:#7fe7ff;
+  --bg:#05080f;
+  --text:#e9effc;
+  --muted:#8fa0c2;
+  --border:#1c2642;
 }
 
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text)}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
 
 .app-navbar{
-  position:sticky; top:0; z-index:1000;
-  margin:0 auto;
-  width:min(1100px, 92%);
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 16px;
-  background:rgba(255,255,255,.92);
-  backdrop-filter:blur(12px);
-  border:1px solid rgba(2,6,23,.06);
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(2,6,23,.06);
-  margin-top:14px;
+  position:sticky; top:12px; z-index:1000;
+  margin:12px auto 0;
+  width:min(1180px, 94%);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:10px 12px 10px 18px;
+  background:rgba(9,14,26,.88);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.7);
 }
 
 .app-brand{
   display:flex; align-items:center; gap:10px;
   text-decoration:none;
-  font-weight:900;
-  font-size:1.25rem;
-  color:var(--primary);
-  letter-spacing:-.4px;
+  font-family:Sora,Inter,system-ui,sans-serif;
+  font-weight:800;
+  font-size:1.3rem;
+  color:#fff;
+  letter-spacing:-.5px;
+  white-space:nowrap;
 }
 .brand-icon{
-  width:34px;height:34px;border-radius:10px;
+  width:36px;height:36px;border-radius:12px;
   display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),var(--accent-hover));
-  color:white;
+  font-size:1.2rem;
+  background:linear-gradient(135deg,#2fd8ff,#2f7bff);
+  color:#04121a;
+  box-shadow:0 6px 18px -6px rgba(47,216,255,.55);
 }
 .app-brand span{color:var(--accent)}
 
 .nav-toggle{
   display:none;
   border:1px solid var(--border);
-  background:white;
-  border-radius:10px;
-  padding:8px 10px;
+  background:#0c1222;
+  border-radius:12px;
+  padding:9px 11px;
   cursor:pointer;
-  color:var(--primary);
+  color:var(--text);
+  font-size:1.15rem;
 }
 
 .app-navlinks{
-  display:flex; align-items:center; gap:14px;
+  display:flex; align-items:center; gap:4px;
 }
 .app-navlink{
   text-decoration:none;
   color:var(--muted);
   font-weight:700;
-  font-size:.92rem;
-  padding:8px 10px;
-  border-radius:10px;
-  display:flex; align-items:center; gap:7px;
+  font-size:.9rem;
+  padding:9px 13px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border:1px solid transparent;
+  transition:color .15s ease,background .15s ease,border-color .15s ease;
 }
-.app-navlink:hover{color:var(--primary); background:#f1f5f9}
-.app-navlink.active{color:var(--primary); background:#e2e8f0}
+.app-navlink:hover{color:#fff; background:#111a30}
+.app-navlink.active{color:var(--accent); background:#0e1830; border-color:#1a2c52}
 
 .app-navlink.cta{
-  color:var(--primary);
-  border:1px solid #fde68a;
-  background:#fffbeb;
+  color:#04121a;
+  background:var(--accent);
+  font-weight:800;
+  margin-left:6px;
 }
-.app-navlink.cta:hover{background:#fff7ed}
+.app-navlink.cta:hover{background:var(--accent-hover)}
 
 .app-auth{display:flex; align-items:center; gap:10px}
 .btn-primary{
   text-decoration:none;
-  background:var(--primary);
-  color:white;
-  padding:9px 14px;
-  border-radius:10px;
+  background:var(--accent);
+  color:#04121a;
+  padding:10px 16px;
+  border-radius:12px;
   font-weight:800;
-  font-size:.9rem;
+  font-size:.88rem;
+  border:1px solid transparent;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .15s ease;
 }
-.btn-primary:hover{background:#1e293b}
+.btn-primary:hover{background:var(--accent-hover)}
 .btn-ghost{
   border:1px solid var(--border);
-  background:white;
-  color:var(--primary);
-  padding:9px 12px;
-  border-radius:10px;
-  font-weight:800;
-  font-size:.9rem;
+  background:transparent;
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:.88rem;
   cursor:pointer;
   text-decoration:none;
+  white-space:nowrap;
+  transition:background .15s ease,border-color .15s ease;
+  display:inline-flex; align-items:center; gap:8px;
 }
-.btn-ghost:hover{background:#f1f5f9}
+.btn-ghost:hover{background:#111a30; border-color:#2a3a63}
 
 .user-chip{display:flex; align-items:center; gap:10px}
 .role-badge{
-  font-size:.72rem; font-weight:900;
-  padding:4px 10px; border-radius:999px;
+  font-size:.7rem; font-weight:800;
+  padding:5px 11px; border-radius:999px;
   border:1px solid var(--border);
-  background:#f8fafc;
+  background:#0c1222;
   color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.6px;
 }
-.role-landlord{background:#ecfeff;color:#0891b2;border-color:#a5f3fc}
-.role-admin{background:#fef2f2;color:#dc2626;border-color:#fecaca}
-.role-seeker{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
-.user-name{font-weight:900;color:var(--primary)}
+.role-landlord{background:#062a33;color:#2fd8ff;border-color:#0e4a5a}
+.role-admin{background:#33101a;color:#fb7185;border-color:#5c1a2a}
+.role-seeker{background:#0a2a1c;color:#34d399;border-color:#14532d}
+.user-name{font-weight:800;color:#fff;font-size:.92rem}
 
-@media (max-width: 860px){
+@media (max-width: 900px){
   .nav-toggle{display:inline-flex}
+  .app-navbar{flex-wrap:wrap}
   .app-navlinks{
     display:none;
-    position:absolute;
-    top:76px;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(1100px, 92%);
+    flex-basis:100%;
     flex-direction:column;
     align-items:stretch;
-    background:rgba(255,255,255,.98);
-    border:1px solid rgba(2,6,23,.08);
-    border-radius:16px;
-    padding:10px;
-    box-shadow:0 20px 40px rgba(2,6,23,.12);
+    padding:6px 2px 2px;
   }
   .app-navlinks.open{display:flex}
+  .app-navlink.cta{margin-left:0; justify-content:center}
+  .app-auth{margin-left:auto}
+  .user-name{display:none}
 }

@@ -700,8 +700,9 @@ app.get('/api/admin/featured-properties', async (req, res) => {
   try {
     const q = `
       SELECT
-        property_id, title, location, district, price, category,
-        is_featured, created_at, landlord_id
+        property_id, title, sector AS location, district,
+        price_per_month AS price, category,
+        is_featured, created_at, owner_id AS landlord_id
       FROM Properties
       WHERE is_featured = TRUE
       ORDER BY created_at DESC
@@ -756,12 +757,13 @@ app.get('/api/admin/properties', async (req, res) => {
 
     const q = `
       SELECT
-        p.property_id, p.title, p.location, p.district, p.price, p.category,
+        p.property_id, p.title, p.sector AS location, p.district,
+        p.price_per_month AS price, p.category,
         p.status, p.rejection_reason, p.is_featured, p.is_deleted,
-        p.created_at, p.landlord_id,
+        p.created_at, p.owner_id AS landlord_id,
         u.full_name AS landlord_name, u.phone AS landlord_phone
       FROM Properties p
-      LEFT JOIN Users u ON u.user_id = p.landlord_id
+      LEFT JOIN Users u ON u.user_id = p.owner_id
       WHERE p.is_deleted = FALSE
         AND p.status = $1
       ORDER BY p.created_at DESC

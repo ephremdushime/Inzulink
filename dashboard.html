@@ -2,152 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Dashboard — InzuLink</title>
+  <title>Admin Console — InzuLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#05080f" />
+  <meta name="description" content="InzuLink admin console: users, moderation, payments, and analytics." />
+  <meta name="robots" content="noindex,nofollow" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
   <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --shadow: 0 18px 35px rgba(2,6,23,0.10);
-      --ok:#16a34a;
-      --okBg:#f0fdf4;
-      --warnBg:#fffbeb;
-      --bad:#dc2626;
-      --badBg:#fef2f2;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui;background:var(--bg);color:var(--text)}
-    .wrap{width:min(1250px,94%);margin:0 auto;padding:18px 0 44px}
+    .console-head{margin-top:16px;padding:24px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .console-head h1{font-family:var(--font-display);font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.6px;color:#fff;margin:8px 0 6px}
+    .console-head p{margin:0;color:var(--muted);line-height:1.65;max-width:70ch;font-size:.92rem}
+    .console-head .mono{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--cyan);font-size:.85em}
 
-    header{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      padding:18px;
-      display:flex;align-items:flex-start;justify-content:space-between;
-      gap:14px;flex-wrap:wrap;
-    }
-    header h1{margin:0;font-size:1.9rem;font-weight:900;letter-spacing:-.6px;color:var(--primary)}
-    header p{margin:6px 0 0;color:var(--muted);font-weight:650;line-height:1.6;max-width:860px}
+    .stat-cards{margin-top:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+    .stat-card{display:flex;gap:14px;align-items:center;padding:20px}
+    .stat-card .glyph{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:1.6rem;background:#0d1a2e;color:var(--cyan);border:1px solid var(--line-soft);flex-shrink:0}
+    .stat-card .n{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1}
+    .stat-card .l{color:var(--faint);font-weight:700;margin-top:3px;font-size:.85rem}
 
-    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
-    .btn{
-      padding:10px 12px;border-radius:12px;border:1px solid transparent;cursor:pointer;
-      font-weight:900;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;
-      background:#fff;color:var(--primary);border-color:var(--border);
-      transition:transform .12s ease, background .12s ease, border-color .12s ease;
-      text-decoration:none;white-space:nowrap;
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-    .btn.primary:hover{background:#1e293b}
-    .btn.danger{background:var(--badBg);color:#991b1b;border-color:#fecaca}
-    .btn.warn{background:var(--warnBg);color:#92400e;border-color:#fde68a}
-    .btn:disabled{opacity:.65;cursor:not-allowed}
-
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      border:1px solid var(--border);
-      background:#f1f5f9;color:#475569;
-      font-weight:900;font-size:.82rem;
-      text-transform:uppercase;letter-spacing:.4px;
-    }
-    .pill.live{background:var(--okBg);border-color:#bbf7d0;color:var(--ok)}
-    .pill.demo{background:var(--warnBg);border-color:#fde68a;color:#92400e}
-
-    .stats{margin-top:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:18px;
-      box-shadow:0 12px 30px rgba(2,6,23,.08);
-      padding:16px;
-    }
-    .stat{display:flex;gap:12px;align-items:center;}
-    .stat i{font-size:34px;color:var(--accent)}
-    .stat .n{font-size:1.6rem;font-weight:900;color:var(--primary);letter-spacing:-.3px}
-    .stat .l{color:var(--muted);font-weight:800;margin-top:2px}
-
-    .breakdown{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
-    .miniRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;font-weight:800;color:#334155;}
+    .breakdown{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    .break-card{padding:20px}
+    .break-card .bt{font-weight:800;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:9px;font-size:.95rem}
+    .break-card .bt i{color:var(--cyan);font-size:1.15rem}
+    .miniRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft);font-weight:700;color:var(--muted);font-size:.9rem}
     .miniRow:last-child{border-bottom:none}
-    .miniRow span{color:var(--muted);font-weight:800}
+    .miniRow span{color:#fff;font-weight:800}
 
-    .tabs{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
+    /* Tabs */
+    .tabs{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
     .tab{
-      padding:10px 14px;border-radius:999px;border:1px solid var(--border);
-      font-weight:900;cursor:pointer;background:#fff;color:#334155;
+      padding:10px 16px;border-radius:12px;border:1px solid var(--line-soft);
+      font-weight:800;font-size:.87rem;cursor:pointer;background:var(--surface);color:var(--muted);
       display:inline-flex;align-items:center;gap:8px;
+      transition:color .15s ease,border-color .15s ease,background .15s ease;
     }
-    .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .tab i{font-size:1.05rem}
+    .tab:hover{color:#fff;border-color:#2a3a63}
+    .tab.active{background:#0d1a2e;color:var(--cyan);border-color:#1d3f73}
     .section{display:none;margin-top:14px}
     .section.active{display:block}
+    .section-shell{padding:22px}
 
-    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
-    .sectionHead h2{margin:0;font-size:1.15rem;font-weight:900;color:var(--primary);letter-spacing:-.3px}
+    .sectionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .sectionHead h2{margin:0;font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.3px}
     .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-left:auto}
+    .tools .input,.tools .select{width:auto;min-width:200px;padding:10px 12px;font-size:.87rem}
 
-    .input{padding:10px 12px;border-radius:12px;border:1px solid #cbd5e1;outline:none;font-family:inherit;background:#fff;min-width:220px;font-weight:750;color:#0f172a;}
-    .select{padding:10px 12px;border-radius:12px;border:1px solid #cbd5e1;outline:none;font-family:inherit;background:#fff;font-weight:800;color:#0f172a;}
-    .input:focus,.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,23,42,.10)}
+    /* Tables (dark) */
+    .tableWrap{overflow:auto;border:1px solid var(--line-soft);border-radius:16px}
+    table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--bg1);min-width:920px}
+    th,td{padding:11px 12px;border-bottom:1px solid var(--line-soft);text-align:left;vertical-align:top}
+    th{background:#0c1428;font-weight:800;color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+    tbody tr:hover td{background:#0d1730}
+    tbody tr:last-child td{border-bottom:none}
+    td .cell-h{font-weight:800;color:#fff}
+    td .cell-sub{color:var(--faint);font-size:.78rem;margin-top:3px}
+    td .cell-sub.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 
-    .tableWrap{overflow:auto;border:1px solid #e5e7eb;border-radius:16px}
-    table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff;min-width:920px}
-    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-    th{position:sticky;top:0;background:#fff;font-weight:900;color:#334155;z-index:1}
-    tr:hover td{background:#fafafa}
+    /* Status tags */
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-weight:800;font-size:.74rem;border:1px solid var(--line);background:#0d1528;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+    .tag.ok{background:#062a33;border-color:#0e4a5a;color:var(--cyan)}
+    .tag.bad{background:#33101a;border-color:#5c1a2a;color:#fda4b5}
+    .tag.warn{background:#2c2107;border-color:#574410;color:#fcd34d}
 
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:.78rem;border:1px solid var(--border);background:#f1f5f9;color:#475569;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
-    .tag.ok{background:var(--okBg);border-color:#bbf7d0;color:var(--ok)}
-    .tag.bad{background:var(--badBg);border-color:#fecaca;color:var(--bad)}
-    .tag.warn{background:var(--warnBg);border-color:#fde68a;color:#92400e}
+    /* Dashboard buttons extend theme .btn */
+    .btn.primary{background:var(--cyan);color:var(--cyan-ink)}
+    .btn.primary:hover{background:#7fe7ff}
+    .btn.danger{background:#1c0b12;border-color:#5c1a2a;color:#fda4b5}
+    .btn.danger:hover{background:#2a0f18;border-color:var(--danger);color:#fff}
+    .btn.warn{background:#1d1607;border-color:#574410;color:#fcd34d}
+    .btn.warn:hover{background:#2c2107;color:#fff}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
 
-    .muted{color:var(--muted);font-weight:750}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+    .empty{padding:26px;text-align:center;color:var(--muted);font-weight:700;border:1px dashed #2a3a63;border-radius:16px;background:var(--bg1)}
 
     .toast{
-      position:fixed;bottom:18px;left:50%;
-      transform:translateX(-50%);
-      background:#0b1220;color:#fff;padding:12px 14px;border-radius:14px;
-      box-shadow:0 18px 35px rgba(2,6,23,.22);
-      font-weight:850;display:none;z-index:9999;
+      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+      background:#0d1a2e;color:#fff;padding:13px 18px;border-radius:14px;
+      border:1px solid #1d3f73;
+      box-shadow:0 18px 35px rgba(0,0,0,.5);
+      font-weight:700;font-size:.9rem;display:none;z-index:9999;
       max-width:min(92vw,720px);text-align:center;
     }
-    .empty{padding:22px;text-align:center;color:var(--muted);font-weight:800;border:1px dashed #cbd5e1;border-radius:16px;background:#fff;}
 
-    .charts{
-      display:grid;
-      gap:14px;
-      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    }
-    .chartHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
-    .chartTitle{font-weight:900;color:var(--primary);display:flex;align-items:center;gap:10px}
-    .chartHint{color:var(--muted);font-weight:750;font-size:.92rem;line-height:1.5}
-    canvas{
-      width:100%;
-      height:260px;
-      border:1px solid #f1f5f9;
-      border-radius:14px;
-      background:#fff;
-    }
+    /* Charts */
+    .charts{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+    .chart-card{padding:18px;background:var(--bg1)}
+    .chartHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .chartTitle{font-weight:800;color:#fff;display:flex;align-items:center;gap:9px;font-size:.93rem}
+    .chartTitle i{color:var(--cyan);font-size:1.1rem}
+    .chartHint{color:var(--faint);font-weight:600;font-size:.8rem}
+    canvas{width:100%;height:260px;border:1px solid var(--line-soft);border-radius:14px;background:#070d18}
 
-    footer{margin-top:18px;background:var(--primary);border-radius:22px;padding:22px 16px;color:#94a3b8;text-align:center;}
+    .mini-foot{margin:26px 0;text-align:center;color:var(--faint);font-size:.85rem;font-weight:600}
+
+    @media (max-width:640px){
+      .tools .input,.tools .select{min-width:0;flex:1}
+      .section-shell{padding:16px}
+    }
   </style>
 
   <script>
@@ -162,57 +122,57 @@
   <div id="appNavbar"></div>
 
   <main class="wrap">
-    <header>
+    <section class="panel console-head">
       <div>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <h1>Admin Dashboard</h1>
-          <span id="modePill" class="pill demo">DEMO MODE</span>
+        <div class="row">
+          <span class="kicker">Admin console</span>
+          <span id="modePill" class="chip chip-warn">Demo mode</span>
         </div>
+        <h1>Mission control</h1>
         <p>
-          Manage users, verify payments, approve promotions, monitor analytics, and manage featured listings.
-          Set <span class="mono">API_BASE</span> to connect to your hosted backend.
+          Users, verification, promotions, analytics, and featured listings.
+          Set <span class="mono">API_BASE</span> to connect the live backend — otherwise you're browsing demo data.
         </p>
       </div>
-
-      <div class="actions">
-        <button class="btn" type="button" onclick="openSetApi()"><i class="ph ph-gear"></i> API_BASE</button>
-        <button class="btn primary" type="button" onclick="refreshAll()"><i class="ph ph-arrows-clockwise"></i> Refresh All</button>
+      <div class="row">
+        <button class="btn btn-dark btn-sm" type="button" onclick="openSetApi()"><i class="ph ph-gear"></i> API base</button>
+        <button class="btn btn-solid btn-sm" type="button" onclick="refreshAll()"><i class="ph ph-arrows-clockwise"></i> Refresh all</button>
       </div>
-    </header>
+    </section>
 
-    <section class="stats">
-      <div class="card stat"><i class="ph ph-users"></i><div><div class="n" id="statUsers">—</div><div class="l">Total users</div></div></div>
-      <div class="card stat"><i class="ph ph-house"></i><div><div class="n" id="statProps">—</div><div class="l">Total properties</div></div></div>
-      <div class="card stat"><i class="ph ph-eye"></i><div><div class="n" id="statLeads">—</div><div class="l">Total views (leads)</div></div></div>
-      <div class="card stat"><i class="ph ph-currency-circle-dollar"></i><div><div class="n" id="statAvg">—</div><div class="l">Avg rent (RWF)</div></div></div>
+    <section class="stat-cards">
+      <div class="panel stat-card"><div class="glyph"><i class="ph ph-users"></i></div><div><div class="n" id="statUsers">—</div><div class="l">Total users</div></div></div>
+      <div class="panel stat-card"><div class="glyph"><i class="ph ph-house"></i></div><div><div class="n" id="statProps">—</div><div class="l">Total properties</div></div></div>
+      <div class="panel stat-card"><div class="glyph"><i class="ph ph-eye"></i></div><div><div class="n" id="statLeads">—</div><div class="l">Total views</div></div></div>
+      <div class="panel stat-card"><div class="glyph"><i class="ph ph-currency-circle-dollar"></i></div><div><div class="n" id="statAvg">—</div><div class="l">Avg rent (RWF)</div></div></div>
     </section>
 
     <section class="breakdown">
-      <div class="card">
-        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-shield-check"></i> Safety</div>
+      <div class="panel break-card">
+        <div class="bt"><i class="ph ph-shield-check"></i> Safety</div>
         <div class="miniRow"><div>Active users</div><span id="bdActive">—</span></div>
         <div class="miniRow"><div>Banned users</div><span id="bdBanned">—</span></div>
         <div class="miniRow"><div>Verified agents</div><span id="bdVerified">—</span></div>
       </div>
 
-      <div class="card">
-        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-user-gear"></i> Roles</div>
+      <div class="panel break-card">
+        <div class="bt"><i class="ph ph-user-gear"></i> Roles</div>
         <div class="miniRow"><div>Landlords</div><span id="bdLandlords">—</span></div>
         <div class="miniRow"><div>Seekers</div><span id="bdSeekers">—</span></div>
         <div class="miniRow"><div>Admins</div><span id="bdAdmins">—</span></div>
       </div>
 
-      <div class="card">
-        <div style="font-weight:900;color:var(--primary);margin-bottom:8px;"><i class="ph ph-star"></i> Monetization</div>
+      <div class="panel break-card">
+        <div class="bt"><i class="ph ph-star"></i> Monetization</div>
         <div class="miniRow"><div>Pro users</div><span id="bdPro">—</span></div>
         <div class="miniRow"><div>Pending Pro requests</div><span id="bdProPending">—</span></div>
         <div class="miniRow"><div>Pending promotions</div><span id="bdPromoPending">—</span></div>
       </div>
     </section>
 
-    <div class="tabs">
+    <div class="tabs" role="tablist">
       <div class="tab active" data-tab="reports"><i class="ph ph-chart-line"></i> Charts & Reports</div>
-      <div class="tab" data-tab="featured"><i class="ph ph-star"></i> Featured Listings</div>
+      <div class="tab" data-tab="featured"><i class="ph ph-star"></i> Featured</div>
       <div class="tab" data-tab="moderation"><i class="ph ph-shield-check"></i> Moderation</div>
       <div class="tab" data-tab="users"><i class="ph ph-users"></i> Users</div>
       <div class="tab" data-tab="pro"><i class="ph ph-trophy"></i> Pro Requests</div>
@@ -222,7 +182,7 @@
     </div>
 
     <section class="section active" id="reports">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
           <h2>Charts & market intelligence</h2>
           <div class="tools">
@@ -231,12 +191,12 @@
               <option value="30" selected>Last 30 days</option>
               <option value="90">Last 90 days</option>
             </select>
-            <button class="btn primary" onclick="loadReports(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <button class="btn primary btn-sm" onclick="loadReports(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
         <div class="charts" style="margin-bottom:14px;">
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-users"></i> New users per day</div>
               <div class="chartHint">Signup growth trend.</div>
@@ -244,7 +204,7 @@
             <canvas id="tsUsers"></canvas>
           </div>
 
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-house"></i> New properties per day</div>
               <div class="chartHint">Supply trend (new listings).</div>
@@ -252,7 +212,7 @@
             <canvas id="tsProps"></canvas>
           </div>
 
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-receipt"></i> Transactions per day</div>
               <div class="chartHint">Monetization activity.</div>
@@ -260,7 +220,7 @@
             <canvas id="tsTx"></canvas>
           </div>
 
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-file-doc"></i> Contracts per day</div>
               <div class="chartHint">Usage signal (agreements).</div>
@@ -270,7 +230,7 @@
         </div>
 
         <div class="charts">
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-map-pin"></i> Avg rent by district</div>
               <div class="chartHint">Based on available rent listings.</div>
@@ -279,38 +239,38 @@
             <div id="repPricing" class="muted" style="margin-top:10px;">Loading…</div>
           </div>
 
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-stack"></i> Inventory by category</div>
-              <div class="chartHint">Shows supply distribution.</div>
+              <div class="chartHint">Supply distribution.</div>
             </div>
             <canvas id="chartInventory"></canvas>
             <div id="repInventory" class="muted" style="margin-top:10px;">Loading…</div>
           </div>
 
-          <div class="card" style="box-shadow:none;border-color:#f1f5f9;">
+          <div class="panel chart-card">
             <div class="chartHead">
               <div class="chartTitle"><i class="ph ph-magnifying-glass"></i> Top search terms</div>
-              <div class="chartHint">Requires search logging to be real.</div>
+              <div class="chartHint">Needs search logging to be real.</div>
             </div>
             <canvas id="chartDemand"></canvas>
             <div id="repDemand" class="muted" style="margin-top:10px;">Loading…</div>
           </div>
         </div>
 
-        <div style="margin-top:14px;" class="muted">
-          Tip: Later, we’ll enable <span class="mono">/api/analytics/search</span> to insert into <span class="mono">SearchLogs</span>.
+        <div class="muted" style="margin-top:14px;font-size:.85rem">
+          Tip: enabling <span class="mono" style="font-family:ui-monospace,Menlo,monospace;color:var(--cyan)">/api/analytics/search</span> inserts will make the demand chart live.
         </div>
       </div>
     </section>
 
     <section class="section" id="featured">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
-          <h2>Featured listings (manage)</h2>
+          <h2>Featured listings</h2>
           <div class="tools">
-            <input id="featuredSearch" class="input" placeholder="Search title/district/category..." />
-            <button class="btn primary" onclick="loadFeatured(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <input id="featuredSearch" class="input" placeholder="Search title / district / category…" />
+            <button class="btn primary btn-sm" onclick="loadFeatured(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -323,20 +283,19 @@
                 <th>Category</th>
                 <th>Price</th>
                 <th>Created</th>
-                <th style="min-width:220px;">Action</th>
+                <th style="min-width:200px;">Action</th>
               </tr>
             </thead>
             <tbody id="featuredTable"></tbody>
           </table>
         </div>
 
-        <div id="featuredEmpty" class="empty" style="display:none;">No featured properties found.</div>
+        <div id="featuredEmpty" class="empty" style="display:none;margin-top:12px">No featured properties found.</div>
       </div>
     </section>
 
-    <!-- MODERATION (UI already present; now we wire it in JS below) -->
     <section class="section" id="moderation">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
           <h2>Property moderation</h2>
           <div class="tools">
@@ -345,8 +304,8 @@
               <option value="Approved">Approved</option>
               <option value="Rejected">Rejected</option>
             </select>
-            <input id="modSearch" class="input" placeholder="Search title/district/landlord phone..." />
-            <button class="btn primary" onclick="loadModeration(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <input id="modSearch" class="input" placeholder="Search title / district / landlord…" />
+            <button class="btn primary btn-sm" onclick="loadModeration(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -361,23 +320,23 @@
                 <th>Price</th>
                 <th>Status</th>
                 <th>Created</th>
-                <th style="min-width:320px;">Actions</th>
+                <th style="min-width:300px;">Actions</th>
               </tr>
             </thead>
             <tbody id="modTable"></tbody>
           </table>
         </div>
 
-        <div id="modEmpty" class="empty" style="display:none;">No properties found for this status.</div>
+        <div id="modEmpty" class="empty" style="display:none;margin-top:12px">No properties found for this status.</div>
       </div>
     </section>
 
     <section class="section" id="users">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
-          <h2>Users management</h2>
+          <h2>Users</h2>
           <div class="tools">
-            <input id="userSearch" class="input" placeholder="Search name/email/phone/nida..." />
+            <input id="userSearch" class="input" placeholder="Search name / email / phone…" />
             <select id="userRoleFilter" class="select">
               <option value="">All roles</option>
               <option value="Admin">Admin</option>
@@ -389,7 +348,7 @@
               <option value="Active">Active</option>
               <option value="Banned">Banned</option>
             </select>
-            <button class="btn primary" onclick="loadUsers(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <button class="btn primary btn-sm" onclick="loadUsers(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -403,23 +362,23 @@
                 <th>Plan</th>
                 <th>Status</th>
                 <th>Created</th>
-                <th style="min-width:220px;">Actions</th>
+                <th style="min-width:200px;">Actions</th>
               </tr>
             </thead>
             <tbody id="usersTable"></tbody>
           </table>
         </div>
-        <div id="usersEmpty" class="empty" style="display:none;">No users to display.</div>
+        <div id="usersEmpty" class="empty" style="display:none;margin-top:12px">No users to display.</div>
       </div>
     </section>
 
     <section class="section" id="pro">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
-          <h2>Pro requests (pending verification)</h2>
+          <h2>Pro requests <span class="muted" style="font-size:.85rem;font-weight:600">· pending verification</span></h2>
           <div class="tools">
-            <input id="proSearch" class="input" placeholder="Search name/phone..." />
-            <button class="btn primary" onclick="loadProRequests(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <input id="proSearch" class="input" placeholder="Search name / phone…" />
+            <button class="btn primary btn-sm" onclick="loadProRequests(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -429,17 +388,17 @@
             <tbody id="proTable"></tbody>
           </table>
         </div>
-        <div id="proEmpty" class="empty" style="display:none;">No pending pro requests.</div>
+        <div id="proEmpty" class="empty" style="display:none;margin-top:12px">No pending pro requests.</div>
       </div>
     </section>
 
     <section class="section" id="promo">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
-          <h2>Property promotions (pending payments)</h2>
+          <h2>Promotions <span class="muted" style="font-size:.85rem;font-weight:600">· pending payments</span></h2>
           <div class="tools">
-            <input id="promoSearch" class="input" placeholder="Search title/phone..." />
-            <button class="btn primary" onclick="loadPendingPromos(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <input id="promoSearch" class="input" placeholder="Search title / phone…" />
+            <button class="btn primary btn-sm" onclick="loadPendingPromos(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -449,22 +408,22 @@
             <tbody id="promoTable"></tbody>
           </table>
         </div>
-        <div id="promoEmpty" class="empty" style="display:none;">No pending promotions.</div>
+        <div id="promoEmpty" class="empty" style="display:none;margin-top:12px">No pending promotions.</div>
       </div>
     </section>
 
     <section class="section" id="transactions">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
           <h2>Transactions</h2>
           <div class="tools">
-            <input id="txSearch" class="input" placeholder="Search user/phone/type..." />
+            <input id="txSearch" class="input" placeholder="Search user / phone / type…" />
             <select id="txTypeFilter" class="select">
               <option value="">All types</option>
               <option value="ProSubscription">ProSubscription</option>
               <option value="PropertyBoost">PropertyBoost</option>
             </select>
-            <button class="btn primary" onclick="loadTransactions(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <button class="btn primary btn-sm" onclick="loadTransactions(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -474,17 +433,17 @@
             <tbody id="txTable"></tbody>
           </table>
         </div>
-        <div id="txEmpty" class="empty" style="display:none;">No transactions found.</div>
+        <div id="txEmpty" class="empty" style="display:none;margin-top:12px">No transactions found.</div>
       </div>
     </section>
 
     <section class="section" id="contracts">
-      <div class="card">
+      <div class="panel section-shell">
         <div class="sectionHead">
           <h2>Contract logs</h2>
           <div class="tools">
-            <input id="contractSearch" class="input" placeholder="Search landlord/tenant/district..." />
-            <button class="btn primary" onclick="loadContracts(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+            <input id="contractSearch" class="input" placeholder="Search landlord / tenant / district…" />
+            <button class="btn primary btn-sm" onclick="loadContracts(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
           </div>
         </div>
 
@@ -494,14 +453,14 @@
             <tbody id="contractsTable"></tbody>
           </table>
         </div>
-        <div id="contractsEmpty" class="empty" style="display:none;">No contracts logged.</div>
+        <div id="contractsEmpty" class="empty" style="display:none;margin-top:12px">No contracts logged.</div>
       </div>
     </section>
 
-    <footer>© 2026 InzuLink — Admin Panel</footer>
+    <div class="mini-foot">© 2026 InzuLink · Admin console</div>
   </main>
 
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status"></div>
 
   <script src="./assets/navbar.js"></script>
 
@@ -511,8 +470,8 @@
     const isLive = !!API_BASE;
 
     const modePill = document.getElementById("modePill");
-    modePill.textContent = isLive ? "LIVE MODE" : "DEMO MODE";
-    modePill.className = "pill " + (isLive ? "live" : "demo");
+    modePill.textContent = isLive ? "Live mode" : "Demo mode";
+    modePill.className = "chip " + (isLive ? "chip-live" : "chip-warn");
 
     // Tabs
     const tabs = document.querySelectorAll(".tab");
@@ -534,6 +493,9 @@
       toastTimer = setTimeout(() => toastEl.style.display = "none", 2600);
     }
 
+    function esc(v){
+      return String(v ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
     function safe(v){ return (v === null || v === undefined) ? "—" : String(v); }
     function fmtDate(s){
       if (!s) return "—";
@@ -658,7 +620,19 @@
       document.getElementById("bdPromoPending").textContent = statePromo.length.toLocaleString();
     }
 
-    // ---------- Charts (no libs) ----------
+    // ---------- Charts (no libs, dark palette) ----------
+    const CH = {
+      bg: "#070d18",
+      grid: "#141d33",
+      axis: "#2a3a63",
+      text: "#8fa0c2",
+      label: "#e9effc",
+      bar: "#2fd8ff",
+      barTop: "rgba(255,255,255,0.30)",
+      line: "#2fd8ff",
+      dot: "#7fe7ff"
+    };
+
     function setCanvasDPI(canvas){
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
@@ -676,13 +650,13 @@
       if (!canvas) return;
       const { ctx, w, h } = setCanvasDPI(canvas);
       ctx.clearRect(0,0,w,h);
-      ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = CH.bg; ctx.fillRect(0,0,w,h);
 
       const top=10, left=42, right=10, bottom=46;
       const pw=w-left-right, ph=h-top-bottom;
 
       if (!labels.length){
-        ctx.fillStyle="#64748b"; ctx.font="800 14px Inter,system-ui";
+        ctx.fillStyle=CH.text; ctx.font="700 14px Inter,system-ui";
         ctx.fillText("No data", 16, 26);
         return;
       }
@@ -690,8 +664,8 @@
       const maxV = Math.max(...values, 1);
       const gridLines = opts.gridLines ?? 4;
 
-      ctx.strokeStyle="#eef2f7"; ctx.lineWidth=1;
-      ctx.fillStyle="#64748b"; ctx.font="800 12px Inter,system-ui";
+      ctx.strokeStyle=CH.grid; ctx.lineWidth=1;
+      ctx.fillStyle=CH.text; ctx.font="700 12px Inter,system-ui";
 
       for (let i=0;i<=gridLines;i++){
         const y = top + (ph * i / gridLines);
@@ -711,13 +685,13 @@
         const x=left + i*(barW+gap);
         const y=top + ph - barH;
 
-        ctx.fillStyle="#f59e0b";
+        ctx.fillStyle=CH.bar;
         ctx.fillRect(x,y,barW,barH);
-        ctx.fillStyle="rgba(255,255,255,0.25)";
+        ctx.fillStyle=CH.barTop;
         ctx.fillRect(x,y,barW,3);
 
-        ctx.fillStyle="#334155";
-        ctx.font="800 11px Inter,system-ui";
+        ctx.fillStyle=CH.label;
+        ctx.font="700 11px Inter,system-ui";
         const label=String(labels[i]);
         const short=label.length>10 ? label.slice(0,9)+"…" : label;
 
@@ -729,7 +703,7 @@
         ctx.restore();
       }
 
-      ctx.strokeStyle="#cbd5e1";
+      ctx.strokeStyle=CH.axis;
       ctx.beginPath();
       ctx.moveTo(left,top);
       ctx.lineTo(left,top+ph);
@@ -742,13 +716,13 @@
       if (!canvas) return;
       const { ctx, w, h } = setCanvasDPI(canvas);
       ctx.clearRect(0,0,w,h);
-      ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle=CH.bg; ctx.fillRect(0,0,w,h);
 
       const top=12, left=42, right=14, bottom=34;
       const pw=w-left-right, ph=h-top-bottom;
 
       if (!labels.length){
-        ctx.fillStyle="#64748b"; ctx.font="800 14px Inter,system-ui";
+        ctx.fillStyle=CH.text; ctx.font="700 14px Inter,system-ui";
         ctx.fillText("No data", 16, 26);
         return;
       }
@@ -756,8 +730,8 @@
       const maxV = Math.max(...values, 1);
       const gridLines = 3;
 
-      ctx.strokeStyle="#eef2f7"; ctx.lineWidth=1;
-      ctx.fillStyle="#64748b"; ctx.font="800 12px Inter,system-ui";
+      ctx.strokeStyle=CH.grid; ctx.lineWidth=1;
+      ctx.fillStyle=CH.text; ctx.font="700 12px Inter,system-ui";
       for (let i=0;i<=gridLines;i++){
         const y = top + (ph * i / gridLines);
         ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(left+pw,y); ctx.stroke();
@@ -768,8 +742,25 @@
       const n = values.length;
       const step = n>1 ? pw/(n-1) : pw;
 
-      ctx.strokeStyle="#f59e0b";
-      ctx.lineWidth=3;
+      // area fill
+      const grad = ctx.createLinearGradient(0, top, 0, top+ph);
+      grad.addColorStop(0, "rgba(47,216,255,0.25)");
+      grad.addColorStop(1, "rgba(47,216,255,0.02)");
+      ctx.beginPath();
+      for (let i=0;i<n;i++){
+        const x = left + i*step;
+        const y = top + ph - (values[i]/maxV)*ph;
+        if (i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.lineTo(left + (n-1)*step, top+ph);
+      ctx.lineTo(left, top+ph);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.strokeStyle=CH.line;
+      ctx.lineWidth=2.5;
       ctx.beginPath();
       for (let i=0;i<n;i++){
         const x = left + i*step;
@@ -779,15 +770,15 @@
       }
       ctx.stroke();
 
-      ctx.fillStyle="#0f172a";
-      for (let i=0;i<n;i++){
+      ctx.fillStyle=CH.dot;
+      for (let i=0;i<n;i+=Math.ceil(n/30)){
         const x = left + i*step;
         const y = top + ph - (values[i]/maxV)*ph;
-        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2); ctx.fill();
       }
 
-      ctx.fillStyle="#334155";
-      ctx.font="800 11px Inter,system-ui";
+      ctx.fillStyle=CH.label;
+      ctx.font="700 11px Inter,system-ui";
       const ticks = Math.min(6, n);
       for (let t=0;t<ticks;t++){
         const idx = Math.round(t*(n-1)/(ticks-1 || 1));
@@ -796,7 +787,7 @@
         ctx.fillText(labels[idx], x, top+ph+22);
       }
 
-      ctx.strokeStyle="#cbd5e1";
+      ctx.strokeStyle=CH.axis;
       ctx.beginPath();
       ctx.moveTo(left,top);
       ctx.lineTo(left,top+ph);
@@ -813,15 +804,15 @@
       const R = stateReports || { pricing:[], inventory:[], demand:[] };
 
       repPricing.innerHTML = R.pricing?.length
-        ? R.pricing.map(x => `<div class="miniRow"><div>${safe(x.district)}</div><span>${fmtMoney(x.avg_price)}</span></div>`).join("")
+        ? R.pricing.map(x => `<div class="miniRow"><div>${esc(x.district)}</div><span>${fmtMoney(x.avg_price)}</span></div>`).join("")
         : `<div class="muted">No pricing data.</div>`;
 
       repInventory.innerHTML = R.inventory?.length
-        ? R.inventory.map(x => `<div class="miniRow"><div>${safe(x.category)}</div><span>${safe(x.count)}</span></div>`).join("")
+        ? R.inventory.map(x => `<div class="miniRow"><div>${esc(x.category)}</div><span>${esc(x.count)}</span></div>`).join("")
         : `<div class="muted">No inventory data.</div>`;
 
       repDemand.innerHTML = R.demand?.length
-        ? R.demand.map(x => `<div class="miniRow"><div>${safe(x.term)}</div><span>${safe(x.searches)}</span></div>`).join("")
+        ? R.demand.map(x => `<div class="miniRow"><div>${esc(x.term)}</div><span>${esc(x.searches)}</span></div>`).join("")
         : `<div class="muted">No search trends yet.</div>`;
 
       drawBarChart("chartPricing", (R.pricing||[]).map(x=>x.district), (R.pricing||[]).map(x=>Number(x.avg_price||0)), {
@@ -857,15 +848,15 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>
-            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
-            <div class="muted mono">Property ID: ${safe(p.property_id)}</div>
+            <div class="cell-h">${esc(p.title)}</div>
+            <div class="cell-sub mono">Property ID: ${esc(p.property_id)}</div>
           </td>
-          <td>${safe(p.location)} • ${safe(p.district)}</td>
-          <td><span class="tag ok">${safe(p.category)}</span></td>
-          <td style="font-weight:900;color:var(--primary);">${fmtMoney(p.price)}</td>
+          <td>${esc(p.location)} · ${esc(p.district)}</td>
+          <td><span class="tag ok">${esc(p.category)}</span></td>
+          <td><span class="cell-h">${fmtMoney(p.price ?? p.price_per_month)}</span></td>
           <td class="muted">${fmtDate(p.created_at)}</td>
           <td>
-            <button class="btn danger" onclick="setFeatured(${p.property_id}, false)">
+            <button class="btn danger btn-sm" onclick="setFeatured(${p.property_id}, false)">
               <i class="ph ph-star-half"></i> Unfeature
             </button>
           </td>
@@ -899,7 +890,7 @@
       }
     }
 
-    // ---------- Moderation (C) ----------
+    // ---------- Moderation ----------
     const modTable = document.getElementById("modTable");
     const modEmpty = document.getElementById("modEmpty");
 
@@ -927,23 +918,23 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>
-            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
-            <div class="muted mono">ID: ${safe(p.property_id)}</div>
-            ${p.rejection_reason ? `<div class="muted" style="margin-top:6px;">Reason: ${safe(p.rejection_reason)}</div>` : ""}
+            <div class="cell-h">${esc(p.title)}</div>
+            <div class="cell-sub mono">ID: ${esc(p.property_id)}</div>
+            ${p.rejection_reason ? `<div class="cell-sub" style="margin-top:6px;">Reason: ${esc(p.rejection_reason)}</div>` : ""}
           </td>
           <td>
-            <div style="font-weight:900;color:var(--primary);">${safe(p.landlord_name || "—")}</div>
-            <div class="muted mono">${safe(p.landlord_phone || "—")}</div>
+            <div class="cell-h">${esc(p.landlord_name || "—")}</div>
+            <div class="cell-sub mono">${esc(p.landlord_phone || "—")}</div>
           </td>
-          <td>${safe(p.location)} • ${safe(p.district)}</td>
-          <td><span class="tag">${safe(p.category)}</span></td>
-          <td style="font-weight:900;color:var(--primary);">${fmtMoney(p.price)}</td>
+          <td>${esc(p.location)} · ${esc(p.district)}</td>
+          <td><span class="tag">${esc(p.category)}</span></td>
+          <td><span class="cell-h">${fmtMoney(p.price ?? p.price_per_month)}</span></td>
           <td>${tagPropertyStatus(p.status)}</td>
           <td class="muted">${fmtDate(p.created_at)}</td>
-          <td style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn primary" onclick="approveProperty(${p.property_id})"><i class="ph ph-check-circle"></i> Approve</button>
-            <button class="btn danger" onclick="rejectProperty(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
-            <button class="btn warn" onclick="removeProperty(${p.property_id})"><i class="ph ph-trash"></i> Remove</button>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn primary btn-sm" onclick="approveProperty(${p.property_id})"><i class="ph ph-check-circle"></i> Approve</button>
+            <button class="btn danger btn-sm" onclick="rejectProperty(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
+            <button class="btn warn btn-sm" onclick="removeProperty(${p.property_id})"><i class="ph ph-trash"></i> Remove</button>
           </td>
         `;
         modTable.appendChild(row);
@@ -954,7 +945,6 @@
       const status = (document.getElementById("modStatus").value || "Pending").toString();
       try{
         if (!isLive){
-          // demo: filter by status
           stateModeration = (DEMO.moderation || []).filter(x => (x.status||"Pending") === status);
           renderModeration();
           return;
@@ -1078,14 +1068,14 @@
         const isBanned = (u.status||"") === "Banned";
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><div style="font-weight:900;color:var(--primary);">${safe(u.full_name)}</div><div class="muted mono">ID: ${safe(u.user_id)}</div></td>
-          <td><div>${safe(u.email)}</div><div class="muted">${safe(u.phone)} • NIDA: <span class="mono">${safe(u.nida_number)}</span></div></td>
+          <td><div class="cell-h">${esc(u.full_name)}</div><div class="cell-sub mono">ID: ${esc(u.user_id)}</div></td>
+          <td><div>${esc(u.email)}</div><div class="cell-sub">${esc(u.phone)} · NIDA: <span class="mono">${esc(u.nida_number)}</span></div></td>
           <td>${userTagRole(u.role)}</td>
           <td>${userTagPlan(u.subscription_plan, u.is_verified_agent)}</td>
           <td>${userTagStatus(u.status)}</td>
           <td class="muted">${fmtDate(u.created_at)}</td>
           <td>
-            <button class="btn ${isBanned ? "primary" : "danger"}" onclick="toggleBan(${u.user_id}, ${isBanned})">
+            <button class="btn btn-sm ${isBanned ? "primary" : "danger"}" onclick="toggleBan(${u.user_id}, ${isBanned})">
               <i class="ph ${isBanned ? "ph-check-circle" : "ph-prohibit"}"></i> ${isBanned ? "Activate" : "Ban"}
             </button>
           </td>
@@ -1125,9 +1115,9 @@
       for (const r of list){
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><div style="font-weight:900;color:var(--primary);">${safe(r.full_name)}</div><div class="muted mono">User ID: ${safe(r.user_id)}</div></td>
-          <td class="mono">${safe(r.pro_payment_phone)}</td>
-          <td><button class="btn primary" onclick="approvePro(${r.user_id})"><i class="ph ph-check-circle"></i> Approve Pro</button></td>
+          <td><div class="cell-h">${esc(r.full_name)}</div><div class="cell-sub mono">User ID: ${esc(r.user_id)}</div></td>
+          <td class="mono" style="font-family:ui-monospace,Menlo,monospace">${esc(r.pro_payment_phone)}</td>
+          <td><button class="btn primary btn-sm" onclick="approvePro(${r.user_id})"><i class="ph ph-check-circle"></i> Approve Pro</button></td>
         `;
         proTable.appendChild(row);
       }
@@ -1164,13 +1154,13 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>
-            <div style="font-weight:900;color:var(--primary);">${safe(p.title)}</div>
-            <div class="muted mono">Property ID: ${safe(p.property_id)}</div>
+            <div class="cell-h">${esc(p.title)}</div>
+            <div class="cell-sub mono">Property ID: ${esc(p.property_id)}</div>
           </td>
-          <td class="mono">${safe(p.payer_phone)}</td>
-          <td style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn primary" onclick="approvePromo(${p.property_id})"><i class="ph ph-star"></i> Approve Featured</button>
-            <button class="btn danger" onclick="rejectPromo(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
+          <td class="mono" style="font-family:ui-monospace,Menlo,monospace">${esc(p.payer_phone)}</td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn primary btn-sm" onclick="approvePromo(${p.property_id})"><i class="ph ph-star"></i> Approve Featured</button>
+            <button class="btn danger btn-sm" onclick="rejectPromo(${p.property_id})"><i class="ph ph-x-circle"></i> Reject</button>
           </td>
         `;
         promoTable.appendChild(row);
@@ -1233,14 +1223,14 @@
       for (const t of list){
         const statusTag = (t.status || "").toLowerCase() === "success"
           ? `<span class="tag ok">Success</span>`
-          : `<span class="tag bad">${safe(t.status)}</span>`;
+          : `<span class="tag bad">${esc(t.status)}</span>`;
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><div style="font-weight:900;color:var(--primary);">${safe(t.full_name || "—")}</div><div class="muted mono">Tx ID: ${safe(t.id)}</div></td>
-          <td class="mono">${safe(t.phone_number)}</td>
-          <td style="font-weight:900;color:var(--primary);">${fmtMoney(t.amount)}</td>
-          <td><span class="tag">${safe(t.payment_type)}</span></td>
+          <td><div class="cell-h">${esc(t.full_name || "—")}</div><div class="cell-sub mono">Tx ID: ${esc(t.id)}</div></td>
+          <td class="mono" style="font-family:ui-monospace,Menlo,monospace">${esc(t.phone_number)}</td>
+          <td><span class="cell-h">${fmtMoney(t.amount)}</span></td>
+          <td><span class="tag">${esc(t.payment_type)}</span></td>
           <td>${statusTag}</td>
           <td class="muted">${fmtDate(t.created_at)}</td>
         `;
@@ -1259,11 +1249,11 @@
       for (const c of list){
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td style="font-weight:900;color:var(--primary);">${safe(c.landlord_name)}</td>
-          <td>${safe(c.tenant_name)}</td>
-          <td class="mono">${safe(c.tenant_id)}</td>
-          <td>${safe(c.property_district)}</td>
-          <td style="font-weight:900;color:var(--primary);">${fmtMoney(c.rent_amount)}</td>
+          <td><span class="cell-h">${esc(c.landlord_name)}</span></td>
+          <td>${esc(c.tenant_name)}</td>
+          <td class="mono" style="font-family:ui-monospace,Menlo,monospace">${esc(c.tenant_id)}</td>
+          <td>${esc(c.property_district)}</td>
+          <td><span class="cell-h">${fmtMoney(c.rent_amount)}</span></td>
           <td class="muted">${fmtDate(c.generated_at)}</td>
         `;
         contractsTable.appendChild(row);
@@ -1296,24 +1286,6 @@
     async function loadFeatured(){
       try{ stateFeatured = isLive ? await fetchJSON("/api/admin/featured-properties", {}, 20000) : DEMO.featured; renderFeatured(); }
       catch(e){ stateFeatured = DEMO.featured; renderFeatured(); toast("Featured loaded (demo fallback)."); }
-    }
-
-    async function loadModeration(){
-      try{
-        if (!isLive){
-          const status = (document.getElementById("modStatus").value || "Pending").toString();
-          stateModeration = (DEMO.moderation || []).filter(x => (x.status||"Pending") === status);
-          renderModeration();
-          return;
-        }
-        const status = (document.getElementById("modStatus").value || "Pending").toString();
-        stateModeration = await fetchJSON(`/api/admin/properties?status=${encodeURIComponent(status)}&limit=200`, {}, 20000);
-        renderModeration();
-      } catch(e){
-        stateModeration = [];
-        renderModeration();
-        toast("Moderation list failed to load.");
-      }
     }
 
     async function loadTransactions(){

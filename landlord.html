@@ -2,381 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Landlord Dashboard — InzuLink</title>
+  <title>Seller Dashboard — InzuLink</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#05080f" />
   <meta name="description" content="Manage your listings, promotion, and subscription plan on InzuLink." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Shared navbar styles -->
+  <!-- Shared styles -->
   <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
   <style>
-    :root{
-      --primary:#0f172a;
-      --accent:#f59e0b;
-      --accent-hover:#d97706;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --shadow: 0 18px 35px rgba(2,6,23,0.10);
+    .dash-head{margin-top:16px;padding:24px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .dash-head h1{font-family:var(--font-display);font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.6px;color:#fff;margin:8px 0 6px}
+    .dash-head .sub{color:var(--muted);font-weight:600;margin:0;max-width:60ch;line-height:1.65}
 
-      --success:#10b981;
-      --success-bg:#f0fdf4;
-      --danger:#dc2626;
-      --danger-bg:#fef2f2;
-      --warn:#f59e0b;
-      --warn-bg:#fffbeb;
-    }
+    .plan-banner{margin-top:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .plan-banner .perks{color:var(--muted);font-size:.9rem;margin-top:8px}
+    .plan-banner .perks b{color:var(--text)}
 
-    body{ margin:0; font-family:Inter,system-ui,Arial; background:var(--bg); color:var(--text); }
+    .manage-list{display:grid;gap:14px;margin-top:16px}
+    .manage-card{
+      display:grid;grid-template-columns:150px 1fr auto;
+      gap:18px;align-items:center;
+      background:var(--surface);border:1px solid var(--line-soft);
+      border-radius:20px;padding:16px;
+    }
+    .manage-thumb{width:150px;height:112px;border-radius:14px;object-fit:cover;background:#0e1628}
+    .manage-card h3{margin:0 0 4px;font-size:1.05rem;color:#fff;letter-spacing:-.2px}
+    .manage-card .loc{color:var(--muted);font-size:.88rem;font-weight:600}
+    .manage-card .loc b{color:var(--cyan)}
+    .manage-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+    .views{color:var(--faint);font-size:.82rem;font-weight:700}
+    .manage-actions{display:flex;gap:8px;align-items:center}
+    .icon-btn{
+      width:42px;height:42px;border-radius:12px;
+      border:1px solid var(--line);background:#0a1120;color:var(--muted);
+      display:grid;place-items:center;font-size:1.15rem;cursor:pointer;
+      transition:border-color .15s ease,color .15s ease,background .15s ease;
+    }
+    .icon-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+    .icon-btn.danger:hover{border-color:var(--danger);color:var(--danger);background:#1c0b12}
+    .promote-btn{cursor:pointer}
 
-    .wrap{
-      width:min(1200px, 92%);
-      margin:0 auto;
-      padding: 18px 0 46px;
-    }
+    .empty-state{margin-top:16px;padding:48px 24px;text-align:center}
+    .empty-state i{font-size:3.2rem;color:#1c2947}
+    .empty-state h2{font-family:var(--font-display);color:#fff;margin:12px 0 6px}
+    .empty-state p{color:var(--muted);margin:0 0 18px}
 
-    .top{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
+    .momo-box{
+      background:#171106;border:1px solid #574410;border-radius:16px;
+      padding:16px;margin-bottom:14px;color:#d8c49a;font-size:.9rem;line-height:1.6;
     }
+    .momo-box strong{color:var(--warn)}
+    .momo-code{
+      display:block;margin-top:10px;padding:13px;border-radius:12px;
+      border:2px dashed #574410;background:#0d0a05;
+      font-weight:800;color:#fff;letter-spacing:1px;text-align:center;font-size:1.05rem;
+    }
+    .modal-btns{display:flex;gap:10px;margin-top:16px}
+    .modal-btns .btn{flex:1;justify-content:center}
 
-    .title{
-      margin:0;
-      font-size: clamp(1.45rem, 2.8vw, 2.1rem);
-      font-weight: 900;
-      letter-spacing:-0.6px;
-      color: var(--primary);
-    }
-    .sub{
-      margin:6px 0 0;
-      color: var(--muted);
-      font-weight: 650;
-      line-height:1.6;
-      max-width: 820px;
-    }
+    .mini-foot{margin:26px 0;text-align:center;color:var(--faint);font-size:.85rem;font-weight:600}
+    .mini-foot a{color:var(--cyan);font-weight:800}
 
-    .actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-left:auto;
+    @media (max-width:760px){
+      .manage-card{grid-template-columns:1fr}
+      .manage-thumb{width:100%;height:170px}
+      .manage-actions{justify-content:flex-start}
     }
-
-    .btn{
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 0.92rem;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      user-select:none;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      text-decoration:none;
-      white-space:nowrap;
-    }
-    .btn:active{ transform:translateY(1px); }
-    .btn-primary{ background: var(--primary); color:#fff; }
-    .btn-primary:hover{ background:#1e293b; }
-    .btn-accent{ background: var(--accent); color:#111827; }
-    .btn-accent:hover{ background: var(--accent-hover); }
-    .btn-outline{ background:#fff; color:var(--primary); border-color: var(--border); }
-    .btn-outline:hover{ background:#f1f5f9; border-color:#cbd5e1; }
-    .btn-disabled{
-      background:#94a3b8 !important;
-      color:#e2e8f0 !important;
-      cursor:not-allowed !important;
-      pointer-events:none !important;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-
-    .banner{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 14px;
-      flex-wrap:wrap;
-    }
-
-    .plan-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 0.82rem;
-      border: 1px solid var(--border);
-      background:#f1f5f9;
-      color:#475569;
-      text-transform: uppercase;
-      letter-spacing:.4px;
-    }
-    .plan-pill.pro{
-      background: var(--success-bg);
-      border-color: #bbf7d0;
-      color:#16a34a;
-    }
-
-    .note{
-      color: var(--muted);
-      font-weight: 650;
-      line-height: 1.6;
-    }
-    .note b{ color: var(--primary); }
-
-    .list{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 16px;
-    }
-
-    .card{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(2,6,23,0.06);
-      display:flex;
-      flex-direction:column;
-      gap: 12px;
-    }
-
-    .cardTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .h{
-      margin:0;
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing:-0.3px;
-      line-height:1.25;
-    }
-
-    .meta{
-      margin-top:6px;
-      color: var(--muted);
-      font-weight: 650;
-      font-size: 0.92rem;
-      line-height:1.55;
-    }
-
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap:wrap;
-      border-top:1px solid #f1f5f9;
-      padding-top: 12px;
-    }
-
-    .status{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing:.4px;
-      border:1px solid var(--border);
-      background:#f1f5f9;
-      color:#475569;
-    }
-    .status.ok{ background: var(--success-bg); border-color:#bbf7d0; color:#16a34a; }
-    .status.sold{ background: var(--danger-bg); border-color:#fecaca; color:#dc2626; }
-
-    .miniBtns{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-
-    .iconBtn{
-      width: 40px; height: 40px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background:#fff;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#475569;
-      transition: background .12s ease, border-color .12s ease, transform .12s ease;
-    }
-    .iconBtn:hover{ background:#f1f5f9; border-color:#cbd5e1; }
-    .iconBtn:active{ transform: translateY(1px); }
-    .iconBtn.danger:hover{ background: var(--danger-bg); border-color:#fecaca; color: var(--danger); }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 7px 10px;
-      border-radius: 12px;
-      border: 1px solid #fde68a;
-      background: #fffbeb;
-      color:#92400e;
-      font-weight: 900;
-      font-size: 0.86rem;
-      cursor:pointer;
-      user-select:none;
-    }
-    .chip:hover{ background:#fef3c7; }
-    .chip.muted{
-      border-color: var(--border);
-      background:#f1f5f9;
-      color:#64748b;
-      cursor:default;
-    }
-    .chip.good{
-      border-color:#bbf7d0;
-      background: var(--success-bg);
-      color:#16a34a;
-      cursor:default;
-    }
-
-    .empty{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 38px 18px;
-      text-align:center;
-    }
-    .empty i{ font-size: 3.6rem; color:#e2e8f0; }
-    .empty h2{ margin: 10px 0 8px; color: var(--primary); font-weight: 900; letter-spacing:-0.4px; }
-    .empty p{ margin:0; color: var(--muted); font-weight: 650; line-height:1.7; }
-
-    /* Modals */
-    .overlay{
-      position: fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background: rgba(2,6,23,0.60);
-      z-index: 2100;
-      padding: 18px;
-    }
-    .modal{
-      width:min(520px, 96vw);
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      position: relative;
-    }
-    .close{
-      position:absolute;
-      top: 10px; right: 10px;
-      width: 40px; height: 40px;
-      border-radius: 12px;
-      border:1px solid var(--border);
-      background:#fff;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 900;
-      color:#475569;
-    }
-    .close:hover{ background:#f1f5f9; }
-
-    .mTitle{ margin: 6px 0 8px; font-size: 1.15rem; font-weight: 900; color: var(--primary); letter-spacing:-0.3px; }
-    .mText{ margin: 0 0 14px; color: var(--muted); font-weight: 650; line-height:1.7; }
-
-    .momoBox{
-      background:#fff7ed;
-      border: 1px solid #fdba74;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-      color:#7c2d12;
-      font-weight: 800;
-      line-height: 1.6;
-    }
-    .code{
-      display:block;
-      margin-top:10px;
-      padding: 12px;
-      border-radius: 14px;
-      border: 2px dashed #cbd5e1;
-      background:#fff;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing: .5px;
-      text-align:center;
-    }
-
-    .field{ display:grid; gap:6px; margin-top: 10px; }
-    label{ font-size:.85rem; font-weight: 900; color:#475569; }
-    .input{
-      width:100%;
-      padding: 12px;
-      border-radius: 12px;
-      border:1px solid #cbd5e1;
-      outline:none;
-      font-family: inherit;
-    }
-    .input:focus{
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15,23,42,0.10);
-    }
-
-    .mBtns{ display:flex; gap:10px; margin-top: 14px; }
-    .mBtns .btn{ flex:1; justify-content:center; }
-
-    footer{
-      margin-top: 18px;
-      background: var(--primary);
-      border-radius: 22px;
-      padding: 22px 16px;
-      color:#94a3b8;
-      text-align:center;
-    }
-    footer a{ color:#94a3b8; font-weight:800; text-decoration:none; }
-    footer a:hover{ color:#fff; }
   </style>
 
   <script>
@@ -396,95 +94,87 @@
   <div id="appNavbar"></div>
 
   <main class="wrap">
-    <section class="top" aria-label="Landlord header">
+    <section class="panel dash-head" aria-label="Seller header">
       <div>
-        <h1 class="title">My Properties</h1>
-        <p class="sub">Manage listings, status (Available/Sold), and promotions. Keep your listings accurate to build trust.</p>
+        <span class="kicker">Seller dashboard</span>
+        <h1>My properties</h1>
+        <p class="sub">Manage listings, availability and promotions. Accurate listings build trust — and get more views.</p>
       </div>
-
-      <div class="actions">
-        <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse Feed</a>
-        <a class="btn btn-accent" id="postBtn" href="post-property.html"><i class="ph ph-plus-circle"></i> Post Property</a>
-        <button class="btn btn-primary" type="button" onclick="init(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+      <div class="row">
+        <a class="btn btn-dark btn-sm" href="feed.html"><i class="ph ph-globe"></i> Marketplace</a>
+        <a class="btn btn-solid btn-sm" id="postBtn" href="post-property.html"><i class="ph ph-plus-circle"></i> Post property</a>
+        <button class="btn btn-line btn-sm" type="button" onclick="init(true)"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
       </div>
     </section>
 
-    <section class="grid">
-      <!-- Plan banner -->
-      <div class="banner" aria-label="Plan banner">
-        <div>
-          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <span class="plan-pill" id="planPill">FREE ACCOUNT</span>
-            <span class="note" id="planNote">Limit: <b id="limitText">4 active posts</b></span>
-          </div>
-          <div class="note" style="margin-top:8px;">
-            Pro agents get: <b>Unlimited posts</b> + <b>Verified badge</b> + more trust.
-          </div>
+    <!-- Plan banner -->
+    <section class="panel plan-banner" aria-label="Plan banner">
+      <div>
+        <div class="row">
+          <span class="chip chip-live" id="planPill">Free account</span>
+          <span class="muted" id="planNote" style="font-size:.88rem">Limit: <b id="limitText" style="color:var(--text)">4 active posts</b></span>
         </div>
-
-        <button class="btn btn-primary" id="upgradeBtn" type="button" onclick="openProModal()">
-          <i class="ph ph-trophy"></i> Upgrade to Pro
-        </button>
+        <div class="perks">Pro sellers get <b>unlimited posts</b> + <b>verified badge</b> + more trust.</div>
       </div>
-
-      <!-- Properties list -->
-      <div id="propArea">
-        <div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading properties...</div>
-      </div>
-
-      <footer>
-        © 2026 InzuLink • <a href="contract.html">Contract Tool</a>
-      </footer>
+      <button class="btn btn-solid btn-sm" id="upgradeBtn" type="button" onclick="openProModal()">
+        <i class="ph ph-trophy"></i> Upgrade to Pro
+      </button>
     </section>
+
+    <!-- Properties list -->
+    <div id="propArea" class="manage-list">
+      <div class="skel" style="height:140px"></div>
+      <div class="skel" style="height:140px"></div>
+    </div>
+
+    <div class="mini-foot">© 2026 InzuLink · <a href="contract.html">Contract tool</a></div>
   </main>
 
   <!-- PRO MODAL -->
   <div class="overlay" id="proModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-label="Upgrade to Pro">
-      <button class="close" onclick="closeAllModals()">✕</button>
-      <div class="mTitle">Become a Pro Agent 🏆</div>
-      <div class="mText">Post unlimited properties, get “Verified Agent” status, and boost trust with seekers.</div>
+    <div class="sheet" style="width:min(520px,96%)" role="dialog" aria-label="Upgrade to Pro">
+      <i class="ph ph-x x" onclick="closeAllModals()"></i>
+      <h2>Become a Pro seller</h2>
+      <div class="content">Unlimited posts, verified badge, and more trust with seekers.</div>
 
-      <div class="momoBox">
-        <div><strong>1) Send 10,000 RWF</strong> via MoMo to the code below:</div>
-        <span class="code">*182*8*1*174118#</span>
-        <div style="font-size:.9rem; color:#7c2d12; margin-top:8px;">
-          Recipient: <strong>Ephrem</strong>
-        </div>
+      <div class="momo-box" style="margin-top:14px">
+        <div><strong>1) Send 10,000 RWF</strong> via MoMo to:</div>
+        <span class="momo-code">*182*8*1*174118#</span>
+        <div style="margin-top:8px;font-size:.85rem">Recipient: <strong>Ephrem</strong></div>
       </div>
 
       <div class="field">
         <label for="proPayerPhone">2) Phone used to pay</label>
-        <input class="input" id="proPayerPhone" placeholder="078..." />
+        <input class="input" id="proPayerPhone" placeholder="078…" inputmode="tel" />
       </div>
 
-      <div class="mBtns">
-        <button class="btn btn-outline" type="button" onclick="closeAllModals()">Cancel</button>
-        <button class="btn btn-primary" type="button" onclick="submitProPayment()"><i class="ph ph-check-circle"></i> Confirm</button>
+      <div class="modal-btns">
+        <button class="btn btn-line" type="button" onclick="closeAllModals()">Cancel</button>
+        <button class="btn btn-solid" type="button" onclick="submitProPayment()"><i class="ph ph-check-circle"></i> Confirm</button>
       </div>
     </div>
   </div>
 
   <!-- FEATURE MODAL -->
   <div class="overlay" id="featModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-label="Promote property">
-      <button class="close" onclick="closeAllModals()">✕</button>
-      <div class="mTitle" style="color:var(--accent);">Promote this Property</div>
-      <div class="mText">Get more views by adding a featured badge (Gold) on the feed.</div>
+    <div class="sheet" style="width:min(520px,96%)" role="dialog" aria-label="Promote property">
+      <i class="ph ph-x x" onclick="closeAllModals()"></i>
+      <h2>Promote this property</h2>
+      <div class="content">A featured badge pushes your listing to the top of the marketplace.</div>
 
-      <div class="momoBox">
-        <div><strong>1) Send 5,000 RWF</strong> via MoMo:</div>
-        <span class="code">*182*8*1*174118#</span>
+      <div class="momo-box" style="margin-top:14px">
+        <div><strong>1) Send 5,000 RWF</strong> via MoMo to:</div>
+        <span class="momo-code">*182*8*1*174118#</span>
       </div>
 
       <div class="field">
         <label for="featPayerPhone">2) Phone used to pay</label>
-        <input class="input" id="featPayerPhone" placeholder="078..." />
+        <input class="input" id="featPayerPhone" placeholder="078…" inputmode="tel" />
       </div>
 
-      <div class="mBtns">
-        <button class="btn btn-outline" type="button" onclick="closeAllModals()">Cancel</button>
-        <button class="btn btn-primary" type="button" onclick="submitFeaturePayment()"><i class="ph ph-rocket-launch"></i> Confirm</button>
+      <div class="modal-btns">
+        <button class="btn btn-line" type="button" onclick="closeAllModals()">Cancel</button>
+        <button class="btn btn-solid" type="button" onclick="submitFeaturePayment()"><i class="ph ph-rocket-launch"></i> Confirm</button>
       </div>
     </div>
   </div>
@@ -494,6 +184,7 @@
 
   <script>
     const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=400&auto=format&fit=crop";
     let user = null;
     try { user = JSON.parse(localStorage.getItem("user")); } catch(_) {}
 
@@ -510,7 +201,16 @@
       if (!Number.isFinite(n)) return "RWF 0";
       return "RWF " + n.toLocaleString("en-RW");
     }
-    function safe(v){ return (v === null || v === undefined) ? "" : String(v); }
+    function esc(v){
+      return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+    function thumb(p){
+      const first = p.images && p.images[0];
+      if (!first) return FALLBACK_IMG;
+      const s = String(first).replace(/\\/g, "/");
+      if (/^https?:\/\//i.test(s)) return s;
+      return `${API_BASE}/${s.replace(/^\//, "")}`;
+    }
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = 15000){
       const controller = new AbortController();
@@ -536,12 +236,12 @@
         el.setAttribute("aria-hidden","true");
       });
     }
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeAllModals(); });
 
     async function submitProPayment(){
       const phone = (document.getElementById("proPayerPhone").value || "").trim();
       if (!phone) return alert("Enter the phone number used for payment.");
 
-      // Uses your server simulation endpoint (works for demos)
       try{
         await fetchWithTimeout(`${API_BASE}/api/payment/pay`, {
           method:"POST",
@@ -555,14 +255,11 @@
           })
         }, 20000);
 
-        // Update local session for UI immediately
         user.plan = "Pro";
         localStorage.setItem("user", JSON.stringify(user));
         closeAllModals();
         await init(true);
-
-        alert("Payment Successful! You are now a PRO Agent.");
-
+        alert("Payment successful! You are now a PRO seller.");
       } catch(_){
         alert("Payment failed or server unreachable. Try again.");
       }
@@ -588,8 +285,7 @@
 
         closeAllModals();
         await init(true);
-        alert("Payment Successful! Property is now Featured.");
-
+        alert("Payment successful! Property is now featured.");
       } catch(_){
         alert("Promotion request failed or server unreachable. Try again.");
       }
@@ -602,7 +298,6 @@
           headers:{ "Content-Type":"application/json" },
           body: JSON.stringify({ status: nextStatus })
         });
-
         if (!res.ok) throw new Error("Failed");
         await init(true);
       } catch(_){
@@ -612,7 +307,6 @@
 
     async function deleteProp(propertyId){
       if (!confirm("Delete this property permanently?")) return;
-
       try{
         const res = await fetchWithTimeout(`${API_BASE}/api/properties/${Number(propertyId)}`, { method:"DELETE" });
         if (!res.ok) throw new Error("Failed");
@@ -624,83 +318,68 @@
 
     function renderEmpty(){
       propArea.innerHTML = `
-        <div class="empty">
+        <div class="panel empty-state">
           <i class="ph ph-house-line"></i>
           <h2>No properties yet</h2>
-          <p>Click “Post Property” to add your first listing.</p>
-          <div style="margin-top:18px;">
-            <a class="btn btn-accent" href="post-property.html"><i class="ph ph-plus-circle"></i> Post Property</a>
-          </div>
+          <p>Post your first listing to start getting enquiries.</p>
+          <a class="btn btn-solid" href="post-property.html"><i class="ph ph-plus-circle"></i> Post property</a>
         </div>
       `;
     }
 
     function renderList(props){
-      const cards = props.map(p => {
-        const id = Number(p.property_id || p.id);
-        const title = safe(p.title || "Property");
-        const location = [p.sector, p.district].filter(Boolean).join(", ") || safe(p.district || "Rwanda");
+      propArea.innerHTML = props.map(p => {
+        const id = Number(p.property_id ?? p.id);
+        const title = p.title || "Property";
+        const location = [p.sector, p.district].filter(Boolean).join(", ") || "Rwanda";
         const price = money(p.price_per_month ?? p.price ?? 0);
-
-        const status = safe(p.status || "Available");
+        const status = p.status || "Available";
         const isAvailable = status === "Available";
         const isFeatured = !!p.is_featured;
-        const promo = safe(p.promotion_status || "");
+        const promo = p.promotion_status || "";
 
-        // Promotion chip
         let promoEl = "";
         if (isFeatured) {
-          promoEl = `<span class="chip good"><i class="ph ph-star-fill"></i> Featured</span>`;
+          promoEl = `<span class="chip chip-warn"><i class="ph ph-crown"></i> Featured</span>`;
         } else if (promo === "Pending") {
-          promoEl = `<span class="chip muted">⏳ Verifying…</span>`;
+          promoEl = `<span class="chip"><i class="ph ph-clock"></i> Verifying…</span>`;
         } else {
-          promoEl = `<span class="chip" onclick="openFeatModal(${id})"><i class="ph ph-rocket-launch"></i> Promote</span>`;
+          promoEl = `<span class="chip chip-live promote-btn" onclick="openFeatModal(${id})"><i class="ph ph-rocket-launch"></i> Promote</span>`;
         }
 
         return `
-          <article class="card">
-            <div class="cardTop">
-              <div>
-                <h3 class="h">${title}</h3>
-                <div class="meta">📍 ${safe(location)} • <b style="color:var(--primary);">${price}</b></div>
-              </div>
-              <div class="status ${isAvailable ? "ok" : "sold"}">
-                <i class="ph ${isAvailable ? "ph-check-circle" : "ph-x-circle"}"></i> ${safe(status)}
+          <article class="manage-card">
+            <img class="manage-thumb" src="${esc(thumb(p))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'" />
+            <div>
+              <h3>${esc(title)}</h3>
+              <div class="loc">${esc(location)} · <b>${esc(price)}</b></div>
+              <div class="manage-tags">
+                <span class="chip ${isAvailable ? "chip-sale" : "chip-warn"}">
+                  <i class="ph ${isAvailable ? "ph-check-circle" : "ph-x-circle"}"></i> ${esc(status)}
+                </span>
+                ${promoEl}
+                <span class="views"><i class="ph ph-eye"></i> ${Number(p.views_count || 0)} views</span>
               </div>
             </div>
-
-            <div class="row">
-              <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                ${promoEl}
-                <span class="note">Views: <b>${Number(p.views_count || 0)}</b></span>
-              </div>
-
-              <div class="miniBtns">
-                ${
-                  isAvailable
-                    ? `<button class="iconBtn" title="Mark as Sold" onclick="setStatus(${id}, 'Sold')"><i class="ph ph-seal-warning"></i></button>`
-                    : `<button class="iconBtn" title="Mark Available" onclick="setStatus(${id}, 'Available')"><i class="ph ph-check"></i></button>`
-                }
-                <button class="iconBtn danger" title="Delete" onclick="deleteProp(${id})"><i class="ph ph-trash"></i></button>
-              </div>
+            <div class="manage-actions">
+              ${isAvailable
+                ? `<button class="icon-btn" title="Mark as sold" onclick="setStatus(${id}, 'Sold')"><i class="ph ph-seal-warning"></i></button>`
+                : `<button class="icon-btn" title="Mark available" onclick="setStatus(${id}, 'Available')"><i class="ph ph-check"></i></button>`}
+              <button class="icon-btn danger" title="Delete" onclick="deleteProp(${id})"><i class="ph ph-trash"></i></button>
             </div>
           </article>
         `;
       }).join("");
-
-      propArea.innerHTML = `<div class="list">${cards}</div>`;
     }
 
     async function init(force=false){
-      // Update plan UI
       const isPro = (user?.plan === "Pro");
-      planPill.textContent = isPro ? "PRO AGENT" : "FREE ACCOUNT";
-      planPill.className = "plan-pill" + (isPro ? " pro" : "");
+      planPill.textContent = isPro ? "Pro seller" : "Free account";
+      planPill.className = "chip " + (isPro ? "chip-sale" : "chip-live");
       limitText.textContent = isPro ? "Unlimited posts" : "4 active posts";
-      upgradeBtn.style.display = isPro ? "none" : "inline-flex";
+      upgradeBtn.style.display = isPro ? "none" : "";
 
-      // Load properties
-      propArea.innerHTML = `<div style="text-align:center; padding:28px; color:#94a3b8; font-weight:900;">Loading properties...</div>`;
+      propArea.innerHTML = `<div class="skel" style="height:140px"></div><div class="skel" style="height:140px"></div>`;
 
       try{
         const res = await fetchWithTimeout(`${API_BASE}/api/my-properties/${user.id}`, {}, 15000);
@@ -709,15 +388,14 @@
 
         const list = Array.isArray(props) ? props : [];
 
-        // Enforce Free plan limit (4 Available)
         const activeCount = list.filter(p => (p.status === "Available")).length;
         if (!isPro && activeCount >= 4) {
-          postBtn.classList.add("btn-disabled");
-          postBtn.innerHTML = `<i class="ph ph-lock-key"></i> Limit Reached (4/4)`;
+          postBtn.className = "btn btn-dark btn-sm";
+          postBtn.innerHTML = `<i class="ph ph-lock-key"></i> Limit reached (4/4)`;
           postBtn.setAttribute("href", "javascript:void(0)");
         } else {
-          postBtn.classList.remove("btn-disabled");
-          postBtn.innerHTML = `<i class="ph ph-plus-circle"></i> Post Property`;
+          postBtn.className = "btn btn-solid btn-sm";
+          postBtn.innerHTML = `<i class="ph ph-plus-circle"></i> Post property`;
           postBtn.setAttribute("href", "post-property.html");
         }
 
@@ -726,23 +404,19 @@
 
       } catch(err){
         propArea.innerHTML = `
-          <div class="empty" style="border-color:#fecaca;">
-            <i class="ph ph-warning-circle" style="color:#fecaca;"></i>
-            <h2 style="color:#991b1b;">Could not load your properties</h2>
+          <div class="panel empty-state" style="border-color:#5c1a2a">
+            <i class="ph ph-warning-circle" style="color:#5c1a2a"></i>
+            <h2>Could not load your properties</h2>
             <p>Check your server or API_BASE, then try again.</p>
-            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-              <button class="btn btn-primary" onclick="init(true)"><i class="ph ph-arrows-clockwise"></i> Retry</button>
-              <a class="btn btn-outline" href="feed.html"><i class="ph ph-globe"></i> Browse Feed</a>
-            </div>
-            <div style="margin-top:10px; color:#94a3b8; font-weight:800;">
-              Tip: <code style="background:#f1f5f9; border:1px solid #e2e8f0; padding:6px 8px; border-radius:10px;">localStorage.setItem("API_BASE","https://YOUR-BACKEND.onrender.com")</code>
+            <div class="row" style="justify-content:center">
+              <button class="btn btn-solid btn-sm" onclick="init(true)"><i class="ph ph-arrows-clockwise"></i> Retry</button>
+              <a class="btn btn-line btn-sm" href="feed.html"><i class="ph ph-globe"></i> Marketplace</a>
             </div>
           </div>
         `;
       }
     }
 
-    // Close modals when clicking outside
     ["proModal","featModal"].forEach(id => {
       document.getElementById(id).addEventListener("click", (e) => {
         if (e.target.id === id) closeAllModals();

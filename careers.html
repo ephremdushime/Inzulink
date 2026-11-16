@@ -1,195 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Careers - InzuLink</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        :root {
-            --primary: #0f172a; 
-            --accent: #f59e0b; 
-            --accent-hover: #d97706;
-            --bg-page: #f8fafc; 
-            --text-main: #334155; 
-            --text-light: #64748b;
-        }
+  <meta charset="UTF-8" />
+  <title>Careers — InzuLink</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05080f" />
+  <meta name="description" content="Join the team building Rwanda's property marketplace." />
 
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-page); margin: 0; padding: 0; color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-        /* --- 1. GLASS NAVBAR --- */
-        .navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; position: sticky; top: 0; width: 90%; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-            margin: 0 auto;
-        }
+  <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
 
-        .brand { 
-            display: flex; align-items: center; gap: 8px;
-            font-size: 1.4rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; text-decoration: none;
-        }
-        .brand-icon {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white; width: 32px; height: 32px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-        }
-        .brand span { color: var(--accent); }
-
-        .nav-center { display: flex; gap: 30px; align-items: center; }
-        .nav-link { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .nav-link:hover { color: var(--accent); }
-
-        /* BUTTON STYLES */
-        .btn-nav-primary { 
-            background: var(--primary); color: white; padding: 8px 20px; border-radius: 8px; 
-            text-decoration: none; font-weight: 700; font-size: 0.85rem; transition: 0.2s; 
-        }
-        .btn-nav-primary:hover { background: #1e293b; }
-
-        .btn-nav-outline {
-            border: 1px solid #cbd5e1; background: transparent; color: var(--primary); 
-            padding: 7px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; 
-            font-size: 0.85rem; transition: 0.2s; margin-right: 10px;
-        }
-        .btn-nav-outline:hover { border-color: var(--primary); background: #f1f5f9; }
-
-        /* --- HERO SECTION --- */
-        .hero { 
-            text-align: center; padding: 80px 20px 60px; background: white; 
-            border-bottom: 1px solid #e2e8f0; 
-            background-image: radial-gradient(#f1f5f9 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .hero h1 { margin: 0 0 15px; font-size: 3rem; color: var(--primary); letter-spacing: -1px; font-weight: 900; }
-        .hero p { color: var(--text-light); margin: 0 auto 30px; font-size: 1.1rem; max-width: 600px; line-height: 1.6; }
-        
-        .hero-tag {
-            display: inline-block; background: #e0f2fe; color: #0284c7; 
-            padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 20px;
-        }
-
-        /* --- JOBS LIST --- */
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; flex: 1; }
-        
-        .job-card { 
-            background: white; border-radius: 12px; padding: 30px; 
-            border: 1px solid #e2e8f0; margin-bottom: 20px; 
-            display: flex; justify-content: space-between; align-items: center;
-            transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .job-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
-
-        .job-info h3 { margin: 0 0 8px; font-size: 1.3rem; color: var(--primary); }
-        .job-meta { display: flex; gap: 15px; color: var(--text-light); font-size: 0.9rem; align-items: center; }
-        .job-meta span { display: flex; align-items: center; gap: 5px; }
-        
-        .badge-type { background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
-
-        .btn-apply {
-            background: white; color: var(--primary); border: 1px solid #cbd5e1;
-            padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none;
-            transition: 0.2s; white-space: nowrap;
-        }
-        .btn-apply:hover { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* --- FOOTER --- */
-        footer { background: var(--primary); color: white; padding: 60px 10% 40px; margin-top: auto; text-align: center; }
-        .copyright { margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; color: #94a3b8; font-size: 0.9rem; }
-
-        /* RESPONSIVE */
-        @media(max-width: 700px) {
-            .job-card { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .btn-apply { width: 100%; text-align: center; }
-            .nav-center { display: none; }
-        }
-    </style>
+  <style>
+    .careers-hero{margin-top:16px;padding:56px 30px;overflow:hidden;position:relative}
+    .careers-hero h1{font-family:var(--font-display);font-size:clamp(2rem,4.4vw,3rem);letter-spacing:-1px;color:#fff;margin:12px 0 10px;max-width:16ch}
+    .careers-hero p{color:var(--muted);font-size:1.02rem;line-height:1.7;margin:0;max-width:56ch}
+    .careers-hero .glyph{
+      position:absolute;right:-10px;bottom:-38px;
+      font-size:11rem;color:#0e1830;pointer-events:none;
+    }
+    .jobs{margin-top:18px;display:grid;gap:14px}
+    .job{
+      display:flex;justify-content:space-between;align-items:center;gap:18px;
+      background:var(--surface);border:1px solid var(--line-soft);
+      border-radius:20px;padding:22px 24px;
+      transition:border-color .18s ease;
+    }
+    .job:hover{border-color:#2b3d66}
+    .job h3{margin:0 0 8px;font-size:1.2rem;color:#fff;letter-spacing:-.3px}
+    .job-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .job-meta .loc{color:var(--muted);font-size:.86rem;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+    .job-meta .loc i{color:var(--cyan)}
+    .job p{color:var(--muted);font-size:.92rem;line-height:1.65;margin:10px 0 0;max-width:62ch}
+    .job .btn{flex-shrink:0}
+    .jobs-empty{padding:52px 24px;text-align:center}
+    .jobs-empty i{font-size:3rem;color:#1c2947}
+    .jobs-empty h3{font-family:var(--font-display);color:#fff;margin:12px 0 6px}
+    .jobs-empty p{color:var(--muted);margin:0 0 18px}
+    .jobs-error{
+      padding:22px;text-align:center;color:#fda4b5;font-weight:700;
+      border:1px solid #5c1a2a;border-radius:18px;background:#170d12;
+    }
+    .mini-foot{margin:26px 0;text-align:center;color:var(--faint);font-size:.85rem;font-weight:600}
+    @media (max-width:700px){
+      .job{flex-direction:column;align-items:stretch}
+      .job .btn{justify-content:center}
+      .careers-hero .glyph{display:none}
+    }
+  </style>
 </head>
+
 <body>
+  <div id="appNavbar"></div>
 
-    <nav class="navbar">
-        <a href="index.html" class="brand">
-            <div class="brand-icon"><i class="ph ph-house-line"></i></div>
-            Inzu<span>Link</span>
-        </a>
-        <div class="nav-center">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="feed.html" class="nav-link">Browse Listings</a>
-            <a href="careers.html" class="nav-link" style="color:var(--accent);">Careers</a>
-        </div>
-        <div>
-            <a href="login.html" class="btn-nav-outline">Log In</a>
-            <a href="signup.html" class="btn-nav-primary">Sign Up</a>
-        </div>
-    </nav>
+  <main class="wrap">
+    <section class="panel careers-hero">
+      <span class="kicker">Careers</span>
+      <h1>Build the future of housing in Rwanda</h1>
+      <p>We're looking for passionate builders, thinkers, and problem solvers to join the team behind the country's property marketplace.</p>
+      <i class="ph ph-briefcase glyph" aria-hidden="true"></i>
+    </section>
 
-    <div class="hero">
-        <span class="hero-tag">We Are Hiring</span>
-        <h1>Build the Future of Housing</h1>
-        <p>Join the team revolutionizing the real estate market in Rwanda. We are looking for passionate builders, thinkers, and problem solvers.</p>
+    <div class="spread" style="margin:22px 0 4px">
+      <h2 style="font-family:var(--font-display);font-size:1.3rem;color:#fff;margin:0">Open positions</h2>
+      <span class="chip" id="jobCount"></span>
     </div>
 
-    <div class="container" id="jobList">
-        <div style="text-align:center; padding:40px; color:#94a3b8;">
-            <i class="ph ph-spinner ph-spin" style="font-size:2rem;"></i><br>
-            Loading positions...
-        </div>
+    <div class="jobs" id="jobList">
+      <div class="skel" style="height:120px"></div>
+      <div class="skel" style="height:120px"></div>
     </div>
 
-    <footer>
-        <div style="font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <div class="brand-icon" style="background:white; color:var(--primary);"><i class="ph ph-house-line"></i></div>
-            Inzu<span style="color:var(--accent);">Link</span>
+    <footer class="site-footer" aria-label="Footer">
+      <div class="foot-grid">
+        <div class="fcol">
+          <div class="foot-brand">
+            <span class="brand-icon"><i class="ph ph-house-line"></i></span>
+            Inzu<em>Link</em>
+          </div>
+          <div class="foot-tag">Making housing accessible, affordable, and transparent for everyone in Rwanda.</div>
         </div>
-        <p style="color:#94a3b8; max-width:500px; margin:0 auto;">Making housing accessible, affordable, and transparent for everyone in Rwanda.</p>
-        <div class="copyright">© 2026 InzuLink. All rights reserved.</div>
+        <div class="fcol">
+          <strong>Platform</strong>
+          <div class="flink"><i class="ph ph-globe"></i> <a href="feed.html">Browse listings</a></div>
+          <div class="flink"><i class="ph ph-plus-circle"></i> <a href="post-property.html">List a property</a></div>
+          <div class="flink"><i class="ph ph-file-text"></i> <a href="contract.html">Contract tool</a></div>
+        </div>
+        <div class="fcol">
+          <strong>Company</strong>
+          <div class="flink"><i class="ph ph-briefcase"></i> <a href="careers.html">Careers</a></div>
+          <div class="flink"><i class="ph ph-house"></i> <a href="index.html">Home</a></div>
+        </div>
+        <div class="fcol">
+          <strong>Contact</strong>
+          <div class="flink"><i class="ph ph-envelope"></i> <span>careers@inzulink.rw</span></div>
+          <div class="flink"><i class="ph ph-map-pin"></i> <span>Kigali, Rwanda</span></div>
+        </div>
+      </div>
+      <div class="copy">© 2026 InzuLink. All rights reserved.</div>
     </footer>
+  </main>
 
-    <script>
-        async function loadJobs() {
-            const container = document.getElementById('jobList');
-            try {
-                const res = await fetch('https://inzulink-v1.onrender.com/api/jobs');
-                const jobs = await res.json();
+  <script src="./assets/navbar.js"></script>
+  <script>
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-v1.onrender.com").replace(/\/$/, "");
 
-                if(jobs.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align:center; padding:60px; background:white; border-radius:12px; border:1px solid #e2e8f0;">
-                            <i class="ph ph-briefcase" style="font-size:3rem; color:#cbd5e1;"></i>
-                            <h3 style="color:#64748b; margin-top:10px;">No Openings Right Now</h3>
-                            <p style="color:#94a3b8;">Please check back later or email us your CV.</p>
-                            <a href="mailto:careers@inzulink.rw" class="btn-nav-primary" style="display:inline-block; margin-top:10px;">Email CV</a>
-                        </div>`;
-                    return;
-                }
+    function esc(v){
+      return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
 
-                container.innerHTML = jobs.map(job => `
-                    <div class="job-card">
-                        <div class="job-info">
-                            <h3>${job.title}</h3>
-                            <div class="job-meta">
-                                <span class="badge-type">${job.type}</span>
-                                <span><i class="ph ph-map-pin"></i> ${job.location || 'Kigali, Rwanda'}</span>
-                            </div>
-                            <p style="color:#64748b; font-size:0.95rem; margin-top:10px; max-width:600px;">
-                                ${job.description}
-                            </p>
-                        </div>
-                        <a href="${job.application_link}" class="btn-apply">Apply Now <i class="ph ph-arrow-right"></i></a>
-                    </div>
-                `).join('');
+    async function loadJobs() {
+      const container = document.getElementById("jobList");
+      const count = document.getElementById("jobCount");
+      try {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 12000);
+        const res = await fetch(`${API_BASE}/api/jobs`, { signal: controller.signal }).finally(() => clearTimeout(t));
+        const jobs = await res.json().catch(() => []);
+        if (!res.ok) throw new Error("bad status");
 
-            } catch (e) {
-                container.innerHTML = `<div style="text-align:center; color:#ef4444;">Unable to load jobs. Server might be offline.</div>`;
-            }
+        if (!Array.isArray(jobs) || jobs.length === 0) {
+          count.textContent = "0 open";
+          container.innerHTML = `
+            <div class="panel jobs-empty">
+              <i class="ph ph-briefcase"></i>
+              <h3>No openings right now</h3>
+              <p>Check back later — or send us your CV and we'll keep it on file.</p>
+              <a href="mailto:careers@inzulink.rw" class="btn btn-solid btn-sm">Email your CV</a>
+            </div>`;
+          return;
         }
 
-        loadJobs();
-    </script>
+        count.textContent = `${jobs.length} open`;
+        container.innerHTML = jobs.map(job => `
+          <div class="job">
+            <div>
+              <h3>${esc(job.title)}</h3>
+              <div class="job-meta">
+                ${job.type ? `<span class="chip">${esc(job.type)}</span>` : `<span class="chip chip-live">Open role</span>`}
+                <span class="loc"><i class="ph ph-map-pin"></i> ${esc(job.location || "Kigali, Rwanda")}</span>
+              </div>
+              <p>${esc(job.description || "")}</p>
+            </div>
+            <a href="${esc(job.application_link || "mailto:careers@inzulink.rw")}" class="btn btn-line btn-sm" ${/^https?:/i.test(job.application_link || "") ? 'target="_blank" rel="noopener"' : ""}>Apply now <i class="ph ph-arrow-right"></i></a>
+          </div>
+        `).join("");
 
+      } catch (e) {
+        count.textContent = "offline";
+        container.innerHTML = `<div class="jobs-error">Unable to load positions — the server might be offline. Try again later.</div>`;
+      }
+    }
+
+    loadJobs();
+  </script>
 </body>
 </html>

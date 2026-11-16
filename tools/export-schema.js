@@ -1,0 +1,154 @@
+// tools/export-schema.js — introspect the Neon Postgres DB and write schema.sql.
+// Reads DATABASE_URL from the audit clone's .env. Prints status only, never secrets.
+// Usage: node tools/export-schema.js
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = path.join(__dirname, ".."); // repo root (scripts live in tools/)
+const OUT = path.join(__dirname, "..", "schema.sql");
+
+function loadEnv(p) {
+  const env = {};
+  for (const line of fs.readFileSync(p, "utf8").split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let v = m[2];
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+    env[m[1]] = v;
+  }
+  return env;
+}
+
+let pg;
+try {
+  pg = require("pg");
+} catch (e) {
+  console.error("EXPORT_STATUS=NO_PG_DRIVER");
+  process.exit(2);
+}
+
+const TYPEMAP = {
+  int4: "INTEGER", int8: "BIGINT", int2: "SMALLINT",
+  float8: "DOUBLE PRECISION", float4: "REAL",
+  bool: "BOOLEAN", text: "TEXT", bpchar: "CHAR",
+  timestamp: "TIMESTAMP", timestamptz: "TIMESTAMPTZ", date: "DATE", time: "TIME",
+  numeric: "NUMERIC", json: "JSON", jsonb: "JSONB", uuid: "UUID", bytea: "BYTEA"
+};
+
+(async () => {
+  let env;
+  try {
+    env = loadEnv(path.join(ROOT, ".env"));
+  } catch (e) {
+    console.error("EXPORT_STATUS=NO_DOTENV");
+    process.exit(2);
+  }
+  if (!env.DATABASE_URL) {
+    console.error("EXPORT_STATUS=NO_DATABASE_URL");
+    process.exit(2);
+  }
+
+  const client = new pg.Client({
+    connectionString: env.DATABASE_URL,
+    ssl: { require: true, rejectUnauthorized: false },
+    connectionTimeoutMillis: 15000,
+    query_timeout: 20000
+  });
+  try {
+    await client.connect();
+  } catch (e) {
+    console.error("EXPORT_STATUS=CONNECT_FAILED " + String(e.code || e.message || "unknown").slice(0, 100));
+    process.exit(3);
+  }
+
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    let out = `-- InzuLink database schema (exported ${today} from Neon)\n` +
+      `-- Restore: psql "$DATABASE_URL" -f schema.sql\n` +
+      `-- Regenerate: node tools/export-schema.js (needs DATABASE_URL in .env)\n\n`;
+
+    // Custom enum types
+    const enums = (await client.query(
+      `SELECT t.typname AS name, string_agg(e.enumlabel, '|' ORDER BY e.enumsortorder) AS labels
+       FROM pg_type t JOIN pg_enum e ON e.enumtypid = t.oid
+       WHERE t.typnamespace = 'public'::regnamespace GROUP BY 1 ORDER BY 1`)).rows;
+    for (const en of enums) {
+      const labels = String(en.labels || "").split("|");
+      out += `CREATE TYPE "${en.name}" AS ENUM (${labels.map(l => `'${l.replace(/'/g, "''")}'`).join(", ")});\n`;
+    }
+    if (enums.length) out += "\n";
+
+    const tables = (await client.query(
+      `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY 1`)).rows
+      .map(r => r.tablename);
+
+    const fkAlters = [];
+    const indexDefs = [];
+
+    for (const t of tables) {
+      const cols = (await client.query(
+        `SELECT column_name, udt_name, character_maximum_length, is_nullable, column_default
+         FROM information_schema.columns
+         WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`, [t])).rows;
+
+      const pk = (await client.query(
+        `SELECT a.attname FROM pg_index i
+         JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+         WHERE i.indrelid = $1::regclass AND i.indisprimary ORDER BY a.attnum`,
+        [`public.${t}`])).rows.map(r => `"${r.attname}"`);
+
+      const uniques = (await client.query(
+        `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
+         WHERE conrelid = $1::regclass AND contype = 'u'`, [`public.${t}`])).rows;
+
+      const fks = (await client.query(
+        `SELECT conname, pg_get_constraintdef(oid) AS def FROM pg_constraint
+         WHERE conrelid = $1::regclass AND contype = 'f'`, [`public.${t}`])).rows;
+
+      const idxs = (await client.query(
+        `SELECT pg_get_indexdef(indexrelid) AS def FROM pg_index
+         WHERE indrelid = $1::regclass AND NOT indisprimary
+           AND indexrelid NOT IN (SELECT conindid FROM pg_constraint WHERE conrelid = $1::regclass)`,
+        [`public.${t}`])).rows;
+
+      let count = null;
+      try {
+        count = (await client.query(`SELECT COUNT(*)::int AS c FROM "public"."${t}"`)).rows[0].c;
+      } catch (e) { /* ignore */ }
+
+      out += `-- Table: ${t}${count === null ? "" : ` (${count} rows at export)`}\n`;
+      out += `CREATE TABLE IF NOT EXISTS "${t}" (\n`;
+      const parts = cols.map(c => {
+        let typ;
+        if (c.udt_name === "varchar") {
+          typ = c.character_maximum_length ? `VARCHAR(${c.character_maximum_length})` : "VARCHAR";
+        } else {
+          typ = TYPEMAP[c.udt_name] || `"${c.udt_name}"`;
+        }
+        const isSerial = !!c.column_default && /nextval\(/.test(c.column_default);
+        let d = `  "${c.column_name}" ${isSerial ? "INTEGER GENERATED BY DEFAULT AS IDENTITY" : typ}`;
+        if (!isSerial && c.column_default) d += ` DEFAULT ${c.column_default}`;
+        if (c.is_nullable === "NO") d += " NOT NULL";
+        return d;
+      });
+      if (pk.length) parts.push(`  PRIMARY KEY (${pk.join(", ")})`);
+      for (const u of uniques) parts.push(`  ${u.def}`);
+      out += parts.join(",\n") + "\n);\n\n";
+
+      for (const f of fks) fkAlters.push(`ALTER TABLE "${t}" ADD CONSTRAINT "${f.conname}" ${f.def};`);
+      for (const ix of idxs) indexDefs.push(`${ix.def};`);
+    }
+
+    if (fkAlters.length) out += "-- Foreign keys\n" + fkAlters.join("\n") + "\n\n";
+    if (indexDefs.length) out += "-- Indexes\n" + indexDefs.join("\n") + "\n";
+
+    fs.writeFileSync(OUT, out);
+    console.log(`EXPORT_STATUS=OK tables=${tables.length} bytes=${out.length}`);
+    console.log("TABLES=" + tables.join(","));
+    await client.end();
+  } catch (e) {
+    console.error("EXPORT_STATUS=QUERY_FAILED " + String(e.message || "unknown").slice(0, 120));
+    try { await client.end(); } catch (_) {}
+    process.exit(3);
+  }
+})();
