@@ -1,4 +1,6 @@
--- InzuLink marketplace schema (canonical — matches server.js at HEAD).
+-- Fresh-database bootstrap schema for InzuLink (canonical — matches server.js at HEAD).
+-- Do not use this file to upgrade a database with existing data; use versioned
+-- additive migrations in migrations/ instead.
 -- Rebuilt 2026-11-16. The previous Neon schema belonged to the retired
 -- student-housing generation and could not run this backend.
 -- Status-like columns are TEXT on purpose: the app uses several lifecycles

@@ -335,6 +335,10 @@
         const price = money(p.price_per_month ?? p.price ?? 0);
         const status = p.status || "Available";
         const isAvailable = status === "Available";
+        const isVerifiedAvailable = p.availability_status === "AVAILABLE"
+          && p.availability_checked_at
+          && p.expires_at
+          && new Date(p.expires_at).getTime() > Date.now();
         const isFeatured = !!p.is_featured;
         const promo = p.promotion_status || "";
 
@@ -357,6 +361,9 @@
                 <span class="chip ${isAvailable ? "chip-sale" : "chip-warn"}">
                   <i class="ph ${isAvailable ? "ph-check-circle" : "ph-x-circle"}"></i> ${esc(status)}
                 </span>
+                <span class="chip ${isVerifiedAvailable ? "chip-sale" : "chip-warn"}">
+                  ${isVerifiedAvailable ? `Verified until ${esc(new Date(p.expires_at).toLocaleDateString())}` : "Availability not verified"}
+                </span>
                 ${promoEl}
                 <span class="views"><i class="ph ph-eye"></i> ${Number(p.views_count || 0)} views</span>
               </div>
@@ -365,11 +372,34 @@
               ${isAvailable
                 ? `<button class="icon-btn" title="Mark as sold" onclick="setStatus(${id}, 'Sold')"><i class="ph ph-seal-warning"></i></button>`
                 : `<button class="icon-btn" title="Mark available" onclick="setStatus(${id}, 'Available')"><i class="ph ph-check"></i></button>`}
+              ${isAvailable && !isVerifiedAvailable
+                ? `<button class="icon-btn" title="Email me an availability confirmation link" onclick="requestAvailabilityConfirmation(${id}, this)"><i class="ph ph-envelope-simple"></i></button>`
+                : ""}
               <button class="icon-btn danger" title="Delete" onclick="deleteProp(${id})"><i class="ph ph-trash"></i></button>
             </div>
           </article>
         `;
       }).join("");
+    }
+
+    async function requestAvailabilityConfirmation(propertyId, button){
+      const email = user.email || prompt("Enter the email address on your InzuLink account:");
+      if (!email) return;
+      button.disabled = true;
+      try{
+        const res = await fetchWithTimeout(`${API_BASE}/api/properties/${Number(propertyId)}/availability-confirmation`, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ email })
+        }, 15000);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Could not request confirmation.");
+        alert(data.message);
+      } catch(err){
+        alert(err.message || "Could not request confirmation. Please try again.");
+      } finally {
+        button.disabled = false;
+      }
     }
 
     async function init(force=false){

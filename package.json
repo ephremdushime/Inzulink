@@ -4,7 +4,10 @@
   "description": "Rwanda Rentals Backend",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test",
+    "db:migrate": "node tools/migrate.js --status",
+    "db:migrate:apply": "node tools/migrate.js --apply"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

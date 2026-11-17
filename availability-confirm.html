@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05080f" />
+  <title>Confirm listing availability — InzuLink</title>
+  <link rel="stylesheet" href="./assets/app.css" />
+  <link rel="stylesheet" href="./assets/theme.css" />
+  <style>
+    body{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
+    main{width:min(520px,100%);text-align:center;padding:34px}
+    h1{color:#fff;font-size:1.55rem}
+    p{color:var(--muted);line-height:1.6}
+    #result{min-height:26px;margin:16px 0;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <span class="brand-icon"><i class="ph ph-house-line"></i></span>
+    <h1>Confirm your listing is available</h1>
+    <p>Confirming refreshes the availability check for seven days. The link can only be used once.</p>
+    <button class="btn btn-solid" id="confirmButton" type="button">Confirm availability</button>
+    <div id="result" role="status" aria-live="polite"></div>
+    <a class="btn btn-line btn-sm" href="landlord.html">Return to dashboard</a>
+  </main>
+  <script>
+    const API_BASE = (localStorage.getItem("API_BASE") || "https://inzulink-00l5.onrender.com").replace(/\/$/, "");
+    const token = new URLSearchParams(window.location.search).get("token") || "";
+    const button = document.getElementById("confirmButton");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", async () => {
+      if (!/^[a-f0-9]{64}$/.test(token)) {
+        result.textContent = "This confirmation link is invalid.";
+        button.disabled = true;
+        return;
+      }
+      button.disabled = true;
+      result.textContent = "Confirming…";
+      try {
+        const response = await fetch(`${API_BASE}/api/properties/confirm-availability`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "Could not confirm availability.");
+        result.textContent = data.message;
+      } catch (error) {
+        result.textContent = error.message || "Could not confirm availability.";
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

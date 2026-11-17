@@ -1,6 +1,6 @@
-// tools/backup-data.js — snapshot surviving rows from the old Neon schema
-// before the rebuild. Writes tools/neon-data-backup.json (DO NOT COMMIT).
-// Prints row counts only, never row contents.
+// Legacy subset export only; this is not a complete database backup.
+// It includes user personal data and password hashes. Do not use it as
+// the sole recovery plan before a production schema change.
 const fs = require("fs");
 const path = require("path");
 

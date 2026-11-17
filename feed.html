@@ -28,6 +28,8 @@
     .search-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .search-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
     #resultCount{color:var(--faint);font-size:.85rem;font-weight:700;margin-left:auto}
+    .availability-toggle{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:.85rem;font-weight:700}
+    .availability-toggle input{accent-color:var(--cyan);width:16px;height:16px}
 
     /* ---------- Map ---------- */
     #feedMap{height:420px;width:100%;margin-top:14px;border-radius:18px;display:none;border:1px solid var(--line);overflow:hidden;background:#070c16}
@@ -234,6 +236,10 @@
         <button class="btn btn-dark btn-sm" type="button" onclick="openReportModal()">
           <i class="ph ph-warning-circle"></i> Report an issue
         </button>
+        <label class="availability-toggle">
+          <input type="checkbox" id="verifiedAvailabilityOnly" onchange="loadFeed()" />
+          Verified availability only
+        </label>
         <span id="resultCount"></span>
       </div>
 
@@ -426,6 +432,7 @@
     let currentModalImages = [];
     let currentModalIndex = 0;
     let currentRating = 0;
+    let verifiedAvailabilityOnly = false;
 
     // Map
     let feedMap = null;
@@ -499,13 +506,17 @@
     async function loadFeed(){
       const container = document.getElementById("houseList");
       container.innerHTML = `<div class="skel" style="height:300px"></div><div class="skel" style="height:300px"></div><div class="skel" style="height:300px"></div>`;
+      verifiedAvailabilityOnly = document.getElementById("verifiedAvailabilityOnly").checked;
+      const endpoint = verifiedAvailabilityOnly
+        ? "/api/properties/verified-available"
+        : "/api/properties";
 
       // Optional analytics (non-blocking)
       try { fetch(`${API_BASE}/api/analytics/visit`, { method: "POST" }); } catch(_) {}
 
       try{
-        const res = await fetchWithTimeout(`${API_BASE}/api/properties`, {}, 15000);
-        const data = await res.json().catch(() => []);
+        const res = await fetchWithTimeout(`${API_BASE}${endpoint}`, {}, 15000);
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data?.error || "Failed to load properties");
 
         allProperties = Array.isArray(data) ? data : [];
@@ -513,15 +524,12 @@
 
         renderFeed(filteredProperties);
         updateMapMarkers(filteredProperties);
+        document.querySelector(".feed-head h2").textContent = verifiedAvailabilityOnly
+          ? "Recently confirmed available"
+          : "Latest listings";
 
       } catch(err){
-        container.innerHTML = `
-          <div class="feed-empty">
-            <i class="ph ph-cloud-slash"></i>
-            <div>Could not load properties — the backend looks offline.</div>
-            <div style="margin-top:8px;font-size:.85rem">Tip: <code>localStorage.setItem("API_BASE","https://YOUR-BACKEND.onrender.com")</code></div>
-          </div>
-        `;
+        container.innerHTML = `<div class="feed-empty"><i class="ph ph-cloud-slash"></i><div>${esc(err.message || "Could not load properties.")}</div></div>`;
       }
     }
 
@@ -531,13 +539,16 @@
       if (count) count.textContent = `${(list || []).length} result${(list || []).length === 1 ? "" : "s"}`;
 
       if (!list || list.length === 0){
-        container.innerHTML = `<div class="feed-empty"><i class="ph ph-magnifying-glass"></i><div>No results found. Try widening your filters.</div></div>`;
+        const message = verifiedAvailabilityOnly
+          ? "No listings have been recently confirmed available yet. Try turning off this filter to browse all listings."
+          : "No results found. Try widening your filters.";
+        container.innerHTML = `<div class="feed-empty"><i class="ph ph-magnifying-glass"></i><div>${message}</div></div>`;
         return;
       }
 
       container.innerHTML = list.map(h => {
         const id = propId(h);
-        const type = normalizeType(h.type || h.listing_type || "Rent");
+        const type = h.status === "Sold" ? "Sold" : normalizeType(h.type || h.listing_type || "Rent");
         const isSold = type === "Sold" || h.is_sold === true || h.status === "Sold";
         const featured = h.is_featured === true;
         const price = propPrice(h);
@@ -561,6 +572,7 @@
             </div>
             <div class="prop-body">
               ${propVerified(h) ? `<div class="verified-line"><i class="ph ph-seal-check"></i> Verified seller</div>` : ""}
+              ${h.availability_checked_at ? `<div class="verified-line"><i class="ph ph-clock"></i> Confirmed ${esc(formatCheckAge(h.availability_checked_at))}</div>` : ""}
               <div class="prop-price">${money(price)}${isRent ? " <small>/month</small>" : ""}</div>
               <h3 class="prop-title">${esc(h.title || "Property")}</h3>
               <div class="prop-meta">
@@ -572,6 +584,8 @@
                 ${
                   isSold
                     ? `<button class="btn btn-dark btn-sm prop-contact" disabled><i class="ph ph-lock"></i> Not available</button>`
+                    : verifiedAvailabilityOnly
+                      ? `<button class="btn btn-dark btn-sm prop-contact" disabled><i class="ph ph-lock"></i> Contact hidden in beta</button>`
                     : `<button class="btn btn-solid btn-sm prop-contact" onclick="event.stopPropagation(); contactHouse(${id});">
                          <i class="ph ph-whatsapp-logo"></i> Contact
                        </button>`
@@ -581,6 +595,18 @@
           </article>
         `;
       }).join("");
+    }
+
+    function formatCheckAge(value){
+      const checkedAt = new Date(value);
+      if (Number.isNaN(checkedAt.getTime())) return "recently";
+      const minutes = Math.max(0, Math.floor((Date.now() - checkedAt.getTime()) / 60000));
+      if (minutes < 1) return "just now";
+      if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days === 1 ? "" : "s"} ago`;
     }
 
     function applyFilters(){
@@ -746,7 +772,15 @@
 
       // WhatsApp button
       const phoneBtn = document.getElementById("modalPhone");
-      phoneBtn.onclick = () => contactHouse(Number(propId(house)));
+      if (verifiedAvailabilityOnly) {
+        phoneBtn.disabled = true;
+        phoneBtn.innerHTML = `<i class="ph ph-lock"></i> Contact hidden in beta`;
+        phoneBtn.onclick = null;
+      } else {
+        phoneBtn.disabled = false;
+        phoneBtn.innerHTML = `<i class="ph ph-whatsapp-logo"></i> Chat on WhatsApp`;
+        phoneBtn.onclick = () => contactHouse(Number(propId(house)));
+      }
 
       // Load reviews
       loadReviews(Number(propId(house)));

@@ -7,6 +7,15 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const {
+  availabilityFeedQuery,
+  toPublicAvailabilityProperty
+} = require('./services/availability-feed');
+const {
+  createConfirmationToken,
+  hashConfirmationToken,
+  isValidConfirmationToken
+} = require('./services/availability-confirmation');
 
 const app = express();
 
@@ -153,7 +162,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       message: "Success",
-      user: { id: user.user_id, name: user.full_name, role: user.role, plan: user.subscription_plan, phone: user.phone }
+      user: { id: user.user_id, name: user.full_name, email: user.email, role: user.role, plan: user.subscription_plan, phone: user.phone }
     });
   } catch (err) {
     res.status(500).json({ error: "Server Error" });
@@ -331,6 +340,241 @@ app.get('/api/properties', async (req, res) => {
   }
 });
 
+app.get('/api/properties/verified-available', async (req, res) => {
+  try {
+    const result = await pool.query(availabilityFeedQuery);
+    res.json(result.rows.map(toPublicAvailabilityProperty));
+  } catch (e) {
+    if (e.code === '42703') {
+      return res.status(503).json({
+        error: "Verified availability is not enabled. Apply the reviewed availability migration first."
+      });
+    }
+    if (e.code === '42P01') {
+      return res.status(503).json({ error: "The marketplace database schema is not available." });
+    }
+    console.error('Verified availability feed failed:', e);
+    res.status(500).json({ error: "Could not load verified availability." });
+  }
+});
+
+app.post('/api/properties/:id/availability-confirmation', async (req, res) => {
+  const propertyId = Number.parseInt(req.params.id, 10);
+  if (!Number.isSafeInteger(propertyId) || propertyId < 1) {
+    return res.status(400).json({ error: "Invalid property ID." });
+  }
+
+  let client;
+  let transactionOpen = false;
+  let tokenRecordCreated = false;
+  let tokenHash = null;
+  try {
+    client = await pool.connect();
+    await client.query('BEGIN');
+    transactionOpen = true;
+    const propertyResult = await client.query(`
+      SELECT p.property_id, p.owner_id, p.title, p.status, p.is_deleted, u.email
+      FROM public.properties p
+      JOIN public.users u ON u.user_id = p.owner_id
+      WHERE p.property_id = $1
+      FOR UPDATE OF p
+    `, [propertyId]);
+
+    if (!propertyResult.rows.length) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(404).json({ error: "Property not found." });
+    }
+
+    const property = propertyResult.rows[0];
+    const requestedEmail = String((req.body && req.body.email) || '').trim().toLowerCase();
+    if (!requestedEmail || requestedEmail !== String(property.email || '').trim().toLowerCase()) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(202).json({
+        message: "If the email matches the listing owner, a confirmation link will be sent."
+      });
+    }
+
+    if (property.status !== 'Available' || property.is_deleted) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(409).json({ error: "Only active available listings can be confirmed." });
+    }
+
+    await client.query(
+      'SELECT user_id FROM public.users WHERE user_id = $1 FOR UPDATE',
+      [property.owner_id]
+    );
+    const recentRequest = await client.query(`
+      SELECT 1
+      FROM public.availability_confirmation_tokens
+      WHERE property_id = $1 AND created_at > NOW() - INTERVAL '6 hours'
+      LIMIT 1
+    `, [propertyId]);
+    if (recentRequest.rows.length) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(429).json({ error: "A confirmation email was sent recently. Please wait six hours before requesting another." });
+    }
+    const ownerRequestCount = await client.query(`
+      SELECT COUNT(*)::INTEGER AS count
+      FROM public.availability_confirmation_tokens
+      WHERE owner_id = $1 AND created_at > NOW() - INTERVAL '1 hour'
+    `, [property.owner_id]);
+    if (ownerRequestCount.rows[0].count >= 3) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(429).json({ error: "Too many confirmation emails were requested. Please try again later." });
+    }
+
+    const { token, tokenHash: newTokenHash } = createConfirmationToken();
+    tokenHash = newTokenHash;
+    await client.query(`
+      UPDATE public.availability_confirmation_tokens
+      SET consumed_at = NOW()
+      WHERE property_id = $1 AND consumed_at IS NULL
+    `, [propertyId]);
+    await client.query(`
+      INSERT INTO public.availability_confirmation_tokens
+        (property_id, owner_id, token_hash, expires_at)
+      VALUES ($1, $2, $3, NOW() + INTERVAL '24 hours')
+    `, [propertyId, property.owner_id, tokenHash]);
+    await client.query('COMMIT');
+    transactionOpen = false;
+    tokenRecordCreated = true;
+
+    const frontendBase = process.env.FRONTEND_URL;
+    if (!frontendBase) throw new Error('FRONTEND_URL is not configured');
+    const confirmationUrl = new URL('/availability-confirm.html', frontendBase);
+    confirmationUrl.searchParams.set('token', token);
+    const safeTitle = String(property.title || 'your property').replace(/[<>&"]/g, '');
+
+    await transporter.sendMail({
+      from: `"InzuLink" <${process.env.EMAIL_USER || 'ephremdushime250@gmail.com'}>`,
+      to: property.email,
+      subject: 'Confirm your InzuLink listing availability',
+      text: `Confirm that "${safeTitle}" is still available by opening this link within 24 hours: ${confirmationUrl.toString()}`,
+      html: `<p>Please confirm that <strong>${safeTitle}</strong> is still available on InzuLink.</p><p><a href="${confirmationUrl.toString()}">Confirm availability</a></p><p>This one-time link expires in 24 hours. If you did not request it, you can ignore this email.</p>`
+    });
+
+    return res.json({ message: "Confirmation link sent to the registered owner email." });
+  } catch (e) {
+    if (client && transactionOpen) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Availability token transaction rollback failed:', rollbackError.message);
+      }
+    }
+    if (tokenRecordCreated && tokenHash) {
+      await pool.query(
+        "DELETE FROM public.availability_confirmation_tokens WHERE token_hash = $1 AND consumed_at IS NULL",
+        [tokenHash]
+      ).catch(cleanupError => console.error('Could not remove unsent availability token:', cleanupError.message));
+    }
+    if (e.code === '42P01' || e.code === '42703') {
+      return res.status(503).json({ error: "Availability confirmation is not enabled. Apply the reviewed migrations first." });
+    }
+    console.error('Availability confirmation email failed:', e);
+    return res.status(503).json({ error: "Could not send the confirmation email. Please try again later." });
+  } finally {
+    if (client) client.release();
+  }
+});
+
+app.post('/api/properties/confirm-availability', async (req, res) => {
+  const token = req.body && req.body.token;
+  if (!isValidConfirmationToken(token)) {
+    return res.status(400).json({ error: "Invalid or expired confirmation link." });
+  }
+
+  const tokenHash = hashConfirmationToken(token);
+  let client;
+  let transactionOpen = false;
+  try {
+    client = await pool.connect();
+    await client.query('BEGIN');
+    transactionOpen = true;
+    const propertyResult = await client.query(`
+      SELECT p.property_id, p.owner_id, p.status, p.is_deleted
+      FROM public.availability_confirmation_tokens t
+      JOIN public.properties p ON p.property_id = t.property_id
+      WHERE t.token_hash = $1
+        AND t.consumed_at IS NULL
+        AND t.expires_at > NOW()
+      FOR UPDATE OF p
+    `, [tokenHash]);
+
+    if (!propertyResult.rows.length) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(400).json({ error: "Invalid or expired confirmation link." });
+    }
+
+    const property = propertyResult.rows[0];
+    const tokenResult = await client.query(`
+      SELECT token_id
+      FROM public.availability_confirmation_tokens
+      WHERE token_hash = $1
+        AND property_id = $2
+        AND owner_id = $3
+        AND consumed_at IS NULL
+        AND expires_at > NOW()
+      FOR UPDATE
+    `, [tokenHash, property.property_id, property.owner_id]);
+
+    if (!tokenResult.rows.length) {
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return res.status(400).json({ error: "Invalid or expired confirmation link." });
+    }
+
+    if (property.status !== 'Available' || property.is_deleted) {
+      await client.query(`
+        UPDATE public.availability_confirmation_tokens
+        SET consumed_at = NOW()
+        WHERE token_id = $1
+      `, [tokenResult.rows[0].token_id]);
+      await client.query('COMMIT');
+      transactionOpen = false;
+      return res.status(409).json({ error: "This listing is no longer active and available." });
+    }
+
+    await client.query(`
+      UPDATE public.properties
+      SET availability_status = 'AVAILABLE',
+          availability_checked_at = NOW(),
+          expires_at = NOW() + INTERVAL '7 days',
+          unlock_count_since_check = 0
+      WHERE property_id = $1
+    `, [property.property_id]);
+    await client.query(`
+      UPDATE public.availability_confirmation_tokens
+      SET consumed_at = NOW()
+      WHERE token_id = $1
+    `, [tokenResult.rows[0].token_id]);
+    await client.query('COMMIT');
+    transactionOpen = false;
+    res.json({ message: "Availability confirmed. Your listing is verified for 7 days." });
+  } catch (e) {
+    if (client && transactionOpen) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Availability confirmation transaction rollback failed:', rollbackError.message);
+      }
+    }
+    if (e.code === '42P01' || e.code === '42703') {
+      return res.status(503).json({ error: "Availability confirmation is not enabled. Apply the reviewed migrations first." });
+    }
+    console.error('Availability confirmation failed:', e);
+    res.status(500).json({ error: "Could not confirm availability." });
+  } finally {
+    if (client) client.release();
+  }
+});
+
 app.get('/api/my-properties/:id', async (req, res) => {
   try {
     const r = await pool.query(`
@@ -366,8 +610,50 @@ app.delete('/api/properties/:id', async (req, res) => {
 });
 
 app.put('/api/properties/:id/status', async (req, res) => {
-  await pool.query('UPDATE Properties SET status=$1, status_updated_at=NOW() WHERE property_id=$2', [req.body.status, req.params.id]);
-  res.json({ msg: "Updated" });
+  const status = req.body && req.body.status;
+  const propertyId = Number.parseInt(req.params.id, 10);
+  if (!['Available', 'Sold'].includes(status)) {
+    return res.status(400).json({ error: "Status must be Available or Sold." });
+  }
+  if (!Number.isSafeInteger(propertyId) || propertyId < 1) {
+    return res.status(400).json({ error: "Invalid property ID." });
+  }
+
+  try {
+    const availabilityColumn = await pool.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'properties'
+          AND column_name = 'availability_status'
+      ) AS enabled
+    `);
+
+    if (availabilityColumn.rows[0].enabled) {
+      const result = await pool.query(`
+        UPDATE public.properties
+        SET status = $1,
+            status_updated_at = NOW(),
+            availability_status = CASE WHEN $1 = 'Sold' THEN 'OCCUPIED' ELSE NULL END,
+            availability_checked_at = NULL,
+            expires_at = NULL,
+            unlock_count_since_check = 0
+        WHERE property_id = $2
+        RETURNING property_id
+      `, [status, propertyId]);
+      if (!result.rows.length) return res.status(404).json({ error: "Property not found." });
+    } else {
+      const result = await pool.query(
+        'UPDATE Properties SET status=$1, status_updated_at=NOW() WHERE property_id=$2 RETURNING property_id',
+        [status, propertyId]
+      );
+      if (!result.rows.length) return res.status(404).json({ error: "Property not found." });
+    }
+    res.json({ msg: "Updated" });
+  } catch (e) {
+    console.error('Property status update failed:', e);
+    res.status(500).json({ error: "Could not update property status." });
+  }
 });
 
 app.post('/api/properties/:id/click', async (req, res) => {
