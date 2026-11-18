@@ -1,0 +1,322 @@
+.auth-page {
+  min-height: 100vh;
+  color: #f8fafc;
+  background:
+    radial-gradient(ellipse at 18% 22%, rgba(185, 68, 48, .2), transparent 34rem),
+    radial-gradient(ellipse at 90% 82%, rgba(245, 158, 11, .1), transparent 30rem),
+    #090b12;
+}
+
+.auth-wrap {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 38px 0 56px;
+}
+
+.auth-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr);
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 28px;
+  background: #15151d;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .48), 0 0 45px rgba(185, 68, 48, .12);
+  animation: auth-card-in .7s cubic-bezier(.2, .75, .25, 1) both;
+}
+
+.auth-welcome {
+  position: relative;
+  display: flex;
+  min-height: 610px;
+  align-items: center;
+  overflow: hidden;
+  padding: 48px 40px;
+  color: #fff7ed;
+  background: #15151d;
+}
+
+.auth-welcome::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(145deg, #f17b50 0%, #c64e36 55%, #9f382f 100%);
+  clip-path: polygon(0 0, 100% 0, 61% 100%, 0 100%);
+  content: "";
+  animation: auth-diagonal-in .85s cubic-bezier(.2, .75, .25, 1) .12s both;
+}
+
+.auth-welcome::after {
+  position: absolute;
+  right: 6%;
+  bottom: 8%;
+  width: 170px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(255, 255, 255, .035), 0 0 0 44px rgba(255, 255, 255, .025);
+  content: "";
+  pointer-events: none;
+}
+
+.auth-welcome-content {
+  position: relative;
+  z-index: 1;
+  max-width: 330px;
+  animation: auth-copy-in .65s ease .28s both;
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 48px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: -.3px;
+}
+
+.auth-brand i {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, .14);
+  font-size: 1.15rem;
+}
+
+.auth-eyebrow {
+  margin: 0 0 12px;
+  color: rgba(255, 247, 237, .8);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.auth-welcome h2 {
+  max-width: 290px;
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -1.8px;
+  line-height: 1.02;
+}
+
+.auth-welcome p:last-child {
+  max-width: 300px;
+  margin: 0;
+  color: rgba(255, 247, 237, .88);
+  font-size: .98rem;
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.auth-content {
+  align-self: center;
+  min-width: 0;
+  padding: 42px clamp(24px, 5vw, 62px);
+  animation: auth-copy-in .6s ease .2s both;
+}
+
+.auth-content .badge {
+  border-color: rgba(245, 158, 11, .3);
+  background: rgba(245, 158, 11, .1);
+  color: #fbbf24;
+}
+
+.auth-content h1 {
+  margin-top: 16px;
+  color: #f8fafc;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+}
+
+.auth-content .sub,
+.auth-content .hint {
+  color: #a1a1aa;
+}
+
+.auth-content .form {
+  gap: 15px;
+}
+
+.auth-content label {
+  color: #d4d4d8;
+}
+
+.auth-content .input,
+.auth-content .select,
+.auth-content .pw-toggle {
+  min-width: 0;
+  border-color: #3f3f46;
+  background: #1d1d27;
+  color: #f8fafc;
+}
+
+.auth-content .input::placeholder {
+  color: #71717a;
+}
+
+.auth-content .input:focus,
+.auth-content .select:focus {
+  border-color: #f17b50;
+  box-shadow: 0 0 0 3px rgba(241, 123, 80, .16);
+}
+
+.auth-content .pw-toggle:hover,
+.auth-content .btn-outline:hover {
+  background: #292933;
+}
+
+.auth-content .check {
+  color: #d4d4d8;
+}
+
+.auth-content .link {
+  color: #fb923c;
+}
+
+.auth-content .btn {
+  min-height: 48px;
+  border-radius: 13px;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.auth-content .btn-primary {
+  background: linear-gradient(110deg, #f17b50, #c64e36);
+  box-shadow: 0 9px 22px rgba(198, 78, 54, .2);
+  color: #fff;
+}
+
+.auth-content .btn-primary:hover {
+  background: linear-gradient(110deg, #fb8b5d, #d65b40);
+  box-shadow: 0 12px 26px rgba(198, 78, 54, .3);
+  transform: translateY(-1px);
+}
+
+.auth-content .btn-outline {
+  border-color: #3f3f46;
+  background: transparent;
+  color: #e4e4e7;
+  text-decoration: none;
+}
+
+.auth-content .hint code {
+  border-color: #3f3f46;
+  background: #1d1d27;
+  color: #d4d4d8;
+  overflow-wrap: anywhere;
+}
+
+.auth-content .mini {
+  border-color: rgba(245, 158, 11, .24);
+  background: rgba(245, 158, 11, .08);
+  color: #fcd9a2;
+}
+
+.auth-content .mini b,
+.auth-content .mini strong {
+  color: #fbbf24;
+}
+
+.auth-card.is-leaving {
+  animation: auth-card-out .24s ease forwards;
+}
+
+@keyframes auth-card-in {
+  from { opacity: 0; transform: translateY(20px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes auth-card-out {
+  to { opacity: 0; transform: translateY(12px) scale(.99); }
+}
+
+@keyframes auth-diagonal-in {
+  from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+  to { clip-path: polygon(0 0, 100% 0, 61% 100%, 0 100%); }
+}
+
+@keyframes auth-copy-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 760px) {
+  .auth-wrap {
+    width: min(560px, calc(100% - 28px));
+    padding: 24px 0 38px;
+  }
+
+  .auth-card {
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+  }
+
+  .auth-welcome {
+    min-height: 220px;
+    padding: 28px;
+  }
+
+  .auth-welcome::before {
+    clip-path: polygon(0 0, 100% 0, 100% 72%, 0 100%);
+    animation-name: auth-mobile-diagonal-in;
+  }
+
+  .auth-welcome::after {
+    right: 7%;
+    bottom: -34%;
+    width: 140px;
+  }
+
+  .auth-brand {
+    margin-bottom: 22px;
+  }
+
+  .auth-welcome h2 {
+    max-width: 360px;
+    font-size: 2rem;
+  }
+
+  .auth-welcome p:last-child {
+    max-width: 380px;
+    font-size: .9rem;
+  }
+
+  .auth-content {
+    padding: 30px 26px 34px;
+  }
+}
+
+@keyframes auth-mobile-diagonal-in {
+  from { clip-path: polygon(0 0, 0 0, 0 0, 0 0); }
+  to { clip-path: polygon(0 0, 100% 0, 100% 72%, 0 100%); }
+}
+
+@media (max-width: 480px) {
+  .auth-content {
+    padding: 26px 20px 30px;
+  }
+
+  .auth-content .row {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card,
+  .auth-welcome::before,
+  .auth-welcome-content,
+  .auth-content {
+    animation: none !important;
+  }
+
+  .auth-card.is-leaving {
+    opacity: 0;
+    transition: opacity .01ms;
+  }
+}
